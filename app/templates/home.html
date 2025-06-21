@@ -1,0 +1,959 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- <div class="container mt-5">
+    <h1 class="text-center">Chào mừng đến với Flask Auth</h1>
+
+    {% if username %}
+    <div class="text-center mt-4">
+        <p>Xin chào <strong>{{ username }}</strong>!</p>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Đăng xuất</a>
+    </div>
+    {% else %}
+    <div class="text-center mt-4">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Đăng nhập</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-success">Đăng ký</a>
+    </div>
+    {% endif %} -->
+
+<!-- </div> -->
+<style>
+    /* Universal Box-Sizing */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+
+    /* Main Container Layout */
+    .container {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+        width: 100px;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: fixed;
+        /* Keeps sidebar in place */
+        top: 64px;
+        height: 100vh;
+        /* Full height */
+        left: 0;
+        border-right: 1px solid #e0e0e0;
+        background-color: #fff;
+    }
+
+    .sidebar-logo {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .sidebar-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 0.85em;
+        transition: color 0.3s ease;
+        color: #000 !important;
+        ;
+        font-weight: 600;
+        width: 100%;
+    }
+
+    .sidebar-nav ul {
+        list-style: none;
+        width: 100%;
+        padding-inline-start: 0px;
+    }
+
+    .sidebar-nav li {
+        margin-bottom: 25px;
+    }
+
+    .sidebar-nav li a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.85em;
+        transition: color 0.3s ease;
+    }
+
+    .sidebar-nav li a:hover {
+        color: #fff;
+    }
+
+    .sidebar-nav li.active a {
+        color: #fff;
+        font-weight: bold;
+        position: relative;
+    }
+
+    .sidebar-nav li.active a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 100%;
+        /* Adjust height as needed to cover the active item */
+        background-color: #fff;
+        border-radius: 0 4px 4px 0;
+    }
+
+
+    .sidebar-nav .icon {
+        font-size: 24px;
+        margin-bottom: 5px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* For specific icons, you'd use background-image, SVG, or icon font here */
+    }
+
+    .sidebar-bottom-icons {
+        margin-top: auto;
+        /* Pushes these icons to the bottom */
+        padding-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sidebar-bottom-icons .icon-item {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .sidebar-bottom-icons .icon-item:hover {
+        color: #fff;
+    }
+
+    /* Main Content Area Styling */
+    .main-content {
+        flex-grow: 1;
+        padding: 30px;
+        overflow-y: auto;
+        /* Allows scrolling if content overflows */
+    }
+
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        background: linear-gradient(to right, #6A11CB 0%, #2575FC 100%);
+        /* Gradient background */
+        border-radius: 15px;
+        padding: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+        margin-bottom: 40px;
+        min-height: 300px;
+        /* Ensure sufficient height */
+        overflow: hidden;
+        /* Hide overflowing slider content */
+    }
+
+    .hero-slider {
+        display: flex;
+        /* Use flexbox for slides */
+        transition: transform 0.5s ease-in-out;
+        /* Smooth transition for slides */
+        width: 100%;
+        /* Occupy full width of its parent */
+    }
+
+    .hero-slider .slide {
+        flex: 0 0 100%;
+        /* Each slide takes full width */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        opacity: 0;
+        position: absolute;
+        /* Position absolute for overlapping slides */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.5s ease-in-out;
+        padding: 40px;
+        /* Re-apply padding for slides */
+    }
+
+    .hero-slider .slide.active {
+        opacity: 1;
+        position: relative;
+        /* Active slide visible */
+    }
+
+
+    .hero-text-content {
+        flex: 1;
+        max-width: 60%;
+        /* Adjust width for text content */
+        padding-right: 30px;
+    }
+
+    .hero-text-content h1 {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .hero-text-content p {
+        font-size: 1.1em;
+        margin-bottom: 25px;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #fff;
+        color: #6A11CB;
+    }
+
+    .btn-primary:hover {
+        background-color: #eee;
+    }
+
+    .hero-image-placeholder {
+        flex: 1;
+        max-width: 40%;
+        height: 250px;
+        /* Adjust height as needed */
+        background: linear-gradient(45deg, #a7b7eb, #d0e7ff);
+        /* Placeholder gradient for illustration */
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9em;
+        color: #555;
+        /* In a real scenario, this would be an actual image or complex SVG */
+    }
+
+    /* Slider Navigation Dots */
+    .slider-nav-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 40px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .dot.active {
+        background-color: #fff;
+    }
+
+    /* Slider Arrows */
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        z-index: 10;
+    }
+
+    .slider-arrow:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .prev-arrow {
+        left: 20px;
+    }
+
+    .next-arrow {
+        right: 20px;
+    }
+
+
+    /* Course Section */
+    .section-title {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+    }
+
+    .tag-new {
+        background-color: #e0f7fa;
+        /* Light blue background */
+        color: #00bcd4;
+        /* Cyan text */
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-size: 0.7em;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .course-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        /* Responsive grid */
+        gap: 30px;
+    }
+
+    .course-card {
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #fff;
+        /* Default text color for cards */
+    }
+
+    /* Card Gradients */
+    .course-card.gradient-blue {
+        background: linear-gradient(135deg, #5A35EB 0%, #7653F5 100%);
+    }
+
+    .course-card.gradient-yellow {
+        background: linear-gradient(135deg, #FAD74B 0%, #FFB648 100%);
+        color: #333;
+        /* Darker text for light background */
+    }
+
+    .course-card.gradient-pink {
+        background: linear-gradient(135deg, #FE6A6A 0%, #FF9A8B 100%);
+    }
+
+    .course-card .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .course-card .crown-icon {
+        font-size: 24px;
+        margin-right: 10px;
+        /* Could be an SVG or image here */
+    }
+
+    .course-card h3 {
+        font-size: 1.4em;
+        font-weight: 600;
+        white-space: nowrap;
+        /* Prevent breaking title */
+    }
+
+    .course-card .pro-text,
+    .course-card .sass-text {
+        font-weight: bold;
+    }
+
+    .course-card .pro-text {
+        color: #fff;
+        /* Match background for blue card */
+    }
+
+    .course-card.gradient-yellow .pro-text {
+        color: #E27900;
+        /* Specific color for yellow card */
+    }
+
+    .course-card.gradient-pink .sass-text {
+        color: #FF0000;
+        /* Specific color for pink card */
+    }
+
+
+    .course-card .card-desc {
+        font-size: 0.95em;
+        margin-bottom: 20px;
+        opacity: 0.9;
+    }
+
+    .course-card .prices {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+    }
+
+    .course-card .original-price {
+        text-decoration: line-through;
+        font-size: 0.9em;
+        opacity: 0.7;
+    }
+
+    .course-card .current-price {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #fff;
+        /* Default for dark cards */
+    }
+
+    .course-card.gradient-yellow .current-price {
+        color: #E27900;
+        /* Specific color for yellow card */
+    }
+
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+        .hero-text-content {
+            max-width: 70%;
+        }
+
+        .hero-image-placeholder {
+            max-width: 30%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 60px;
+            padding-top: 15px;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-nav span {
+            display: none;
+            /* Hide text on smaller sidebar */
+        }
+
+        .sidebar-bottom-icons {
+            gap: 15px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .hero-section {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+            min-height: auto;
+        }
+
+        .hero-text-content {
+            max-width: 100%;
+            padding-right: 0;
+            margin-bottom: 20px;
+        }
+
+        .hero-image-placeholder {
+            max-width: 80%;
+            height: 200px;
+        }
+
+        .slider-nav-dots {
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 10px;
+        }
+
+        .slider-arrow {
+            width: 35px;
+            height: 35px;
+            font-size: 1.2em;
+        }
+
+        .course-cards {
+            grid-template-columns: 1fr;
+            /* Stack cards on very small screens */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-content {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+        }
+
+        .hero-text-content h1 {
+            font-size: 1.8em;
+        }
+
+        .hero-text-content p {
+            font-size: 0.9em;
+        }
+    }
+</style>
+<style>
+    /* Universal Box-Sizing & Basic Body Reset */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+
+
+    /* Main Header Styling */
+    .main-header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 72px;
+        /* Fixed height for the header */
+        display: flex;
+        padding: 0 20px;
+        align-items: center;
+        background-color: #ffffff;
+        justify-content: space-around;
+        /* Padding on left and right */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-bottom: 1px solid #e0e0e0;
+        /* Subtle shadow at the bottom */
+        z-index: 1000;
+    }
+
+    /* Left Section: Logo & Text */
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        /* Space between logo square and text */
+    }
+
+    .logo-square {
+        width: 36px;
+        height: 36px;
+        background-color: #FF5E00;
+        /* Orange color from image */
+        border-radius: 8px;
+        /* Slightly rounded corners */
+    }
+
+    .logo-text {
+        font-size: 1.15em;
+        font-weight: 600;
+        /* Semi-bold */
+        color: #333333;
+        white-space: nowrap;
+        /* Prevent text wrapping */
+    }
+
+    /* Center Section: Search Bar */
+    .header-center {
+        flex-grow: 1;
+        /* Allows search bar to take available space */
+        display: flex;
+        justify-content: center;
+        /* Center the search bar within its flexible container */
+    }
+
+    .search-bar {
+        width: 60%;
+        /* Occupy full width of its container */
+        max-width: 580px;
+        /* Max width for the search bar as seen in image */
+        height: 44px;
+        background-color: #f9f9f9;
+        /* Light grey background */
+        border: 1px solid #e0e0e0;
+        /* Light grey border */
+        border-radius: 9999px;
+        /* Pill shape */
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 10px;
+    }
+
+    .search-icon {
+        font-size: 1.1em;
+        color: #888888;
+    }
+
+    .search-bar input {
+        flex-grow: 1;
+        /* Input takes remaining space */
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 1em;
+        color: #333333;
+        padding: 0;
+        /* Remove default input padding */
+    }
+
+    .search-bar input::placeholder {
+        color: #b0b0b0;
+    }
+
+    /* Right Section: My Courses & Notification */
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        /* Space between text and icon */
+        margin-left: 40px;
+        /* Push to the right, provide some space from search bar */
+        white-space: nowrap;
+        /* Prevent text wrapping */
+    }
+
+    .my-courses-text {
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #333333;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .my-courses-text:hover {
+        color: #007bff;
+        /* Example hover effect */
+    }
+
+    .notification-icon {
+        position: relative;
+        font-size: 1.4em;
+        /* Size of the bell icon */
+        color: #888888;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .notification-icon:hover {
+        color: #333333;
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: 0px;
+        /* Adjust as needed */
+        right: 0px;
+        /* Adjust as needed */
+        width: 8px;
+        height: 8px;
+        background-color: #FF4D4D;
+        /* Red dot */
+        border-radius: 50%;
+        border: 1px solid #ffffff;
+        /* White border around the dot */
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 900px) {
+        .main-header {
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            max-width: 450px;
+        }
+
+        .header-right {
+            gap: 15px;
+            margin-left: 20px;
+        }
+
+        .my-courses-text {
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .main-header {
+            height: 60px;
+            /* Slightly shorter header */
+        }
+
+        .logo-square {
+            width: 30px;
+            height: 30px;
+        }
+
+        .logo-text {
+            font-size: 1em;
+        }
+
+        .search-bar {
+            height: 40px;
+            max-width: 300px;
+            padding: 0 15px;
+        }
+
+        .search-bar input {
+            font-size: 0.9em;
+        }
+
+        .my-courses-text {
+            display: none;
+            /* Hide text on smaller screens if space is tight */
+        }
+
+        .header-right {
+            margin-left: auto;
+            /* Push icons to the very right */
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-header {
+            padding: 0 15px;
+        }
+
+        .logo-text {
+            display: none;
+            /* Hide text, just show logo square */
+        }
+
+        .header-left {
+            gap: 0;
+            /* No gap if text is hidden */
+        }
+
+        .search-bar {
+            max-width: 200px;
+            /* Make search bar smaller */
+            padding: 0 10px;
+        }
+
+        .header-right {
+            gap: 15px;
+        }
+    }
+</style>
+
+
+<header class="main-header">
+    <div class="header-left">
+        <div class="logo-square"></div>
+        <span class="logo-text">Học Lập Trình Để Đi Làm</span>
+    </div>
+
+    <div class="header-center">
+        <div class="search-bar">
+            <span class="search-icon">🔍</span> <input type="text" placeholder="Tìm kiếm khóa học, bài viết, video...">
+        </div>
+    </div>
+
+    <div class="header-right">
+        <span class="my-courses-text">Khoá học của tôi</span>
+        <div class="notification-icon">
+            <span class="bell-icon">🔔</span>
+            <div class="notification-dot"></div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="active">
+                    <a href="#" class="sidebar-link">
+                        <div class="icon">🏠</div> <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link">
+                        <div class="icon">🗺️</div> <span>Lộ trình</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link">
+                        <div class="icon">✍️</div> <span>Bài viết</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-bottom-icons">
+            <div class="icon-item">🌐</div>
+            <div class="icon-item">⚙️</div>
+            <div class="icon-item">🛒</div>
+            <div class="icon-item">💬</div>
+            <div class="icon-item">☀️</div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <div class="hero-slider">
+                <div class="slide active">
+                    <div class="hero-text-content">
+                        <h1>Thành Quả của Học Viên</h1>
+                        <p>Để đạt được kết quả tốt trong mọi việc ta cần xác định mục tiêu rõ ràng cho việc đó. Học tập
+                            cũng không là ngoại lệ.</p>
+                        <button class="btn btn-primary">XEM THÀNH QUẢ</button>
+                    </div>
+                    <div class="hero-image-placeholder">
+                    </div>
+                </div>
+            </div>
+
+            <div class="slider-nav-dots">
+                <span class="dot active" data-slide="0"></span>
+                <span class="dot" data-slide="1"></span>
+                <span class="dot" data-slide="2"></span>
+                <span class="dot" data-slide="3"></span>
+                <span class="dot" data-slide="4"></span>
+            </div>
+            <button class="slider-arrow prev-arrow">&lt;</button>
+            <button class="slider-arrow next-arrow">&gt;</button>
+        </section>
+
+        <section class="course-section">
+            <h2 class="section-title">
+                Khóa học Pro <span class="tag-new">MỚI</span>
+            </h2>
+            <div class="course-cards">
+                <div class="course-card gradient-blue">
+                    <div class="card-header">
+                        <div class="crown-icon">👑</div>
+                        <h3>HTML, CSS <span class="pro-text">Pro</span></h3>
+                    </div>
+                    <p class="card-desc">Cho người mới bắt đầu</p>
+                    <div class="prices">
+                        <span class="original-price">2.500.000đ</span>
+                        <span class="current-price">1.299.000đ</span>
+                    </div>
+                </div>
+
+                <div class="course-card gradient-yellow">
+                    <div class="card-header">
+                        <div class="crown-icon">👑</div>
+                        <h3>JavaScript <span class="pro-text">Pro</span></h3>
+                    </div>
+                    <p class="card-desc">Cho người mới bắt đầu</p>
+                    <div class="prices">
+                        <span class="original-price">3.299.000đ</span>
+                        <span class="current-price">1.399.000đ</span>
+                    </div>
+                </div>
+
+                <div class="course-card gradient-pink">
+                    <div class="card-header">
+                        <div class="crown-icon">👑</div>
+                        <h3>Ngôn ngữ <span class="sass-text">Sass</span></h3>
+                    </div>
+                    <p class="card-desc">Cho Frontend Developer</p>
+                    <div class="prices">
+                        <span class="original-price">400.000đ</span>
+                        <span class="current-price">299.000đ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = document.querySelectorAll('.hero-slider .slide');
+        const dots = document.querySelectorAll('.slider-nav-dots .dot');
+        const prevArrow = document.querySelector('.prev-arrow');
+        const nextArrow = document.querySelector('.next-arrow');
+
+        let currentSlide = 0;
+
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Hide all slides and remove active class from dots
+            slides.forEach((slide) => {
+                slide.classList.remove('active');
+            });
+            dots.forEach((dot) => {
+                dot.classList.remove('active');
+            });
+
+            // Show the current slide and activate the corresponding dot
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        // Event listener for previous arrow
+        prevArrow.addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        // Event listener for next arrow
+        nextArrow.addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        // Event listeners for dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+
+        // Initialize the first slide
+        showSlide(currentSlide);
+
+        // Optional: Auto - slide
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000); // Change slide every 5 seconds
+    });
+</script>
+{% endblock %}
