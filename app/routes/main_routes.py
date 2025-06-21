@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, redirect, url_for
 
 main_bp = Blueprint('main', __name__)
 
@@ -6,4 +6,4 @@ main_bp = Blueprint('main', __name__)
 def home():
     if 'username' in session:
         return render_template('home.html', username=session['username'])
-    return render_template('home.html')
+    return redirect(url_for('auth.login'))
