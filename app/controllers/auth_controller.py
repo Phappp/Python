@@ -11,18 +11,35 @@ class AuthController:
     OTP_EXPIRATION = 300  # 5 minutes in seconds
 
     @staticmethod
+    def _send_otp_email(recipient, otp):
+        try:
+            msg = Message("Mã OTP xác thực của bạn",
+                          sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                          recipients=[recipient])
+            msg.body = f"Mã OTP của bạn là: {otp}. Mã này sẽ hết hạn sau 5 phút."
+            mail.send(msg)
+            current_app.logger.info(f"Đã gửi OTP tới {recipient}")
+            return True
+        except Exception as e:
+            current_app.logger.error(f"Lỗi gửi email: {e}")
+            return False
+
+    @staticmethod
     def register(form):
         if form.validate_on_submit():
             username = form.username.data
+            email = form.email.data
             password = form.password.data
             role = form.role.data
             
             if User.find_by_username(username) is None:
-                User.create(username, password, role)
-                flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
-                return redirect(url_for('auth.login'))
-            
-            flash('Tên người dùng đã tồn tại!', 'danger')
+                if User.find_by_email(email) is None:
+                    User.create(username, email, password, role)
+                    flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
+                    return redirect(url_for('auth.login'))
+                flash('Email đã tồn tại!', 'danger')
+            else:
+                flash('Tên người dùng đã tồn tại!', 'danger')
         return None
     
 
@@ -39,14 +56,20 @@ class AuthController:
             user = User.find_by_username(username)
             
             if user and User.check_password(user, password):
+                otp = ''.join(random.choices(string.digits, k=6))
 
-                session['username'] = username
-                session['role'] = user['role']
-                flash('Đăng nhập thành công!', 'success')
-                return redirect(url_for('main.home'))
+                if AuthController._send_otp_email(user['email'], otp):
+                    session['auth_otp'] = otp
+                    session['auth_otp_time'] = int(time.time())
+                    session['auth_otp_username'] = user['username']
+                    session['role'] = user['role']
 
-            
-            flash('Tên người dùng hoặc mật khẩu không đúng!', 'danger')
+                    flash('Một mã OTP đã được gửi đến email của bạn.', 'info')
+                    return redirect(url_for('auth.verify_otp'))
+                else:
+                    flash('Không thể gửi email OTP. Vui lòng thử lại sau.', 'danger')
+            else:
+                flash('Tên người dùng hoặc mật khẩu không đúng!', 'danger')
         return None
     
     @staticmethod
