@@ -1,22 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center">Chào mừng đến với Flask Auth</h1>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    {% if username %}
-    <div class="text-center mt-4">
-        <p>Xin chào <strong>{{ username }}</strong>! (Vai trò: <strong>{{ role_display }}</strong>)</p>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Đăng xuất</a>
-    </div>
-    {% else %}
-    <div class="text-center mt-4">
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Đăng nhập</a>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-success">Đăng ký</a>
-    </div>
-    {% endif %}
-<<<<<<< HEAD
-</div>
 <style>
     /* Universal Box-Sizing */
     *,
@@ -26,7 +13,6 @@
         margin: 0;
         padding: 0;
     }
-
 
     /* Main Container Layout */
     .container {
@@ -42,10 +28,8 @@
         flex-direction: column;
         align-items: center;
         position: fixed;
-        /* Keeps sidebar in place */
         top: 64px;
         height: 100vh;
-        /* Full height */
         left: 0;
         border-right: 1px solid #e0e0e0;
         background-color: #fff;
@@ -68,7 +52,6 @@
         font-size: 0.85em;
         transition: color 0.3s ease;
         color: #000 !important;
-        ;
         font-weight: 600;
         width: 100%;
     }
@@ -111,11 +94,9 @@
         transform: translateY(-50%);
         width: 4px;
         height: 100%;
-        /* Adjust height as needed to cover the active item */
         background-color: #fff;
         border-radius: 0 4px 4px 0;
     }
-
 
     .sidebar-nav .icon {
         font-size: 24px;
@@ -125,12 +106,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        /* For specific icons, you'd use background-image, SVG, or icon font here */
     }
 
     .sidebar-bottom-icons {
         margin-top: auto;
-        /* Pushes these icons to the bottom */
         padding-bottom: 20px;
         display: flex;
         flex-direction: column;
@@ -153,14 +132,12 @@
         flex-grow: 1;
         padding: 30px;
         overflow-y: auto;
-        /* Allows scrolling if content overflows */
     }
 
     /* Hero Section */
     .hero-section {
         position: relative;
         background: linear-gradient(to right, #6A11CB 0%, #2575FC 100%);
-        /* Gradient background */
         border-radius: 15px;
         padding: 40px;
         display: flex;
@@ -169,49 +146,38 @@
         color: #fff;
         margin-bottom: 40px;
         min-height: 300px;
-        /* Ensure sufficient height */
         overflow: hidden;
-        /* Hide overflowing slider content */
     }
 
     .hero-slider {
         display: flex;
-        /* Use flexbox for slides */
         transition: transform 0.5s ease-in-out;
-        /* Smooth transition for slides */
         width: 100%;
-        /* Occupy full width of its parent */
     }
 
     .hero-slider .slide {
         flex: 0 0 100%;
-        /* Each slide takes full width */
         display: flex;
         justify-content: space-between;
         align-items: center;
         opacity: 0;
         position: absolute;
-        /* Position absolute for overlapping slides */
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         transition: opacity 0.5s ease-in-out;
         padding: 40px;
-        /* Re-apply padding for slides */
     }
 
     .hero-slider .slide.active {
         opacity: 1;
         position: relative;
-        /* Active slide visible */
     }
-
 
     .hero-text-content {
         flex: 1;
         max-width: 60%;
-        /* Adjust width for text content */
         padding-right: 30px;
     }
 
@@ -251,16 +217,13 @@
         flex: 1;
         max-width: 40%;
         height: 250px;
-        /* Adjust height as needed */
         background: linear-gradient(45deg, #a7b7eb, #d0e7ff);
-        /* Placeholder gradient for illustration */
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9em;
         color: #555;
-        /* In a real scenario, this would be an actual image or complex SVG */
     }
 
     /* Slider Navigation Dots */
@@ -317,8 +280,7 @@
         right: 20px;
     }
 
-
-    /* Course Section */
+    /* Course Section - Horizontal Layout */
     .section-title {
         font-size: 1.8em;
         margin-bottom: 25px;
@@ -330,9 +292,7 @@
 
     .tag-new {
         background-color: #e0f7fa;
-        /* Light blue background */
         color: #00bcd4;
-        /* Cyan text */
         padding: 4px 10px;
         border-radius: 5px;
         font-size: 0.7em;
@@ -340,14 +300,42 @@
         text-transform: uppercase;
     }
 
+    /* Horizontal Course Cards Container */
+    .course-cards-container {
+        position: relative;
+        margin-bottom: 40px;
+    }
+
     .course-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        /* Responsive grid */
-        gap: 30px;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding: 10px 0;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide scrollbar but keep functionality */
+    .course-cards::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .course-cards::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .course-cards::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .course-cards::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
     }
 
     .course-card {
+        flex: 0 0 320px;
         background-color: #fff;
         border-radius: 15px;
         padding: 25px;
@@ -356,7 +344,13 @@
         flex-direction: column;
         justify-content: space-between;
         color: #fff;
-        /* Default text color for cards */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
     }
 
     /* Card Gradients */
@@ -367,11 +361,18 @@
     .course-card.gradient-yellow {
         background: linear-gradient(135deg, #FAD74B 0%, #FFB648 100%);
         color: #333;
-        /* Darker text for light background */
     }
 
     .course-card.gradient-pink {
         background: linear-gradient(135deg, #FE6A6A 0%, #FF9A8B 100%);
+    }
+
+    .course-card.gradient-green {
+        background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    }
+
+    .course-card.gradient-purple {
+        background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
     }
 
     .course-card .card-header {
@@ -381,16 +382,15 @@
     }
 
     .course-card .crown-icon {
-        font-size: 24px;
+        font-size: 20px;
         margin-right: 10px;
-        /* Could be an SVG or image here */
+        color: #FFD700;
     }
 
     .course-card h3 {
-        font-size: 1.4em;
+        font-size: 1.3em;
         font-weight: 600;
         white-space: nowrap;
-        /* Prevent breaking title */
     }
 
     .course-card .pro-text,
@@ -400,24 +400,21 @@
 
     .course-card .pro-text {
         color: #fff;
-        /* Match background for blue card */
     }
 
     .course-card.gradient-yellow .pro-text {
         color: #E27900;
-        /* Specific color for yellow card */
     }
 
     .course-card.gradient-pink .sass-text {
         color: #FF0000;
-        /* Specific color for pink card */
     }
 
-
     .course-card .card-desc {
-        font-size: 0.95em;
+        font-size: 0.9em;
         margin-bottom: 20px;
         opacity: 0.9;
+        line-height: 1.4;
     }
 
     .course-card .prices {
@@ -428,22 +425,56 @@
 
     .course-card .original-price {
         text-decoration: line-through;
-        font-size: 0.9em;
+        font-size: 0.85em;
         opacity: 0.7;
     }
 
     .course-card .current-price {
-        font-size: 1.5em;
+        font-size: 1.4em;
         font-weight: bold;
         color: #fff;
-        /* Default for dark cards */
     }
 
     .course-card.gradient-yellow .current-price {
         color: #E27900;
-        /* Specific color for yellow card */
     }
 
+    /* Scroll Navigation Arrows */
+    .scroll-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll-nav:hover {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .scroll-nav.prev {
+        left: -20px;
+    }
+
+    .scroll-nav.next {
+        right: -20px;
+    }
+
+    .scroll-nav i {
+        color: #333;
+        font-size: 14px;
+    }
 
     /* Responsive Adjustments */
     @media (max-width: 1024px) {
@@ -453,6 +484,10 @@
 
         .hero-image-placeholder {
             max-width: 30%;
+        }
+
+        .scroll-nav {
+            display: none;
         }
     }
 
@@ -468,7 +503,6 @@
 
         .sidebar-nav span {
             display: none;
-            /* Hide text on smaller sidebar */
         }
 
         .sidebar-bottom-icons {
@@ -509,9 +543,8 @@
             font-size: 1.2em;
         }
 
-        .course-cards {
-            grid-template-columns: 1fr;
-            /* Stack cards on very small screens */
+        .course-card {
+            flex: 0 0 280px;
         }
     }
 
@@ -531,8 +564,14 @@
         .hero-text-content p {
             font-size: 0.9em;
         }
+
+        .course-card {
+            flex: 0 0 260px;
+            padding: 20px;
+        }
     }
 </style>
+
 <style>
     /* Universal Box-Sizing & Basic Body Reset */
     * {
@@ -540,8 +579,6 @@
         margin: 0;
         padding: 0;
     }
-
-
 
     /* Main Header Styling */
     .main-header {
@@ -551,16 +588,13 @@
         left: 0;
         width: 100%;
         height: 72px;
-        /* Fixed height for the header */
         display: flex;
         padding: 0 20px;
         align-items: center;
         background-color: #ffffff;
         justify-content: space-around;
-        /* Padding on left and right */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         border-bottom: 1px solid #e0e0e0;
-        /* Subtle shadow at the bottom */
         z-index: 1000;
     }
 
@@ -569,48 +603,36 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        /* Space between logo square and text */
     }
 
     .logo-square {
         width: 36px;
         height: 36px;
         background-color: #FF5E00;
-        /* Orange color from image */
         border-radius: 8px;
-        /* Slightly rounded corners */
     }
 
     .logo-text {
         font-size: 1.15em;
         font-weight: 600;
-        /* Semi-bold */
         color: #333333;
         white-space: nowrap;
-        /* Prevent text wrapping */
     }
 
     /* Center Section: Search Bar */
     .header-center {
         flex-grow: 1;
-        /* Allows search bar to take available space */
         display: flex;
         justify-content: center;
-        /* Center the search bar within its flexible container */
     }
 
     .search-bar {
         width: 60%;
-        /* Occupy full width of its container */
         max-width: 580px;
-        /* Max width for the search bar as seen in image */
         height: 44px;
         background-color: #f9f9f9;
-        /* Light grey background */
         border: 1px solid #e0e0e0;
-        /* Light grey border */
         border-radius: 9999px;
-        /* Pill shape */
         display: flex;
         align-items: center;
         padding: 0 20px;
@@ -624,14 +646,12 @@
 
     .search-bar input {
         flex-grow: 1;
-        /* Input takes remaining space */
         border: none;
         outline: none;
         background: transparent;
         font-size: 1em;
         color: #333333;
         padding: 0;
-        /* Remove default input padding */
     }
 
     .search-bar input::placeholder {
@@ -643,11 +663,8 @@
         display: flex;
         align-items: center;
         gap: 25px;
-        /* Space between text and icon */
         margin-left: 40px;
-        /* Push to the right, provide some space from search bar */
         white-space: nowrap;
-        /* Prevent text wrapping */
     }
 
     .my-courses-text {
@@ -660,13 +677,11 @@
 
     .my-courses-text:hover {
         color: #007bff;
-        /* Example hover effect */
     }
 
     .notification-icon {
         position: relative;
         font-size: 1.4em;
-        /* Size of the bell icon */
         color: #888888;
         cursor: pointer;
         transition: color 0.2s ease;
@@ -679,16 +694,23 @@
     .notification-dot {
         position: absolute;
         top: 0px;
-        /* Adjust as needed */
         right: 0px;
-        /* Adjust as needed */
         width: 8px;
         height: 8px;
         background-color: #FF4D4D;
-        /* Red dot */
         border-radius: 50%;
         border: 1px solid #ffffff;
-        /* White border around the dot */
+    }
+
+    .user-info-widget, .auth-buttons {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-greeting {
+        font-size: 0.9em;
+        color: #555;
+        white-space: nowrap;
     }
 
     /* Responsive Adjustments */
@@ -714,7 +736,6 @@
     @media (max-width: 700px) {
         .main-header {
             height: 60px;
-            /* Slightly shorter header */
         }
 
         .logo-square {
@@ -738,12 +759,10 @@
 
         .my-courses-text {
             display: none;
-            /* Hide text on smaller screens if space is tight */
         }
 
         .header-right {
             margin-left: auto;
-            /* Push icons to the very right */
             gap: 20px;
         }
     }
@@ -755,17 +774,14 @@
 
         .logo-text {
             display: none;
-            /* Hide text, just show logo square */
         }
 
         .header-left {
             gap: 0;
-            /* No gap if text is hidden */
         }
 
         .search-bar {
             max-width: 200px;
-            /* Make search bar smaller */
             padding: 0 10px;
         }
 
@@ -775,7 +791,6 @@
     }
 </style>
 
-
 <header class="main-header">
     <div class="header-left">
         <div class="logo-square"></div>
@@ -784,21 +799,31 @@
 
     <div class="header-center">
         <div class="search-bar">
-            <span class="search-icon">🔍</span> <input type="text" placeholder="Tìm kiếm khóa học, bài viết, video...">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Tìm kiếm khóa học, bài viết, video...">
         </div>
     </div>
 
     <div class="header-right">
-        <span class="my-courses-text">Khoá học của tôi</span>
-        <div class="notification-icon">
-            <span class="bell-icon">🔔</span>
-            <div class="notification-dot"></div>
-        </div>
+        <a href="#" class="my-courses-text" style="text-decoration: none;">Khoá học của tôi</a>
+        
+        {% if username %}
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+                <div class="notification-dot"></div>
+            </div>
+            <div class="user-info-widget">
+                <span class="user-greeting">Xin chào, <strong>{{ username }}</strong>! (Vai trò: <strong>{{ role_display }}</strong>)</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-sm ms-2">Đăng xuất</a>
+            </div>
+        {% else %}
+            <div class="auth-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-light btn-sm">Đăng nhập</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm ms-2">Đăng ký</a>
+            </div>
+        {% endif %}
     </div>
 </header>
-
-
-
 
 <div class="container">
     <aside class="sidebar">
@@ -808,27 +833,30 @@
             <ul>
                 <li class="active">
                     <a href="#" class="sidebar-link">
-                        <div class="icon">🏠</div> <span>Trang chủ</span>
+                        <i class="fas fa-home icon"></i>
+                        <span>Trang chủ</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="sidebar-link">
-                        <div class="icon">🗺️</div> <span>Lộ trình</span>
+                        <i class="fas fa-map icon"></i>
+                        <span>Lộ trình</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="sidebar-link">
-                        <div class="icon">✍️</div> <span>Bài viết</span>
+                        <i class="fas fa-pen icon"></i>
+                        <span>Bài viết</span>
                     </a>
                 </li>
             </ul>
         </nav>
         <div class="sidebar-bottom-icons">
-            <div class="icon-item">🌐</div>
-            <div class="icon-item">⚙️</div>
-            <div class="icon-item">🛒</div>
-            <div class="icon-item">💬</div>
-            <div class="icon-item">☀️</div>
+            <i class="fas fa-globe icon-item"></i>
+            <i class="fas fa-cog icon-item"></i>
+            <i class="fas fa-shopping-cart icon-item"></i>
+            <i class="fas fa-comments icon-item"></i>
+            <i class="fas fa-sun icon-item"></i>
         </div>
     </aside>
 
@@ -860,47 +888,117 @@
 
         <section class="course-section">
             <h2 class="section-title">
+                <i class="fas fa-crown"></i>
                 Khóa học Pro <span class="tag-new">MỚI</span>
             </h2>
-            <div class="course-cards">
-                <div class="course-card gradient-blue">
-                    <div class="card-header">
-                        <div class="crown-icon">👑</div>
-                        <h3>HTML, CSS <span class="pro-text">Pro</span></h3>
+            
+            <div class="course-cards-container">
+                <button class="scroll-nav prev" onclick="scrollCourses('left')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="course-cards" id="courseCards">
+                    <div class="course-card gradient-blue">
+                        <div class="card-header">
+                            <i class="fas fa-crown crown-icon"></i>
+                            <h3>HTML, CSS <span class="pro-text">Pro</span></h3>
+                        </div>
+                        <p class="card-desc">Cho người mới bắt đầu</p>
+                        <div class="prices">
+                            <span class="original-price">2.500.000đ</span>
+                            <span class="current-price">1.299.000đ</span>
+                        </div>
                     </div>
-                    <p class="card-desc">Cho người mới bắt đầu</p>
-                    <div class="prices">
-                        <span class="original-price">2.500.000đ</span>
-                        <span class="current-price">1.299.000đ</span>
-                    </div>
-                </div>
 
-                <div class="course-card gradient-yellow">
-                    <div class="card-header">
-                        <div class="crown-icon">👑</div>
-                        <h3>JavaScript <span class="pro-text">Pro</span></h3>
+                    <div class="course-card gradient-yellow">
+                        <div class="card-header">
+                            <i class="fas fa-crown crown-icon"></i>
+                            <h3>JavaScript <span class="pro-text">Pro</span></h3>
+                        </div>
+                        <p class="card-desc">Cho người mới bắt đầu</p>
+                        <div class="prices">
+                            <span class="original-price">3.299.000đ</span>
+                            <span class="current-price">1.399.000đ</span>
+                        </div>
                     </div>
-                    <p class="card-desc">Cho người mới bắt đầu</p>
-                    <div class="prices">
-                        <span class="original-price">3.299.000đ</span>
-                        <span class="current-price">1.399.000đ</span>
-                    </div>
-                </div>
 
-                <div class="course-card gradient-pink">
-                    <div class="card-header">
-                        <div class="crown-icon">👑</div>
-                        <h3>Ngôn ngữ <span class="sass-text">Sass</span></h3>
+                    <div class="course-card gradient-pink">
+                        <div class="card-header">
+                            <i class="fas fa-crown crown-icon"></i>
+                            <h3>Ngôn ngữ <span class="sass-text">Sass</span></h3>
+                        </div>
+                        <p class="card-desc">Cho Frontend Developer</p>
+                        <div class="prices">
+                            <span class="original-price">400.000đ</span>
+                            <span class="current-price">299.000đ</span>
+                        </div>
                     </div>
-                    <p class="card-desc">Cho Frontend Developer</p>
-                    <div class="prices">
-                        <span class="original-price">400.000đ</span>
-                        <span class="current-price">299.000đ</span>
+
+                    <div class="course-card gradient-green">
+                        <div class="card-header">
+                            <i class="fas fa-crown crown-icon"></i>
+                            <h3>React <span class="pro-text">Pro</span></h3>
+                        </div>
+                        <p class="card-desc">Cho Frontend Developer</p>
+                        <div class="prices">
+                            <span class="original-price">4.500.000đ</span>
+                            <span class="current-price">2.199.000đ</span>
+                        </div>
+                    </div>
+
+                    <div class="course-card gradient-purple">
+                        <div class="card-header">
+                            <i class="fas fa-crown crown-icon"></i>
+                            <h3>Node.js <span class="pro-text">Pro</span></h3>
+                        </div>
+                        <p class="card-desc">Cho Backend Developer</p>
+                        <div class="prices">
+                            <span class="original-price">5.299.000đ</span>
+                            <span class="current-price">2.599.000đ</span>
+                        </div>
                     </div>
                 </div>
+                
+                <button class="scroll-nav next" onclick="scrollCourses('right')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </section>
     </main>
-
 </div>
+
+<script>
+function scrollCourses(direction) {
+    const container = document.getElementById('courseCards');
+    const scrollAmount = 340; // card width + gap
+    
+    if (direction === 'left') {
+        container.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+        });
+    } else {
+        container.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Auto-hide scroll navigation on mobile
+function checkScrollNavVisibility() {
+    const scrollNavs = document.querySelectorAll('.scroll-nav');
+    const container = document.getElementById('courseCards');
+    
+    if (window.innerWidth <= 1024) {
+        scrollNavs.forEach(nav => nav.style.display = 'none');
+    } else {
+        scrollNavs.forEach(nav => nav.style.display = 'flex');
+    }
+}
+
+// Check on load and resize
+window.addEventListener('load', checkScrollNavVisibility);
+window.addEventListener('resize', checkScrollNavVisibility);
+</script>
 {% endblock %}
