@@ -8,9 +8,10 @@ class AuthController:
         if form.validate_on_submit():
             username = form.username.data
             password = form.password.data
+            role = form.role.data
             
             if User.find_by_username(username) is None:
-                User.create(username, password)
+                User.create(username, password, role)
                 flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
                 return redirect(url_for('auth.login'))
             
@@ -26,6 +27,7 @@ class AuthController:
             
             if user and User.check_password(user, password):
                 session['username'] = username
+                session['role'] = user['role']
                 flash('Đăng nhập thành công!', 'success')
                 return redirect(url_for('main.home'))
             
@@ -35,5 +37,6 @@ class AuthController:
     @staticmethod
     def logout():
         session.pop('username', None)
+        session.pop('role', None)
         flash('Bạn đã đăng xuất thành công!', 'success')
         return redirect(url_for('main.home'))

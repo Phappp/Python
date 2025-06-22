@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- <div class="container mt-5">
+<div class="container mt-5">
     <h1 class="text-center">Chào mừng đến với Flask Auth</h1>
 
     {% if username %}
     <div class="text-center mt-4">
-        <p>Xin chào <strong>{{ username }}</strong>!</p>
+        <p>Xin chào <strong>{{ username }}</strong>! (Vai trò: <strong>{{ role_display }}</strong>)</p>
         <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Đăng xuất</a>
     </div>
     {% else %}
@@ -14,9 +14,8 @@
         <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Đăng nhập</a>
         <a href="{{ url_for('auth.register') }}" class="btn btn-success">Đăng ký</a>
     </div>
-    {% endif %} -->
-
-<!-- </div> -->
+    {% endif %}
+</div>
 <style>
     /* Universal Box-Sizing */
     *,

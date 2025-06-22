@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, EqualTo
 
 class RegistrationForm(FlaskForm):
@@ -9,6 +9,9 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Xác nhận mật khẩu',
                                   validators=[DataRequired(), EqualTo('password')])
+    role = SelectField('Vai trò', 
+                      choices=[('student', 'Sinh viên'), ('lecture', 'Giảng viên')],
+                      default='student')
     submit = SubmitField('Đăng ký')
 
 class LoginForm(FlaskForm):
