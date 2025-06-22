@@ -37,9 +37,11 @@ def create_app():
     # Đăng ký blueprints
     from .routes.auth_routes import auth_bp
     from .routes.main_routes import main_bp
+    from .routes.course_routes import course_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(course_bp)
     mail.init_app(app)
 
     return app

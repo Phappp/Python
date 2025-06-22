@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+        background: #000;
+        border-radius: 8px;
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .chapter-list .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .chapter-list .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .chapter-list .list-group-item.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+</style>
+
+<div class="container mt-4">
+    <a href="{{ url_for('main.home') }}" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách khóa học
+    </a>
+
+    <h1 class="mb-4">{{ title }}</h1>
+
+    <div class="row">
+        <!-- Video Player -->
+        <div class="col-lg-8">
+            <div class="video-container shadow mb-4">
+                {% if chapters and chapters[0].video_url_embed %}
+                <iframe id="video-player" src="{{ chapters[0].video_url_embed }}" title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+                {% else %}
+                <div class="d-flex justify-content-center align-items-center h-100 bg-light rounded">
+                    <p class="text-muted">Chưa có video nào trong khóa học này.</p>
+                </div>
+                {% endif %}
+            </div>
+            <h3 id="video-title" class="mb-4">
+                {% if chapters %}{{ chapters[0].title }}{% endif %}
+            </h3>
+        </div>
+
+        <!-- Chapter List -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Danh sách chương</h5>
+                </div>
+                <ul class="list-group list-group-flush chapter-list" id="chapter-list">
+                    {% if chapters %}
+                    {% for chapter in chapters %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center {% if loop.first %}active{% endif %}"
+                        data-video-url="{{ chapter.video_url_embed }}" data-video-title="{{ chapter.title }}">
+                        <i class="fas fa-play-circle me-2"></i>
+                        <span class="flex-grow-1">{{ loop.index }}. {{ chapter.title }}</span>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="list-group-item">Chưa có chương nào được thêm vào.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chapterList = document.getElementById('chapter-list');
+        const videoPlayer = document.getElementById('video-player');
+        const videoTitle = document.getElementById('video-title');
+
+        if (chapterList && videoPlayer) {
+            chapterList.addEventListener('click', function (e) {
+                const clickedItem = e.target.closest('li.list-group-item');
+                if (clickedItem) {
+                    const currentActive = chapterList.querySelector('.active');
+                    if (currentActive) {
+                        currentActive.classList.remove('active');
+                    }
+
+                    clickedItem.classList.add('active');
+
+                    const videoUrl = clickedItem.getAttribute('data-video-url');
+                    const newTitle = clickedItem.getAttribute('data-video-title');
+
+                    videoPlayer.src = videoUrl;
+                    if (videoTitle) {
+                        videoTitle.textContent = newTitle;
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

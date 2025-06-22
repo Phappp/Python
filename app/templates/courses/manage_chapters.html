@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('course.manage_courses') }}" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách khóa học
+    </a>
+
+    <h1 class="mb-2">Quản lý chương cho khóa học: "{{ course.name }}"</h1>
+    <p class="text-muted mb-4">Tại đây bạn có thể thêm, sửa, hoặc xóa các chương.</p>
+
+    <div class="row">
+        <!-- Form thêm chương mới -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thêm chương mới</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('course.manage_chapters', course_id=course._id) }}"
+                        novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                            <div class="invalid-feedback">{% for e in form.title.errors %}<span>{{ e }}</span>{% endfor
+                                %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.video_url.label(class="form-label fw-bold") }}
+                            {{ form.video_url(class="form-control" + (" is-invalid" if form.video_url.errors else ""))
+                            }}
+                            {% if form.video_url.errors %}
+                            <div class="invalid-feedback">{% for e in form.video_url.errors %}<span>{{ e }}</span>{%
+                                endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách các chương đã có -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Danh sách chương ({{ chapters|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if chapters %}
+                    <ul class="list-group list-group-flush">
+                        {% for chapter in chapters %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ loop.index }}. {{ chapter.title }}</h6>
+                                <small class="text-muted">{{ chapter.video_url }}</small>
+                            </div>
+                            <div>
+                                <!-- TODO: Thêm chức năng sửa chương -->
+                                <form
+                                    action="{{ url_for('course.delete_chapter', course_id=course._id, chapter_id=chapter._id) }}"
+                                    method="POST" class="d-inline"
+                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa chương này không?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-muted">Chưa có chương nào trong khóa học này.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -27,3 +27,28 @@ class LoginForm(FlaskForm):
 class OTPForm(FlaskForm):
     otp = StringField('Mã OTP', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Xác thực')
+
+class CourseForm(FlaskForm):
+    name = StringField('Tên khóa học', validators=[DataRequired(), Length(min=5, max=100)])
+    description = StringField('Mô tả', validators=[DataRequired(), Length(min=10, max=200)])
+    original_price = StringField('Giá gốc (ví dụ: 2.500.000)', validators=[DataRequired()])
+    discounted_price = StringField('Giá khuyến mãi (ví dụ: 1.299.000)', validators=[DataRequired()])
+    color = SelectField('Màu nền', 
+                      choices=[
+                          ('purple', 'Tím'), 
+                          ('yellow', 'Vàng'), 
+                          ('red', 'Đỏ'),
+                          ('blue', 'Xanh dương'),
+                          ('green', 'Xanh lá')
+                      ],
+                      default='purple',
+                      validators=[DataRequired()])
+    icon_class = StringField('Lớp icon (ví dụ: fas fa-crown)', 
+                             default='fas fa-crown',
+                             validators=[DataRequired()])
+    submit = SubmitField('Tạo khóa học')
+
+class ChapterForm(FlaskForm):
+    title = StringField('Tiêu đề chương', validators=[DataRequired(), Length(min=5, max=100)])
+    video_url = StringField('URL Video', validators=[DataRequired()])
+    submit = SubmitField('Lưu chương')
