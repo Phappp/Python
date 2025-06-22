@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -6,9 +7,9 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
-                        <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
-                        <h4>Xác thực 2 yếu tố</h4>
-                        <p class="text-muted">Nhập mã OTP để hoàn tất đăng nhập</p>
+                        <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+                        <h4>Xác thực đăng ký</h4>
+                        <p class="text-muted">Nhập mã OTP đã được gửi đến email của bạn</p>
                     </div>
 
                     <form method="POST" novalidate>
@@ -28,20 +29,20 @@
                             </div>
                             {% endif %}
                             <div class="form-text">
-                                Mã OTP đã được gửi đến email của bạn
+                                Mã OTP gồm 6 chữ số, có hiệu lực trong 5 phút
                             </div>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-check me-2"></i>{{ form.submit.label }}
                             </button>
                         </div>
                     </form>
 
                     <div class="text-center mt-4">
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-1"></i>Quay lại đăng nhập
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại đăng ký
                         </a>
                     </div>
                 </div>

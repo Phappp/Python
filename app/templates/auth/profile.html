@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Profile Header -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    <span class="avatar-text">{{ user.username[0].upper() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2 class="mb-1">{{ user.full_name or user.username }}</h2>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-at me-2"></i>{{ user.username }}
+                                {% if user.role == 'student' %}
+                                <span class="badge bg-primary ms-2">
+                                    <i class="fas fa-user-graduate me-1"></i>Học viên
+                                </span>
+                                {% elif user.role == 'lecture' %}
+                                <span class="badge bg-success ms-2">
+                                    <i class="fas fa-chalkboard-teacher me-1"></i>Giảng viên
+                                </span>
+                                {% endif %}
+                            </p>
+                            <div class="profile-actions">
+                                <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Chỉnh sửa hồ sơ
+                                </a>
+                                <a href="{{ url_for('auth.change_password') }}"
+                                    class="btn btn-outline-secondary btn-sm ms-2">
+                                    <i class="fas fa-key me-1"></i>Đổi mật khẩu
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Information -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>Thông tin cá nhân
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Họ và tên</label>
+                            <p class="mb-0 fw-bold">{{ user.full_name or 'Chưa cập nhật' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Email</label>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope me-2 text-muted"></i>
+                                {{ user.email }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Số điện thoại</label>
+                            <p class="mb-0">
+                                <i class="fas fa-phone me-2 text-muted"></i>
+                                {{ user.phone or 'Chưa cập nhật' }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Ngày tham gia</label>
+                            <p class="mb-0">
+                                <i class="fas fa-calendar me-2 text-muted"></i>
+                                {{ user.created_at.strftime('%d/%m/%Y') if user.created_at else 'Chưa có thông tin' }}
+                            </p>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Giới thiệu bản thân</label>
+                            <p class="mb-0">
+                                {{ user.bio or 'Chưa có thông tin giới thiệu' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Information -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2 text-warning"></i>Bảo mật tài khoản
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Xác thực 2 yếu tố</label>
+                            <div class="d-flex align-items-center">
+                                {% if user.two_factor_enabled %}
+                                <span class="badge bg-success me-2">
+                                    <i class="fas fa-check me-1"></i>Đã bật
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>Chưa bật
+                                </span>
+                                {% endif %}
+                                <a href="{{ url_for('auth.security_settings') }}"
+                                    class="btn btn-sm btn-outline-primary">
+                                    Cấu hình
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Cập nhật lần cuối</label>
+                            <p class="mb-0">
+                                <i class="fas fa-clock me-2 text-muted"></i>
+                                {{ user.updated_at.strftime('%d/%m/%Y %H:%M') if user.updated_at else 'Chưa có thông
+                                tin' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-info"></i>Thao tác nhanh
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('auth.edit_profile') }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-edit me-3 text-primary"></i>
+                            <div>
+                                <div class="fw-bold">Chỉnh sửa hồ sơ</div>
+                                <small class="text-muted">Cập nhật thông tin cá nhân</small>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('auth.change_password') }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-key me-3 text-warning"></i>
+                            <div>
+                                <div class="fw-bold">Đổi mật khẩu</div>
+                                <small class="text-muted">Bảo mật tài khoản</small>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('auth.security_settings') }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-shield-alt me-3 text-success"></i>
+                            <div>
+                                <div class="fw-bold">Cài đặt bảo mật</div>
+                                <small class="text-muted">Cấu hình 2FA</small>
+                            </div>
+                        </a>
+                        {% if user.role == 'student' %}
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-certificate me-3 text-info"></i>
+                            <div>
+                                <div class="fw-bold">Chứng chỉ của tôi</div>
+                                <small class="text-muted">Xem chứng chỉ đã đạt được</small>
+                            </div>
+                        </a>
+                        {% elif user.role == 'lecture' %}
+                        <a href="{{ url_for('course.manage_courses') }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-tasks me-3 text-info"></i>
+                            <div>
+                                <div class="fw-bold">Quản lý khóa học</div>
+                                <small class="text-muted">Xem và chỉnh sửa khóa học</small>
+                            </div>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Statistics -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2 text-success"></i>Thống kê tài khoản
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <div class="stat-number text-primary fw-bold">0</div>
+                                <div class="stat-label text-muted small">Khóa học</div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <div class="stat-number text-success fw-bold">0</div>
+                                <div class="stat-label text-muted small">Chứng chỉ</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number text-warning fw-bold">0</div>
+                                <div class="stat-label text-muted small">Giờ học</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number text-info fw-bold">0</div>
+                                <div class="stat-label text-muted small">Điểm số</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-avatar {
+        position: relative;
+    }
+
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-text {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-actions {
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        padding: 1rem 0;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .list-group-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .profile-actions {
+            margin-top: 0.5rem;
+        }
+
+        .profile-actions .btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-actions .btn:last-child {
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}

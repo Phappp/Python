@@ -6,6 +6,19 @@ from app.models.course_model import Course
 
 course_bp = Blueprint('course', __name__, url_prefix='/courses')
 
+@course_bp.route('/')
+@login_required
+def view_courses():
+    """
+    Route để hiển thị danh sách tất cả khóa học có sẵn cho sinh viên.
+    """
+    if session.get('role') != 'student':
+        flash('Chỉ sinh viên mới có thể xem danh sách khóa học.', 'warning')
+        return redirect(url_for('main.home'))
+    
+    courses = list(Course.get_all())
+    return render_template('courses/view_courses.html', courses=courses, title="Danh sách khóa học")
+
 @course_bp.route('/new', methods=['GET', 'POST'])
 @login_required
 @role_required('lecture')

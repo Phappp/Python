@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, Email
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, BooleanField
+from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional
 
 class RegistrationForm(FlaskForm):
     username = StringField('Tên người dùng', 
@@ -27,6 +27,33 @@ class LoginForm(FlaskForm):
 class OTPForm(FlaskForm):
     otp = StringField('Mã OTP', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Xác thực')
+
+# Profile Management Forms
+class ProfileEditForm(FlaskForm):
+    full_name = StringField('Họ và tên', 
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email',
+                       validators=[DataRequired(), Email()])
+    phone = StringField('Số điện thoại', 
+                       validators=[Optional(), Length(min=10, max=15)])
+    bio = TextAreaField('Giới thiệu bản thân', 
+                       validators=[Optional(), Length(max=500)])
+    submit = SubmitField('Cập nhật thông tin')
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Mật khẩu hiện tại', 
+                                   validators=[DataRequired()])
+    new_password = PasswordField('Mật khẩu mới', 
+                               validators=[DataRequired(), Length(min=6, message='Mật khẩu phải có ít nhất 6 ký tự')])
+    confirm_new_password = PasswordField('Xác nhận mật khẩu mới',
+                                       validators=[DataRequired(), EqualTo('new_password', message='Mật khẩu xác nhận không khớp')])
+    submit = SubmitField('Đổi mật khẩu')
+
+class SecuritySettingsForm(FlaskForm):
+    two_factor_enabled = BooleanField('Bật xác thực 2 yếu tố (2FA)')
+    current_password = PasswordField('Mật khẩu hiện tại (để xác nhận thay đổi)', 
+                                   validators=[DataRequired()])
+    submit = SubmitField('Cập nhật cài đặt bảo mật')
 
 class CourseForm(FlaskForm):
     name = StringField('Tên khóa học', validators=[DataRequired(), Length(min=5, max=100)])

@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Page Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="mb-1">Cài đặt bảo mật</h2>
+                    <p class="text-muted mb-0">Quản lý các tùy chọn bảo mật cho tài khoản</p>
+                </div>
+            </div>
+
+            <!-- Security Settings Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>Cài đặt bảo mật
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Two-Factor Authentication Section -->
+                        <div class="security-section mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="security-icon me-3">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Xác thực 2 yếu tố (2FA)</h6>
+                                    <p class="text-muted mb-0 small">Bảo vệ tài khoản bằng mã xác thực từ ứng dụng di
+                                        động</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.two_factor_enabled(class="form-check-input", id="twoFactorToggle") }}
+                                </div>
+                            </div>
+
+                            <div class="two-factor-info" id="twoFactorInfo" style="display: none;">
+                                <div class="alert alert-info">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-info-circle me-2 mt-1"></i>
+                                        <div>
+                                            <strong>Hướng dẫn kích hoạt 2FA:</strong>
+                                            <ol class="mb-0 mt-2">
+                                                <li>Tải ứng dụng Google Authenticator hoặc Microsoft Authenticator</li>
+                                                <li>Quét mã QR hoặc nhập mã thủ công</li>
+                                                <li>Nhập mã 6 số từ ứng dụng để xác nhận</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- QR Code Placeholder -->
+                                <div class="text-center mb-3">
+                                    <div class="qr-code-placeholder">
+                                        <i class="fas fa-qrcode fa-3x text-muted"></i>
+                                        <p class="text-muted mt-2">Mã QR sẽ hiển thị ở đây</p>
+                                    </div>
+                                </div>
+
+                                <!-- Manual Code -->
+                                <div class="mb-3">
+                                    <label class="form-label">Mã thủ công (nếu không thể quét QR):</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" value="ABCD EFGH IJKL MNOP" readonly>
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="copyToClipboard(this)">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Password Section -->
+                        <div class="mb-4">
+                            <label for="{{ form.current_password.id }}" class="form-label">
+                                <i class="fas fa-lock me-2 text-muted"></i>{{ form.current_password.label }}
+                            </label>
+                            <div class="input-group">
+                                {{ form.current_password(class="form-control" + (" is-invalid" if
+                                form.current_password.errors else ""), placeholder="Nhập mật khẩu hiện tại để xác nhận",
+                                id="currentPassword") }}
+                                <button class="btn btn-outline-secondary" type="button"
+                                    onclick="togglePassword('currentPassword')">
+                                    <i class="fas fa-eye" id="currentPasswordIcon"></i>
+                                </button>
+                            </div>
+                            {% if form.current_password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.current_password.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Nhập mật khẩu hiện tại để xác nhận thay đổi cài đặt bảo mật</div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i>{{ form.submit.label }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Status -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-info"></i>Trạng thái bảo mật
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="security-status-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="status-icon me-3">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="status-title">Xác thực 2 yếu tố</div>
+                                        <div class="status-value">
+                                            {% if user.two_factor_enabled %}
+                                            <span class="badge bg-success">Đã bật</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Chưa bật</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="security-status-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="status-icon me-3">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="status-title">Xác thực email</div>
+                                        <div class="status-value">
+                                            <span class="badge bg-success">Đã xác thực</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="security-status-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="status-icon me-3">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="status-title">Phiên đăng nhập</div>
+                                        <div class="status-value">
+                                            <span class="badge bg-info">Hoạt động</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="security-status-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="status-icon me-3">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="status-title">Mức bảo mật</div>
+                                        <div class="status-value">
+                                            {% if user.two_factor_enabled %}
+                                            <span class="badge bg-success">Cao</span>
+                                            {% else %}
+                                            <span class="badge bg-warning">Trung bình</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tips -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>Mẹo bảo mật
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Luôn bật xác thực 2 yếu tố để tăng cường bảo mật
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Sử dụng mật khẩu mạnh và thay đổi định kỳ
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Không chia sẻ mã 2FA với bất kỳ ai
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Đăng xuất khỏi các thiết bị không sử dụng
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-control {
+        border-radius: 8px 0 0 8px;
+        border: 1px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .input-group .btn {
+        border-radius: 0 8px 8px 0;
+        border: 1px solid #e9ecef;
+        border-left: none;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border-color: #e9ecef;
+        color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #495057;
+    }
+
+    .security-section {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+    }
+
+    .security-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+        margin-top: 0;
+    }
+
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .qr-code-placeholder {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 2rem;
+        margin: 1rem 0;
+    }
+
+    .security-status-item {
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .status-icon {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.875rem;
+    }
+
+    .status-title {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .status-value {
+        font-size: 0.875rem;
+    }
+
+    .list-unstyled li {
+        padding: 0.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .d-flex.justify-content-between .btn {
+            width: 100%;
+        }
+
+        .security-section {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + 'Icon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    function copyToClipboard(button) {
+        const input = button.previousElementSibling;
+        input.select();
+        document.execCommand('copy');
+
+        // Show feedback
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 2000);
+    }
+
+    // Toggle 2FA info section
+    document.addEventListener('DOMContentLoaded', function () {
+        const twoFactorToggle = document.getElementById('twoFactorToggle');
+        const twoFactorInfo = document.getElementById('twoFactorInfo');
+
+        if (twoFactorToggle) {
+            twoFactorToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    twoFactorInfo.style.display = 'block';
+                } else {
+                    twoFactorInfo.style.display = 'none';
+                }
+            });
+
+            // Show info if already enabled
+            if (twoFactorToggle.checked) {
+                twoFactorInfo.style.display = 'block';
+            }
+        }
+    });
+</script>
+{% endblock %}
