@@ -11,7 +11,6 @@ class AuthController:
     OTP_EXPIRATION = 300  # 5 minutes in seconds
 
     @staticmethod
-<<<<<<< HEAD
     def register(form):
         if form.validate_on_submit():
             username = form.username.data
@@ -26,26 +25,7 @@ class AuthController:
             flash('Tên người dùng đã tồn tại!', 'danger')
         return None
     
-=======
-    def generate_otp(length=6):
-        return ''.join(random.choices(string.digits, k=length))
 
-    @staticmethod
-    def send_otp_email(email, otp):
-        try:
-            msg = Message(
-                "Mã OTP đăng nhập",
-                recipients=[email],
-                body=f"Mã OTP của bạn: {otp} (Hiệu lực 5 phút)"
-            )
-            mail.send(msg)
-            return True
-        except Exception as e:
-            current_app.logger.error(f"Lỗi gửi email: {str(e)}")
-            flash('Hệ thống đang bận. Vui lòng thử lại sau!', 'danger')
-            return False
-
->>>>>>> b7b4b2b9d38e110421f1f0807531b9b5524ceb48
     @staticmethod
     def login(form):
         if 'username' in session:  # Kiểm tra nếu đã đăng nhập
@@ -59,35 +39,12 @@ class AuthController:
             user = User.find_by_username(username)
             
             if user and User.check_password(user, password):
-<<<<<<< HEAD
+
                 session['username'] = username
                 session['role'] = user['role']
                 flash('Đăng nhập thành công!', 'success')
                 return redirect(url_for('main.home'))
-=======
-                otp = AuthController.generate_otp()
-                
-                # Set ALL OTP-related data in a single operation
-                session.update({
-                    'auth_otp': otp,
-                    'auth_otp_time': int(time.time()),
-                    'auth_otp_username': username,
-                    '_fresh': True,
-                    '_permanent': False  # Will be True only after OTP verification
-                })
-                
-                # Force session to save before redirect
-                session.modified = True
-                
-                current_app.logger.debug(f"Session after OTP generation: {dict(session)}")
-                
-                if not AuthController.send_otp_email(user['email'], otp):
-                    return redirect(url_for('auth.login'))
-                
-                # Create response object to ensure session is committed
-                response = redirect(url_for('auth.verify_otp'))
-                return response
->>>>>>> b7b4b2b9d38e110421f1f0807531b9b5524ceb48
+
             
             flash('Tên người dùng hoặc mật khẩu không đúng!', 'danger')
         return None
@@ -139,11 +96,8 @@ class AuthController:
 
     @staticmethod
     def logout():
-<<<<<<< HEAD
         session.pop('username', None)
         session.pop('role', None)
-=======
-        session.clear()
->>>>>>> b7b4b2b9d38e110421f1f0807531b9b5524ceb48
+
         flash('Bạn đã đăng xuất thành công!', 'success')
         return redirect(url_for('main.home'))

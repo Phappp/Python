@@ -3,21 +3,13 @@ from app.extensions import mongo
 
 class User:
     @staticmethod
-<<<<<<< HEAD
     def create(username, password, role='student'):
         hashed_password = generate_password_hash(password)
         return mongo.db.users.insert_one({
             'username': username,
             'password': hashed_password,
             'role': role
-=======
-    def create(username, password, email):
-        hashed_password = generate_password_hash(password)
-        return mongo.db.users.insert_one({
-            'username': username,
-            'email': email,
-            'password': hashed_password
->>>>>>> b7b4b2b9d38e110421f1f0807531b9b5524ceb48
+
         })
     
     @staticmethod
