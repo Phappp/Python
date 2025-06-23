@@ -1,86 +1,653 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
-                        <h4>Đăng nhập</h4>
-                        <p class="text-muted">Đăng nhập vào tài khoản của bạn</p>
-                    </div>
 
-                    <form method="POST" novalidate>
-                        {{ form.hidden_tag() }}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        /* Changed to auto for scroll on smaller screens if needed */
+        overflow-y: auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        /* Ensure body takes full height and flexes content */
+        flex-direction: column;
+    }
 
-                        <div class="mb-3">
-                            <label for="{{ form.username.id }}" class="form-label">
-                                <i class="fas fa-user me-2"></i>{{ form.username.label }}
-                            </label>
-                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
-                            placeholder="Nhập tên người dùng") }}
-                            {% if form.username.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.username.errors %}
-                                {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        flex-grow: 1;
+        /* Allow container to grow and take available space */
+    }
 
-                        <div class="mb-4">
-                            <label for="{{ form.password.id }}" class="form-label">
-                                <i class="fas fa-lock me-2"></i>{{ form.password.label }}
-                            </label>
-                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
-                            placeholder="Nhập mật khẩu") }}
-                            {% if form.password.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
+    .login-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 192, 203, 0.3);
+        padding: 40px;
+        width: 100%;
+        max-width: 450px;
+        position: relative;
+        overflow: hidden;
+        margin: auto;
+        /* Center the card horizontally */
+        /* Thêm thuộc tính min-height để đảm bảo card có kích thước tối thiểu, 
+           tránh việc bị co quá nhỏ trên màn hình rất hẹp */
+        min-height: 450px;
+        display: flex;
+        /* Dùng flexbox để căn chỉnh nội dung bên trong card */
+        flex-direction: column;
+        justify-content: space-between;
+        /* Đẩy header và form ra 2 phía */
+    }
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>{{ form.submit.label }}
-                            </button>
-                        </div>
-                    </form>
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff69b4, #ff1493, #ff69b4);
+        background-size: 200% 100%;
+        animation: shimmer 3s ease-in-out infinite;
+    }
 
-                    <div class="text-center mt-4">
-                        <p class="mb-0">
-                            Chưa có tài khoản?
-                            <a href="{{ url_for('auth.register') }}" class="text-decoration-none">
-                                <i class="fas fa-user-plus me-1"></i>Đăng ký
-                            </a>
-                        </p>
-                    </div>
-                </div>
+    @keyframes shimmer {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .login-icon:hover {
+        transform: scale(1.05);
+    }
+
+    .login-icon i {
+        font-size: 35px;
+        color: white;
+    }
+
+    .login-title {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-subtitle {
+        color: #7f8c8d;
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+        transition: transform 0.3s ease;
+        /* Added for interactive effect */
+    }
+
+    .form-label {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 192, 203, 0.2);
+        border-radius: 12px;
+        padding: 15px 20px;
+        font-size: 16px;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        /* Ensure inputs take full width */
+        box-sizing: border-box;
+        /* Include padding in width */
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff69b4;
+        box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-2px);
+    }
+
+    .form-control.is-invalid {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        border: none;
+        border-radius: 12px;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-login:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-login:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-login.loading {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .btn-login.loading .btn-text {
+        opacity: 0;
+    }
+
+    .btn-login.loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid transparent;
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid rgba(255, 192, 203, 0.2);
+    }
+
+    .register-link p {
+        color: #7f8c8d;
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+
+    .register-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .register-link a:hover {
+        color: #ff69b4;
+    }
+
+    .info-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 192, 203, 0.2);
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-card h6 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .info-card ul {
+        margin-bottom: 0;
+    }
+
+    .info-card li {
+        color: #7f8c8d;
+        font-size: 13px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+
+    .info-card li:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-card i {
+        margin-right: 8px;
+        font-size: 14px;
+    }
+
+    .floating-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+        }
+    }
+
+    /* --- Responsive Adjustments --- */
+
+    /* For screens smaller than 1300px (general desktop/laptop adjustment) */
+    @media (max-width: 1300px) {
+        .login-card {
+            max-width: 400px;
+            /* Hơi thu nhỏ form lại */
+            padding: 35px;
+            /* Giảm padding */
+        }
+
+        .login-title {
+            font-size: 26px;
+            /* Giảm cỡ chữ tiêu đề */
+        }
+
+        .login-subtitle {
+            font-size: 15px;
+            /* Giảm cỡ chữ phụ đề */
+        }
+
+        .form-control {
+            padding: 14px 18px;
+            /* Giảm padding input */
+            font-size: 15px;
+            /* Giảm cỡ chữ input */
+        }
+
+        .btn-login {
+            padding: 14px 28px;
+            /* Giảm padding nút */
+            font-size: 15px;
+            /* Giảm cỡ chữ nút */
+        }
+    }
+
+    /* For screens smaller than 992px (typical tablet landscape) */
+    @media (max-width: 992px) {
+        .login-card {
+            max-width: 380px;
+            padding: 30px;
+        }
+
+        .login-title {
+            font-size: 24px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            padding: 12px 25px;
+            font-size: 14px;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+        }
+
+        .login-icon i {
+            font-size: 30px;
+        }
+    }
+
+    /* For screens smaller than 768px (typical tablet portrait and large phones) */
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 15px;
+            /* Giảm padding tổng thể container */
+        }
+
+        .login-card {
+            padding: 25px;
+            /* Giảm padding của card */
+            border-radius: 15px;
+            /* Bo góc nhỏ hơn */
+            max-width: 350px;
+            /* Giới hạn chiều rộng tối đa chặt hơn */
+            min-height: auto;
+            /* Cho phép chiều cao co giãn theo nội dung trên mobile */
+            justify-content: center;
+            /* Căn giữa nội dung trong card trên mobile */
+        }
+
+        .login-icon {
+            width: 65px;
+            height: 65px;
+            margin-bottom: 15px;
+        }
+
+        .login-icon i {
+            font-size: 28px;
+        }
+
+        .login-title {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            padding: 10px 14px;
+            /* Giảm đáng kể padding input */
+            font-size: 14px;
+            /* Giảm cỡ chữ input */
+            border-radius: 10px;
+            /* Bo góc nhỏ hơn cho input */
+        }
+
+        .invalid-feedback {
+            font-size: 12px;
+        }
+
+        .btn-login {
+            padding: 12px 20px;
+            /* Giảm padding nút */
+            font-size: 14px;
+            /* Giảm cỡ chữ nút */
+            border-radius: 10px;
+            /* Bo góc nhỏ hơn cho nút */
+        }
+
+        .register-link {
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        .register-link p {
+            font-size: 13px;
+        }
+    }
+
+    /* For screens smaller than 576px (typical mobile phones) */
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 10px;
+        }
+
+        .login-card {
+            padding: 20px;
+            border-radius: 10px;
+            /* Đảm bảo form không quá rộng trên màn hình nhỏ nhất */
+            max-width: 95%;
+        }
+
+        .login-icon {
+            width: 55px;
+            height: 55px;
+        }
+
+        .login-icon i {
+            font-size: 25px;
+        }
+
+        .login-title {
+            font-size: 20px;
+        }
+
+        .login-subtitle {
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-size: 12px;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        .btn-login {
+            padding: 10px 18px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        .register-link {
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+
+        .register-link p {
+            font-size: 12px;
+        }
+    }
+
+    /* For extremely small screens, e.g., below 380px */
+    @media (max-width: 380px) {
+        .login-card {
+            padding: 15px;
+        }
+
+        .login-title {
+            font-size: 18px;
+        }
+
+        .form-control {
+            padding: 7px 10px;
+            font-size: 12px;
+        }
+
+        .btn-login {
+            padding: 9px 15px;
+            font-size: 12px;
+        }
+    }
+</style>
+
+<div class="floating-particles">
+    <div class="particle" style="top: 10%; left: 10%; width: 20px; height: 20px; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 20%; right: 15%; width: 15px; height: 15px; animation-delay: 1s;"></div>
+    <div class="particle" style="bottom: 30%; left: 20%; width: 25px; height: 25px; animation-delay: 2s;"></div>
+    <div class="particle" style="bottom: 20%; right: 10%; width: 18px; height: 18px; animation-delay: 3s;"></div>
+</div>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-user"></i>
             </div>
-
-            <!-- Info Card -->
-            <div class="card border-0 shadow-sm mt-4">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="fas fa-info-circle me-2 text-info"></i>Thông tin đăng nhập
-                    </h6>
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            Đăng nhập bình thường nếu chưa bật 2FA
-                        </li>
-                        <li>
-                            <i class="fas fa-shield-alt text-warning me-2"></i>
-                            Yêu cầu OTP nếu đã bật xác thực 2 yếu tố
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <h1 class="login-title">Đăng nhập</h1>
+            <p class="login-subtitle">Chào mừng bạn trở lại!</p>
         </div>
+
+        <form method="POST" novalidate id="loginForm">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label for="{{ form.username.id }}" class="form-label">
+                    <i class="fas fa-user me-2"></i>{{ form.username.label }}
+                </label>
+                {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
+                placeholder="Nhập tên người dùng") }}
+                {% if form.username.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id }}" class="form-label">
+                    <i class="fas fa-lock me-2"></i>{{ form.password.label }}
+                </label>
+                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                placeholder="Nhập mật khẩu") }}
+                {% if form.password.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <span class="btn-text">
+                    <i class="fas fa-sign-in-alt me-2"></i>{{ form.submit.label }}
+                </span>
+            </button>
+        </form>
+
+        <div class="register-link">
+            <p>
+                Chưa có tài khoản?
+                <a href="{{ url_for('auth.register') }}">
+                    <i class="fas fa-user-plus me-1"></i>Đăng ký ngay
+                </a>
+            </p>
+        </div>
+
+
     </div>
 </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+        const btn = document.getElementById('loginBtn');
+        const btnText = btn.querySelector('.btn-text');
+
+        // Add loading state
+        btn.classList.add('loading');
+        btnText.style.opacity = '0';
+
+        // Prevent double submission
+        btn.disabled = true;
+
+        // Optional: Add a small delay to show loading animation
+        setTimeout(() => {
+            // Form will submit normally
+        }, 500);
+    });
+
+    // Add some interactive effects
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function () {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+
+        input.addEventListener('blur', function () {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+</script>
+
 {% endblock %}

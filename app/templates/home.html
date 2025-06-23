@@ -2,79 +2,469 @@
 
 {% block content %}
 <style>
+    /* Global Page Styling */
+    body {
+        background-color: #f5f7fa;
+        /* Nền rất nhẹ, sạch sẽ */
+        font-family: 'Inter', sans-serif;
+        /* Font sans-serif hiện đại */
+        color: #333;
+        /* Chữ tối hơn để dễ đọc */
+    }
+
+    /* --- Course Cards (Chế độ xem của sinh viên) --- */
     .course-card {
-        border-radius: 15px;
-        color: white;
-        padding: 25px;
-        margin-bottom: 20px;
-        transition: transform 0.2s ease-in-out;
+        border-radius: 18px;
+        /* Bo góc mềm mại hơn */
+        color: #ffffff;
+        /* Chữ trắng trên nền gradient */
+        padding: 30px;
+        /* Tăng padding */
+        margin-bottom: 25px;
+        /* Thêm khoảng cách giữa các thẻ */
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        /* Chuyển đổi mượt mà và phức tạp hơn */
         border: none;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        /* Đổ bóng mới: đa lớp và rõ ràng hơn */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+            /* Bóng mờ cơ bản */
+            0 10px 20px rgba(0, 0, 0, 0.08);
+        /* Bóng nổi bật hơn */
+        position: relative;
+        overflow: hidden;
+        /* Rất quan trọng để cắt hiệu ứng quét */
+        cursor: pointer;
+        /* Cho biết thẻ có thể nhấp */
+        z-index: 1;
+        /* Thiết lập ngữ cảnh xếp chồng */
+        display: flex;
+        /* Sử dụng flexbox để căn chỉnh nội dung */
+        flex-direction: column;
+        /* Sắp xếp nội dung theo cột */
+        justify-content: space-between;
+        /* Đẩy nội dung lên và xuống */
+        min-height: 200px;
+        /* Đảm bảo chiều cao tối thiểu cho thẻ */
+    }
+
+    /* Hiệu ứng ánh sáng quét khi hover */
+    .course-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150%;
+        /* Rộng hơn để bao phủ quét chéo */
+        height: 100%;
+        background: linear-gradient(90deg,
+                /* Quét từ trái sang phải */
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 35%,
+                /* Bắt đầu dải ánh sáng */
+                rgba(255, 255, 255, 0.3) 65%,
+                /* Kết thúc dải ánh sáng */
+                rgba(255, 255, 255, 0) 100%);
+        transform: translateX(-100%) rotate(25deg);
+        /* Bắt đầu ngoài vùng hiển thị, xoay để quét chéo */
+        transform-origin: top left;
+        /* Điểm xoay */
+        transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+        /* Hoạt ảnh quét mượt mà */
+        z-index: 2;
+        /* Nằm trên nền gradient */
     }
 
     .course-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        /* Nâng lên rõ hơn */
+        /* Đổ bóng mạnh hơn khi hover */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15),
+            0 20px 40px rgba(0, 0, 0, 0.1);
     }
 
+    .course-card:hover::after {
+        transform: translateX(100%) rotate(25deg);
+        /* Quét ngang sang phải */
+    }
+
+    /* Màu sắc thẻ khóa học cụ thể với gradient được cải tiến */
     .course-card-purple {
-        background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        /* Tím-xanh */
     }
 
     .course-card-yellow {
-        background: linear-gradient(45deg, #f7971e 0%, #ffd200 100%);
+        background: linear-gradient(135deg, #FFC700 0%, #FF8D00 100%);
+        /* Cam-vàng */
     }
 
     .course-card-red {
-        background: linear-gradient(45deg, #d32f2f 0%, #ff5252 100%);
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        /* Đỏ đậm hơn */
     }
 
     .course-card-blue {
-        background: linear-gradient(45deg, #2196F3, #03A9F4);
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        /* Xanh da trời */
     }
 
     .course-card-green {
-        background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        /* Xanh ngọc */
+    }
+
+    .course-card .card-body {
+        position: relative;
+        /* Giữ nội dung ở trên pseudo-elements */
+        z-index: 3;
+        /* Đảm bảo văn bản/nội dung ở trên hiệu ứng quét */
+        display: flex;
+        /* Sử dụng flexbox cho nội dung */
+        flex-direction: column;
+        flex-grow: 1;
+        /* Cho phép mở rộng để lấp đầy không gian */
     }
 
     .course-card .card-title {
-        font-weight: bold;
-        font-size: 1.8rem;
+        font-weight: 700;
+        /* Đậm hơn */
+        font-size: 2.2rem;
+        /* Tiêu đề lớn hơn */
         margin-bottom: 1rem;
+        letter-spacing: -0.5px;
+        /* Thu hẹp khoảng cách chữ để tạo điểm nhấn */
     }
 
     .course-card .card-title i {
-        color: #ffeb3b;
-        margin-right: 10px;
-        font-size: 1.6rem;
+        color: rgba(255, 255, 255, 0.8);
+        /* Icon hòa quyện nhẹ với thẻ, nhưng vẫn hiển thị */
+        margin-right: 12px;
+        /* Thêm khoảng cách */
+        font-size: 1.8rem;
+        /* Icon lớn hơn */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        /* Bóng đổ nhẹ cho icon */
     }
 
+    /* Ẩn thông tin bổ sung ban đầu */
+    .course-card .card-text,
+    .course-card .price,
+    .course-card .course-meta {
+        opacity: 0;
+        /* Mặc định ẩn */
+        max-height: 0;
+        /* Chiều cao bằng 0 để ẩn hoàn toàn */
+        overflow: hidden;
+        /* Cắt bỏ phần vượt quá */
+        transition: opacity 0.4s ease-in-out, max-height 0.4s ease-in-out, margin 0.4s ease-in-out;
+        /* Hiệu ứng chuyển động mượt mà */
+        margin-top: 0;
+        /* Đảm bảo không có margin khi ẩn */
+    }
+
+    /* Hiển thị thông tin khi hover */
+    .course-card:hover .card-text,
+    .course-card:hover .price,
+    .course-card:hover .course-meta {
+        opacity: 1;
+        /* Hiển thị */
+        max-height: 150px;
+        /* Cho phép nội dung hiển thị (đặt đủ lớn) */
+        margin-top: 10px;
+        /* Khôi phục margin-top cho meta, card-text */
+    }
+
+    .course-card:hover .price {
+        margin-top: 1.5rem;
+        /* Giữ nguyên margin-top của giá */
+    }
+
+
     .course-card .card-text {
-        font-size: 1.1rem;
-        opacity: 0.9;
+        font-size: 1.15rem;
+        /* Văn bản lớn hơn một chút */
+        line-height: 1.6;
+        opacity: 0.95;
+        /* Ít trong suốt hơn */
+        /* margin-bottom: 20px; */
+        /* Loại bỏ margin-bottom để điều khiển bằng transition */
     }
 
     .course-card .price {
-        margin-top: 1.5rem;
-        font-family: monospace;
+        /* margin-top: 1.5rem; */
+        /* Loại bỏ margin-top để điều khiển bằng transition */
+        font-family: 'Space Mono', monospace;
+        /* Font monospace hiện đại hơn */
+        display: flex;
+        /* Căn chỉnh giá theo chiều ngang */
+        align-items: baseline;
+        gap: 15px;
+        /* Khoảng cách giữa giá gốc và giá giảm */
     }
 
     .course-card .original-price {
         text-decoration: line-through;
         opacity: 0.7;
-        margin-right: 15px;
-        font-size: 1rem;
+        font-size: 1.1rem;
+        /* Giá gốc lớn hơn một chút */
+        font-weight: 500;
     }
 
     .course-card .discounted-price {
-        font-size: 2.2rem;
-        font-weight: bold;
+        font-size: 2.8rem;
+        /* Giá giảm lớn hơn nhiều */
+        font-weight: 800;
+        /* Rất đậm */
+        color: #ffeb3b;
+        /* Màu vàng sáng để nhấn mạnh */
+        text-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        /* Bóng đổ mạnh hơn cho giá */
+        line-height: 1;
+        /* Giữ line height chặt chẽ */
     }
 
+    .course-meta {
+        font-size: 0.95rem;
+        opacity: 0.8;
+        /* margin-top: 15px; */
+        /* Loại bỏ margin-top để điều khiển bằng transition */
+        padding-top: 10px;
+        /* Padding nhỏ ở trên */
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        /* Đường phân cách mảnh */
+    }
+
+    .course-meta i {
+        margin-right: 8px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .course-meta div {
+        margin-bottom: 5px;
+        /* Khoảng cách giữa các dòng meta */
+    }
+
+    .course-meta div:last-child {
+        margin-bottom: 0;
+    }
+
+    /* --- Banner chào mừng (Chế độ xem Giảng viên/Chưa đăng nhập) --- */
     .welcome-banner {
-        padding: 3rem;
-        background-color: #f8f9fa;
-        border-radius: 15px;
+        padding: 4rem 3rem;
+        /* Padding rộng rãi hơn */
+        background: linear-gradient(135deg, #e0f2f7 0%, #d1e9f1 100%);
+        /* Gradient xanh nhạt mềm mại */
+        border-radius: 20px;
+        /* Bo góc nhiều hơn */
         text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        /* Bóng đổ hiện đại */
+        color: #2c3e50;
+        /* Chữ tối hơn */
+        margin-top: 30px;
+    }
+
+    .welcome-banner h1 {
+        font-size: 3.2rem;
+        /* Văn bản chào mừng lớn hơn */
+        font-weight: 800;
+        /* Rất đậm */
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        color: #1a2a3a;
+    }
+
+    /* Điều chỉnh các nút trong welcome-banner */
+    .welcome-banner .btn-group {
+        margin-top: 2rem;
+        /* Khoảng cách trên từ tiêu đề */
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        /* Cho phép các nút xuống dòng trên màn hình nhỏ */
+        gap: 15px;
+        /* Khoảng cách giữa các nút */
+    }
+
+    .welcome-banner .btn {
+        font-size: 1.1rem;
+        padding: 14px 30px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        /* margin: 10px; */
+        /* Sử dụng gap thay cho margin riêng lẻ */
+    }
+
+    .welcome-banner .btn-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        /* Primary blue gradient */
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.25);
+        color: white;
+        /* Đảm bảo chữ trắng */
+    }
+
+    .welcome-banner .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.35);
+        background: linear-gradient(45deg, #0056b3, #007bff);
+        /* Invert gradient */
+    }
+
+    .welcome-banner .btn-outline-light {
+        background-color: transparent;
+        border: 2px solid #007bff;
+        /* Viền xanh */
+        color: #007bff;
+        /* Chữ xanh */
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.1);
+    }
+
+    .welcome-banner .btn-outline-light:hover {
+        transform: translateY(-2px);
+        background-color: #007bff;
+        /* Nền xanh khi hover */
+        color: white;
+        /* Chữ trắng khi hover */
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.2);
+    }
+
+    .welcome-banner .btn i {
+        margin-right: 8px;
+    }
+
+    /* Điều chỉnh Responsive */
+    @media (min-width: 992px) {
+
+        /* Trên màn hình desktop và lớn hơn */
+        .col-md-6 {
+            flex: 0 0 50%;
+            /* Đảm bảo chiếm 50% chiều rộng */
+            max-width: 50%;
+            /* Tối đa 2 thẻ trên 1 hàng */
+        }
+    }
+
+    @media (max-width: 991px) {
+
+        /* Trên màn hình tablet và nhỏ hơn */
+        .course-card {
+            padding: 25px;
+        }
+
+        .course-card .card-title {
+            font-size: 2rem;
+        }
+
+        .course-card .card-title i {
+            font-size: 1.7rem;
+        }
+
+        .course-card .card-text {
+            font-size: 1.05rem;
+        }
+
+        .course-card .discounted-price {
+            font-size: 2.5rem;
+        }
+
+        .welcome-banner h1 {
+            font-size: 2.8rem;
+        }
+
+        /* Nút sẽ tự động xuống dòng và full width trên màn hình nhỏ hơn */
+        .welcome-banner .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 767px) {
+
+        /* Trên màn hình điện thoại */
+        .container {
+            padding: 0 15px;
+        }
+
+        .course-card {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
+
+        /* Điều chỉnh hiệu ứng quét cho màn hình nhỏ hơn */
+        .course-card::after {
+            width: 200%;
+            /* Rộng hơn để bao phủ không gian chéo */
+            height: 150%;
+            /* Cao hơn */
+            transform: translateX(-150%) rotate(25deg);
+        }
+
+        .course-card:hover::after {
+            transform: translateX(50%) rotate(25deg);
+            /* Điều chỉnh vị trí kết thúc */
+        }
+
+        .course-card .card-title {
+            font-size: 1.8rem;
+        }
+
+        .course-card .card-title i {
+            font-size: 1.5rem;
+        }
+
+        .course-card .card-text {
+            font-size: 1rem;
+        }
+
+        .course-card .original-price {
+            font-size: 0.95rem;
+        }
+
+        .course-card .discounted-price {
+            font-size: 2.2rem;
+        }
+
+        .welcome-banner {
+            padding: 3rem 20px;
+            border-radius: 15px;
+        }
+
+        .welcome-banner h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Nút sẽ tự động xuống dòng và full width trên màn hình nhỏ hơn */
+        .welcome-banner .btn-group {
+            flex-direction: column;
+        }
+
+        .welcome-banner .btn {
+            font-size: 1rem;
+            padding: 12px 25px;
+        }
+    }
+
+    @media (max-width: 575px) {
+
+        /* Trên các thiết bị di động rất nhỏ */
+        .course-card .card-title {
+            font-size: 1.6rem;
+        }
+
+        .course-card .card-title i {
+            font-size: 1.4rem;
+        }
+
+        .course-card .discounted-price {
+            font-size: 2rem;
+        }
+
+        .welcome-banner h1 {
+            font-size: 1.8rem;
+        }
     }
 </style>
 
@@ -85,45 +475,64 @@
     <div class="row">
         {% if courses %}
         {% for course in courses %}
-        <div class="col-md-12">
-            <a href="{{ url_for('course.view_course', course_id=course._id) }}" class="text-decoration-none">
+        <div class="col-md-6"> <a href="{{ url_for('course.view_course', course_id=course._id) }}"
+                class="text-decoration-none">
                 <div class="card course-card course-card-{{ course.color|default('purple') }}">
                     <div class="card-body">
-                        <h3 class="card-title"><i class="{{ course.icon_class|default('fas fa-crown') }}"></i> {{
+                        <h3 class="card-title"><i class="{{ course.icon_class|default('fas fa-book-open') }}"></i> {{
                             course.name }}</h3>
                         <p class="card-text">{{ course.description }}</p>
                         <p class="price">
                             <span class="original-price">{{ course.original_price }}đ</span>
                             <span class="discounted-price">{{ course.discounted_price }}đ</span>
                         </p>
+                        <div class="course-meta">
+                            <div class="mb-1">
+                                <i class="fas fa-user-tie"></i>
+                                Giảng viên: {{ course.created_by }}
+                            </div>
+                            <div class="mb-1">
+                                <i class="fas fa-play-circle"></i>
+                                {{ course.chapters|length if course.chapters else 0 }} chương
+                            </div>
+                        </div>
                     </div>
                 </div>
             </a>
         </div>
         {% endfor %}
         {% else %}
-        <div class="col-12">
-            <p>Hiện tại chưa có khóa học nào.</p>
+        <div class="col-12 text-center py-5">
+            <h2 class="text-muted">Không có khóa học nào được tìm thấy.</h2>
+            <p class="text-muted">Hãy quay lại sau để khám phá các khóa học mới!</p>
+            <i class="fas fa-box-open fa-3x text-muted mt-4"></i>
         </div>
         {% endif %}
     </div>
     {% elif role == 'lecture' %}
     <div class="welcome-banner">
-        <h1>Chào mừng Giảng viên, {{ username }}!</h1>
+        <h1>Chào mừng Giảng viên, **{{ username }}**!</h1>
         <p class="lead">Bạn có thể quản lý và thêm các khóa học mới tại đây.</p>
-        <a href="{{ url_for('course.create_course') }}" class="btn btn-primary btn-lg mt-3">
-            <i class="fas fa-plus-circle"></i> Thêm khóa học mới
-        </a>
-        <a href="{{ url_for('course.manage_courses') }}" class="btn btn-secondary btn-lg mt-3">
-            <i class="fas fa-tasks"></i> Quản lý khóa học
-        </a>
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="{{ url_for('course.create_course') }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-plus-circle"></i> Thêm khóa học mới
+            </a>
+            <a href="{{ url_for('course.manage_courses') }}" class="btn btn-secondary btn-lg mt-3">
+                <i class="fas fa-tasks"></i> Quản lý khóa học
+            </a>
+        </div>
     </div>
     {% endif %}
     {% else %}
     <div class="welcome-banner">
         <h1>Chào mừng bạn đến với nền tảng học tập!</h1>
-        <p class="lead">Vui lòng <a href="{{ url_for('auth.login') }}">đăng nhập</a> hoặc <a
-                href="{{ url_for('auth.register') }}">đăng ký</a> để xem các khóa học.</p>
+        <div class="btn-group"> <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-user-plus"></i> Đăng ký
+            </a>
+        </div>
     </div>
     {% endif %}
 </div>
