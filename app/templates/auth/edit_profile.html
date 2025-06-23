@@ -23,8 +23,32 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" novalidate>
+                    <form method="POST" enctype="multipart/form-data" novalidate>
                         {{ form.hidden_tag() }}
+
+                        <!-- Avatar Upload Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="avatar-upload-section text-center">
+                                    <div class="current-avatar mb-3">
+                                        {% if user.avatar %}
+                                        <img src="{{ user.avatar }}" alt="Avatar" class="avatar-preview"
+                                            id="avatarPreview">
+                                        {% else %}
+                                        <div class="avatar-placeholder" id="avatarPreview">
+                                            <i class="fas fa-user fa-3x text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <label for="{{ form.avatar.id }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-camera me-2"></i>{{ form.avatar.label }}
+                                    </label>
+                                    {{ form.avatar(class="d-none", accept="image/*", onchange="previewAvatar(this)") }}
+                                    <div class="form-text mt-2">Chọn ảnh đại diện cho hồ sơ của bạn (JPG, PNG, GIF)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -44,19 +68,35 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.email.id }}" class="form-label">
-                                    <i class="fas fa-envelope me-2 text-muted"></i>{{ form.email.label }}
+                                <label for="{{ form.hometown.id }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ form.hometown.label }}
                                 </label>
-                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
-                                placeholder="example@email.com") }}
-                                {% if form.email.errors %}
+                                {{ form.hometown(class="form-control" + (" is-invalid" if form.hometown.errors else ""),
+                                placeholder="Nhập quê quán") }}
+                                {% if form.hometown.errors %}
                                 <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}
+                                    {% for error in form.hometown.errors %}
                                     {{ error }}
                                     {% endfor %}
                                 </div>
                                 {% endif %}
-                                <div class="form-text">Email sẽ được sử dụng để liên lạc</div>
+                                <div class="form-text">Thông tin về quê quán của bạn</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.birth_date.id }}" class="form-label">
+                                    <i class="fas fa-calendar me-2 text-muted"></i>{{ form.birth_date.label }}
+                                </label>
+                                {{ form.birth_date(class="form-control" + (" is-invalid" if form.birth_date.errors else
+                                ""), type="date") }}
+                                {% if form.birth_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.birth_date.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Chọn ngày, tháng, năm sinh</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -72,7 +112,23 @@
                                     {% endfor %}
                                 </div>
                                 {% endif %}
-                                <div class="form-text">Số điện thoại để liên lạc (không bắt buộc)</div>
+                                <div class="form-text">Số điện thoại để liên lạc</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.email.id }}" class="form-label">
+                                    <i class="fas fa-envelope me-2 text-muted"></i>{{ form.email.label }}
+                                </label>
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                                placeholder="example@email.com") }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Email sẽ được sử dụng để liên lạc</div>
                             </div>
 
                             <div class="col-12 mb-4">
@@ -125,6 +181,10 @@
                         <li class="mb-2">
                             <i class="fas fa-check-circle text-success me-2"></i>
                             Số điện thoại giúp tăng tính bảo mật cho tài khoản
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Ảnh đại diện sẽ hiển thị trên hồ sơ và trong các tương tác
                         </li>
                         <li>
                             <i class="fas fa-check-circle text-success me-2"></i>
@@ -198,29 +258,49 @@
         color: #6c757d;
     }
 
-    .btn-outline-secondary:hover {
+    .avatar-upload-section {
+        padding: 2rem;
+        border: 2px dashed #e9ecef;
+        border-radius: 12px;
         background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #495057;
     }
 
-    .list-unstyled li {
-        padding: 0.5rem 0;
+    .avatar-preview,
+    .avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9ecef;
     }
 
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .d-flex.justify-content-between .btn {
-            width: 100%;
-        }
+    .avatar-placeholder {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
     }
 </style>
+
+<script>
+    function previewAvatar(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var preview = document.getElementById('avatarPreview');
+                if (preview.tagName === 'IMG') {
+                    preview.src = e.target.result;
+                } else {
+                    // Replace placeholder with image
+                    preview.outerHTML = '<img src="' + e.target.result + '" alt="Avatar" class="avatar-preview" id="avatarPreview">';
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}

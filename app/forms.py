@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, BooleanField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, BooleanField, DateField
 from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional
 
 class RegistrationForm(FlaskForm):
@@ -30,24 +31,41 @@ class OTPForm(FlaskForm):
 
 # Profile Management Forms
 class ProfileEditForm(FlaskForm):
+    avatar = FileField('Ảnh đại diện', 
+                      validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Chỉ cho phép file ảnh!')])
     full_name = StringField('Họ và tên', 
-                           validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email',
-                       validators=[DataRequired(), Email()])
+                           validators=[Optional(), Length(min=2, max=100)])
+    hometown = StringField('Quê quán', 
+                          validators=[Optional(), Length(max=100)])
+    birth_date = DateField('Ngày sinh', 
+                          validators=[Optional()], 
+                          format='%Y-%m-%d')
     phone = StringField('Số điện thoại', 
                        validators=[Optional(), Length(min=10, max=15)])
+    email = StringField('Email',
+                       validators=[DataRequired(), Email()])
     bio = TextAreaField('Giới thiệu bản thân', 
                        validators=[Optional(), Length(max=500)])
     submit = SubmitField('Cập nhật thông tin')
 
-class ChangePasswordForm(FlaskForm):
+class ChangePasswordRequestForm(FlaskForm):
     current_password = PasswordField('Mật khẩu hiện tại', 
                                    validators=[DataRequired()])
     new_password = PasswordField('Mật khẩu mới', 
                                validators=[DataRequired(), Length(min=6, message='Mật khẩu phải có ít nhất 6 ký tự')])
     confirm_new_password = PasswordField('Xác nhận mật khẩu mới',
                                        validators=[DataRequired(), EqualTo('new_password', message='Mật khẩu xác nhận không khớp')])
-    submit = SubmitField('Đổi mật khẩu')
+    submit = SubmitField('Gửi mã OTP')
+
+class ChangePasswordWithOTPForm(FlaskForm):
+    current_password = PasswordField('Mật khẩu hiện tại', 
+                                   validators=[DataRequired()])
+    new_password = PasswordField('Mật khẩu mới', 
+                               validators=[DataRequired(), Length(min=6, message='Mật khẩu phải có ít nhất 6 ký tự')])
+    confirm_new_password = PasswordField('Xác nhận mật khẩu mới',
+                                       validators=[DataRequired(), EqualTo('new_password', message='Mật khẩu xác nhận không khớp')])
+    send_otp = SubmitField('Gửi mã OTP')
+    submit = SubmitField('Xác nhận thay đổi')
 
 class SecuritySettingsForm(FlaskForm):
     two_factor_enabled = BooleanField('Bật xác thực 2 yếu tố (2FA)')

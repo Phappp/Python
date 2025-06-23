@@ -64,7 +64,12 @@
                                 <small class="text-muted">{{ chapter.video_url }}</small>
                             </div>
                             <div>
-                                <!-- TODO: Thêm chức năng sửa chương -->
+                                <!-- Nút sửa chương -->
+                                <a href="{{ url_for('course.edit_chapter', course_id=course._id, chapter_id=chapter._id) }}"
+                                    class="btn btn-sm btn-outline-warning me-1">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <!-- Nút xóa chương -->
                                 <form
                                     action="{{ url_for('course.delete_chapter', course_id=course._id, chapter_id=chapter._id) }}"
                                     method="POST" class="d-inline"

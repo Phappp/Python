@@ -1,9 +1,11 @@
 import random
 import string
 import time
-from datetime import datetime
-from flask import flash, redirect, url_for, session, current_app
+import os
+from datetime import datetime, date
+from flask import flash, redirect, url_for, session, current_app, request
 from flask_mail import Message
+from werkzeug.utils import secure_filename
 from app.extensions import mail
 from app.models.user_model import User
 
@@ -23,6 +25,28 @@ class AuthController:
         except Exception as e:
             current_app.logger.error(f"Lỗi gửi email: {e}")
             return False
+
+    @staticmethod
+    def _save_avatar(file):
+        """Lưu file avatar và trả về đường dẫn"""
+        if file and file.filename:
+            # Tạo thư mục uploads nếu chưa tồn tại
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'avatars')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Tạo tên file an toàn
+            filename = secure_filename(file.filename)
+            # Thêm timestamp để tránh trùng tên
+            name, ext = os.path.splitext(filename)
+            filename = f"{name}_{int(time.time())}{ext}"
+            
+            # Lưu file
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+            
+            # Trả về đường dẫn tương đối
+            return f'/static/uploads/avatars/{filename}'
+        return None
 
     @staticmethod
     def register(form):
@@ -209,69 +233,204 @@ class AuthController:
     @staticmethod
     def update_profile(form):
         """Cập nhật thông tin hồ sơ cá nhân"""
-        if form.validate_on_submit():
-            username = session.get('username')
-            if not username:
-                flash('Phiên làm việc không hợp lệ!', 'danger')
-                return redirect(url_for('auth.login'))
-            
-            user = User.find_by_username(username)
-            if not user:
-                flash('Không tìm thấy thông tin người dùng!', 'danger')
-                return redirect(url_for('auth.login'))
-            
-            # Kiểm tra email có bị trùng với người dùng khác không
-            new_email = form.email.data
-            if new_email != user.get('email'):
-                existing_user = User.find_by_email(new_email)
-                if existing_user and existing_user['username'] != username:
-                    flash('Email này đã được sử dụng bởi tài khoản khác!', 'danger')
-                    return None
-            
-            # Cập nhật thông tin
-            update_data = {
-                'full_name': form.full_name.data,
-                'email': new_email,
-                'phone': form.phone.data or '',
-                'bio': form.bio.data or '',
-                'updated_at': datetime.utcnow()
-            }
-            
-            if User.update_profile(username, update_data):
-                flash('Cập nhật thông tin thành công!', 'success')
-                return redirect(url_for('auth.profile'))
-            else:
-                flash('Có lỗi xảy ra khi cập nhật thông tin!', 'danger')
+        username = session.get('username')
+        if not username:
+            flash('Phiên làm việc không hợp lệ!', 'danger')
+            return redirect(url_for('auth.login'))
         
-        return None
+        user = User.find_by_username(username)
+        if not user:
+            flash('Không tìm thấy thông tin người dùng!', 'danger')
+            return redirect(url_for('auth.login'))
+        
+        # Kiểm tra email có bị trùng với người dùng khác không
+        new_email = form.email.data
+        if new_email != user.get('email'):
+            existing_user = User.find_by_email(new_email)
+            if existing_user and existing_user['username'] != username:
+                flash('Email này đã được sử dụng bởi tài khoản khác!', 'danger')
+                return None
+        
+        # Chuẩn bị dữ liệu cập nhật
+        update_data = {
+            'full_name': form.full_name.data,
+            'email': new_email,
+            'hometown': form.hometown.data or '',
+            'phone': form.phone.data or '',
+            'bio': form.bio.data or '',
+        }
+        
+        # Chuyển đổi date thành datetime để tương thích với MongoDB
+        birth_date_obj = form.birth_date.data
+        if birth_date_obj:
+            update_data['birth_date'] = datetime.combine(birth_date_obj, datetime.min.time())
+        else:
+            update_data['birth_date'] = None
+
+        # Xử lý upload avatar nếu có
+        if form.avatar.data:
+            avatar_path = AuthController._save_avatar(form.avatar.data)
+            if avatar_path:
+                update_data['avatar'] = avatar_path
+            else:
+                flash('Có lỗi xảy ra khi tải lên ảnh đại diện!', 'danger')
+                return None
+        
+        if User.update_profile(username, update_data):
+            flash('Cập nhật thông tin thành công!', 'success')
+            return redirect(url_for('auth.profile'))
+        else:
+            flash('Có lỗi xảy ra khi cập nhật thông tin!', 'danger')
+            return None # Re-render form on failure
+
+    @staticmethod
+    def request_password_change(form):
+        """Xử lý yêu cầu thay đổi mật khẩu, kiểm tra và gửi OTP"""
+        username = session.get('username')
+        if not username:
+            flash('Phiên làm việc không hợp lệ!', 'danger')
+            return redirect(url_for('auth.login'))
+
+        user = User.find_by_username(username)
+        if not user:
+            flash('Không tìm thấy thông tin người dùng!', 'danger')
+            return redirect(url_for('auth.login'))
+
+        # Kiểm tra mật khẩu hiện tại
+        if not User.check_password(user, form.current_password.data):
+            flash('Mật khẩu hiện tại không đúng!', 'danger')
+            return None  # Re-render the form with error
+
+        # Mật khẩu đúng, gửi OTP
+        otp = ''.join(random.choices(string.digits, k=6))
+        if AuthController._send_otp_email(user['email'], otp, "Mã OTP xác thực thay đổi mật khẩu"):
+            session['change_password_otp'] = otp
+            session['change_password_otp_time'] = int(time.time())
+            # Lưu mật khẩu mới vào session để sử dụng sau khi xác thực OTP
+            session['change_password_new_password'] = form.new_password.data
+            
+            flash('Mã OTP đã được gửi đến email của bạn.', 'info')
+            return redirect(url_for('auth.verify_password_change'))
+        else:
+            flash('Không thể gửi email OTP. Vui lòng thử lại sau.', 'danger')
+            return None
+
+    @staticmethod
+    def verify_password_change(form):
+        """Xác thực OTP và hoàn tất thay đổi mật khẩu"""
+        username = session.get('username')
+        if not username or 'change_password_otp' not in session:
+            flash('Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.', 'danger')
+            return redirect(url_for('auth.change_password'))
+
+        # Kiểm tra OTP
+        verification_time = int(time.time())
+        created_time = int(session.get('change_password_otp_time', 0))
+        
+        if verification_time - created_time > AuthController.OTP_EXPIRATION:
+            # Xóa session OTP
+            session.pop('change_password_otp', None)
+            session.pop('change_password_otp_time', None)
+            session.pop('change_password_new_password', None)
+            flash('Mã OTP đã hết hạn. Vui lòng thử lại!', 'danger')
+            return redirect(url_for('auth.change_password'))
+
+        if str(session['change_password_otp']) != str(form.otp.data):
+            flash('Mã OTP không đúng!', 'danger')
+            return None # Re-render the OTP form with error
+
+        # OTP đúng, cập nhật mật khẩu
+        new_password = session.get('change_password_new_password')
+        if User.update_password(username, new_password):
+            flash('Đổi mật khẩu thành công!', 'success')
+        else:
+            flash('Có lỗi xảy ra khi đổi mật khẩu!', 'danger')
+
+        # Xóa toàn bộ session OTP
+        session.pop('change_password_otp', None)
+        session.pop('change_password_otp_time', None)
+        session.pop('change_password_new_password', None)
+
+        return redirect(url_for('auth.profile'))
 
     @staticmethod
     def change_password(form):
         """Đổi mật khẩu"""
         if form.validate_on_submit():
+            response = AuthController.change_password(form)
+            if response:
+                return response
+        
+        return None
+
+    @staticmethod
+    def send_change_password_otp(current_password, new_password):
+        """Gửi OTP để xác thực thay đổi mật khẩu"""
+        try:
             username = session.get('username')
             if not username:
-                flash('Phiên làm việc không hợp lệ!', 'danger')
-                return redirect(url_for('auth.login'))
+                return {'success': False, 'message': 'Phiên làm việc không hợp lệ'}
             
             user = User.find_by_username(username)
             if not user:
-                flash('Không tìm thấy thông tin người dùng!', 'danger')
-                return redirect(url_for('auth.login'))
+                return {'success': False, 'message': 'Không tìm thấy thông tin người dùng'}
             
             # Kiểm tra mật khẩu hiện tại
-            if not User.check_password(user, form.current_password.data):
-                flash('Mật khẩu hiện tại không đúng!', 'danger')
-                return None
+            if not User.check_password(user, current_password):
+                return {'success': False, 'message': 'Mật khẩu hiện tại không đúng'}
             
-            # Cập nhật mật khẩu mới
-            if User.update_password(username, form.new_password.data):
-                flash('Đổi mật khẩu thành công!', 'success')
-                return redirect(url_for('auth.profile'))
+            # Tạo OTP
+            otp = ''.join(random.choices(string.digits, k=6))
+            
+            # Gửi OTP qua email
+            if AuthController._send_otp_email(user['email'], otp, "Mã OTP xác thực thay đổi mật khẩu"):
+                # Lưu OTP vào session
+                session['change_password_otp'] = otp
+                session['change_password_otp_time'] = int(time.time())
+                session['change_password_new_password'] = new_password
+                
+                return {'success': True, 'message': 'Mã OTP đã được gửi đến email của bạn'}
             else:
-                flash('Có lỗi xảy ra khi đổi mật khẩu!', 'danger')
-        
-        return None
+                return {'success': False, 'message': 'Không thể gửi email OTP'}
+                
+        except Exception as e:
+            current_app.logger.error(f"Error sending change password OTP: {e}")
+            return {'success': False, 'message': 'Có lỗi xảy ra khi gửi OTP'}
+
+    @staticmethod
+    def _verify_change_password_otp(otp):
+        """Xác thực OTP cho thay đổi mật khẩu"""
+        try:
+            required_keys = ['change_password_otp', 'change_password_otp_time', 'change_password_new_password']
+            missing_keys = [key for key in required_keys if key not in session]
+            
+            if missing_keys:
+                return False
+
+            verification_time = int(time.time())
+            created_time = int(session['change_password_otp_time'])
+            time_delta = verification_time - created_time
+            
+            if time_delta > AuthController.OTP_EXPIRATION:
+                # Cleanup session
+                session.pop('change_password_otp', None)
+                session.pop('change_password_otp_time', None)
+                session.pop('change_password_new_password', None)
+                return False
+
+            if str(session['change_password_otp']) != str(otp):
+                return False
+
+            # Cleanup session sau khi xác thực thành công
+            session.pop('change_password_otp', None)
+            session.pop('change_password_otp_time', None)
+            session.pop('change_password_new_password', None)
+            
+            return True
+            
+        except Exception as e:
+            current_app.logger.error(f"Error verifying change password OTP: {e}")
+            return False
 
     @staticmethod
     def update_security_settings(form):

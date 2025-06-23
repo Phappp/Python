@@ -11,6 +11,13 @@ class User:
             'email': email,
             'password': hashed_password,
             'role': role,
+            'full_name': '',
+            'phone': '',
+            'bio': '',
+            'avatar': '',
+            'hometown': '',
+            'birth_date': None,
+            'two_factor_enabled': False,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         })
@@ -37,6 +44,9 @@ class User:
     def update_profile(username, update_data):
         """Cập nhật thông tin hồ sơ cá nhân"""
         try:
+            # Thêm updated_at vào dữ liệu cập nhật
+            update_data['updated_at'] = datetime.utcnow()
+            
             result = mongo.db.users.update_one(
                 {'username': username},
                 {'$set': update_data}
@@ -44,6 +54,24 @@ class User:
             return result.modified_count > 0
         except Exception as e:
             print(f"Error updating profile: {e}")
+            return False
+
+    @staticmethod
+    def update_avatar(username, avatar_path):
+        """Cập nhật avatar cho người dùng"""
+        try:
+            result = mongo.db.users.update_one(
+                {'username': username},
+                {
+                    '$set': {
+                        'avatar': avatar_path,
+                        'updated_at': datetime.utcnow()
+                    }
+                }
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating avatar: {e}")
             return False
 
     @staticmethod

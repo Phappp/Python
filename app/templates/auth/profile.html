@@ -10,9 +10,13 @@
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <div class="profile-avatar">
+                                {% if user.avatar %}
+                                <img src="{{ user.avatar }}" alt="Avatar" class="avatar-circle">
+                                {% else %}
                                 <div class="avatar-circle">
                                     <span class="avatar-text">{{ user.username[0].upper() }}</span>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col">
@@ -55,32 +59,53 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Họ và tên</label>
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-user me-2"></i>Họ và tên
+                            </label>
                             <p class="mb-0 fw-bold">{{ user.full_name or 'Chưa cập nhật' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Email</label>
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </label>
+                            <p class="mb-0">{{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-phone me-2"></i>Số điện thoại
+                            </label>
+                            <p class="mb-0">{{ user.phone or 'Chưa cập nhật' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-map-marker-alt me-2"></i>Quê quán
+                            </label>
+                            <p class="mb-0">{{ user.hometown or 'Chưa cập nhật' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-calendar me-2"></i>Ngày sinh
+                            </label>
                             <p class="mb-0">
-                                <i class="fas fa-envelope me-2 text-muted"></i>
-                                {{ user.email }}
+                                {% if user.birth_date %}
+                                {{ user.birth_date.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                Chưa cập nhật
+                                {% endif %}
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Số điện thoại</label>
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-calendar-plus me-2"></i>Ngày tham gia
+                            </label>
                             <p class="mb-0">
-                                <i class="fas fa-phone me-2 text-muted"></i>
-                                {{ user.phone or 'Chưa cập nhật' }}
-                            </p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Ngày tham gia</label>
-                            <p class="mb-0">
-                                <i class="fas fa-calendar me-2 text-muted"></i>
                                 {{ user.created_at.strftime('%d/%m/%Y') if user.created_at else 'Chưa có thông tin' }}
                             </p>
                         </div>
                         <div class="col-12">
-                            <label class="form-label text-muted small">Giới thiệu bản thân</label>
+                            <label class="form-label text-muted small">
+                                <i class="fas fa-info-circle me-2"></i>Giới thiệu bản thân
+                            </label>
                             <p class="mb-0">
                                 {{ user.bio or 'Chưa có thông tin giới thiệu' }}
                             </p>
@@ -206,15 +231,15 @@
                                 <div class="stat-label text-muted small">Chứng chỉ</div>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 mb-3">
                             <div class="stat-item">
-                                <div class="stat-number text-warning fw-bold">0</div>
+                                <div class="stat-number text-info fw-bold">0</div>
                                 <div class="stat-label text-muted small">Giờ học</div>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 mb-3">
                             <div class="stat-item">
-                                <div class="stat-number text-info fw-bold">0</div>
+                                <div class="stat-number text-warning fw-bold">0</div>
                                 <div class="stat-label text-muted small">Điểm số</div>
                             </div>
                         </div>
@@ -231,55 +256,30 @@
     }
 
     .avatar-circle {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: bold;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 4px solid white;
+    }
+
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .avatar-text {
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .profile-actions {
-        margin-top: 1rem;
-    }
-
-    .stat-item {
-        padding: 1rem 0;
-    }
-
-    .stat-number {
-        font-size: 1.5rem;
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-
-    .list-group-item {
-        border: none;
-        padding: 1rem;
-        transition: all 0.2s ease;
-    }
-
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-        transform: translateX(5px);
-    }
-
-    .list-group-item i {
-        width: 20px;
-        text-align: center;
+        font-size: 2.5rem;
+        font-weight: bold;
     }
 
     .card {
@@ -288,33 +288,66 @@
     }
 
     .card-header {
-        padding: 1rem 1.5rem;
+        padding: 1.5rem;
         border-bottom: 1px solid #e9ecef;
     }
 
     .card-body {
-        padding: 1.5rem;
+        padding: 2rem;
     }
 
     .form-label {
         font-weight: 500;
+        color: #495057;
         margin-bottom: 0.5rem;
     }
 
-    @media (max-width: 768px) {
-        .profile-actions {
-            margin-top: 0.5rem;
-        }
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
 
-        .profile-actions .btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
 
-        .profile-actions .btn:last-child {
-            margin-bottom: 0;
-        }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 1rem 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .stat-item {
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
     }
 </style>
 {% endblock %}

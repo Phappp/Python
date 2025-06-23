@@ -100,6 +100,26 @@ def delete_chapter(course_id, chapter_id):
     flash('Đã xóa chương thành công!', 'success')
     return redirect(url_for('course.manage_chapters', course_id=course_id))
 
+@course_bp.route('/<course_id>/chapters/<chapter_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required('lecture')
+def edit_chapter(course_id, chapter_id):
+    course = Course.find_by_id(course_id)
+    if not course or course['created_by'] != session['username']:
+        flash('Bạn không có quyền chỉnh sửa chương này.', 'danger')
+        return redirect(url_for('course.manage_courses'))
+    chapter_data = Course.find_chapter(course_id, chapter_id)
+    if not chapter_data or not chapter_data.get('chapters'):
+        flash('Chương không tồn tại.', 'danger')
+        return redirect(url_for('course.manage_chapters', course_id=course_id))
+    chapter = chapter_data['chapters'][0]
+    form = ChapterForm(data=chapter)
+    if form.validate_on_submit():
+        response = CourseController.update_chapter(course_id, chapter_id, form)
+        if response:
+            return response
+    return render_template('courses/edit_chapter.html', form=form, course=course, chapter=chapter, title='Chỉnh sửa chương')
+
 def get_embed_url(youtube_url):
     """
     Chuyển đổi URL YouTube tiêu chuẩn thành URL có thể nhúng được.

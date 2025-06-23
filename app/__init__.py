@@ -44,4 +44,16 @@ def create_app():
     app.register_blueprint(course_bp)
     mail.init_app(app)
 
+    @app.context_processor
+    def inject_user_info():
+        from app.models.user_model import User
+        username = session.get('username')
+        role = session.get('role')
+        avatar = None
+        if username:
+            user = User.find_by_username(username)
+            if user:
+                avatar = user.get('avatar')
+        return dict(username=username, role=role, avatar=avatar)
+
     return app

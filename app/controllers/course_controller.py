@@ -65,4 +65,20 @@ class CourseController:
             flash('Xóa khóa học thành công!', 'success')
         except Exception as e:
             flash(f'Lỗi khi xóa khóa học: {e}', 'danger')
-        return redirect(url_for('course.manage_courses')) 
+        return redirect(url_for('course.manage_courses'))
+
+    @staticmethod
+    def update_chapter(course_id, chapter_id, form):
+        if form.validate_on_submit():
+            try:
+                Course.update_chapter(
+                    course_id=course_id,
+                    chapter_id=chapter_id,
+                    title=form.title.data,
+                    video_url=form.video_url.data
+                )
+                flash('Cập nhật chương thành công!', 'success')
+                return redirect(url_for('course.manage_chapters', course_id=course_id))
+            except Exception as e:
+                flash(f'Đã có lỗi xảy ra khi cập nhật chương: {e}', 'danger')
+        return None 
