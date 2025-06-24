@@ -212,35 +212,25 @@
               </a>
             </li> -->
             {% if username %} {% if role == 'student' %}
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-file-alt me-1"></i>Tài liệu
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-clipboard-list me-1"></i>Bài tập
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('course.view_courses') }}">
+                <i class="fas fa-book me-1"></i>Khóa học
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">
                 <i class="fas fa-certificate me-1"></i>Chứng chỉ
               </a>
-            </li>
+            </li> -->
             {% elif role == 'lecture' %}
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-file-alt me-1"></i>Tài liệu
+              <a class="nav-link" href="{{ url_for('course.manage_courses') }}">
+                <i class="fas fa-tasks me-1"></i>Quản lý khóa học
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-clipboard-list me-1"></i>Bài tập
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-certificate me-1"></i>Chứng chỉ
+              <a class="nav-link" href="{{ url_for('course.create_course') }}">
+                <i class="fas fa-plus me-1"></i>Tạo khóa học
               </a>
             </li>
             {% endif %} {% endif %}

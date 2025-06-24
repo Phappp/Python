@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 
 class Course:
     @staticmethod
-    def create(name, description, original_price, discounted_price, created_by, color, icon_class, course_type):
+    def create(name, description, original_price, discounted_price, created_by, color, icon_class):
         """
         Tạo một khóa học mới và lưu vào cơ sở dữ liệu.
         """
@@ -15,7 +15,6 @@ class Course:
             'created_by': created_by,
             'color': color,
             'icon_class': icon_class,
-            'course_type': course_type,
             'chapters': []  # Khởi tạo mảng chapters rỗng
         })
 
