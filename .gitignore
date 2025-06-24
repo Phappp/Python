@@ -4,3 +4,4 @@ __pycache__/
 *.pyo
 *.pyd
 venv/
+app/static/uploads/avatars/Screenshot_2025-05-29_193712_1750762439.png

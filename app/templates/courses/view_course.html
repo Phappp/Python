@@ -21,6 +21,24 @@
         height: 100%;
     }
 
+    body>div.container.mt-4>div>div.col-lg-4>div.card.shadow-sm {
+        border-top: 4px solid #1d1b1b9a;
+        border-right: 4px solid #1d1b1b9a;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+        /* overflow-y: scroll; */
+    }
+
+    #chapter-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    #chapter-list::-webkit-scrollbar {
+        width: 1px;
+    }
+
     .chapter-list .list-group-item {
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
@@ -60,7 +78,7 @@
                 </div>
                 {% endif %}
             </div>
-            <h3 id="video-title" class="mb-4">
+            <h3 id="video-title" class="mb-4" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
                 {% if chapters %}{{ chapters[0].title }}{% endif %}
             </h3>
         </div>
@@ -68,8 +86,8 @@
         <!-- Chapter List -->
         <div class="col-lg-4">
             <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Danh sách chương</h5>
+                <div class="card-header" ">
+                    <h5 class=" mb-0">Danh sách chương</h5>
                 </div>
                 <ul class="list-group list-group-flush chapter-list" id="chapter-list">
                     {% if chapters %}
