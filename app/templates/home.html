@@ -25,19 +25,20 @@
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         /* Chuyển đổi mượt mà và phức tạp hơn */
         border: none;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         /* Đổ bóng mới: đa lớp và rõ ràng hơn */
         /* box-shadow:
             0 20px 40px rgba(0, 0, 0, 0.35),
             0 10px 20px rgba(0, 0, 0, 0.2); */
         box-shadow:
             inset 0 0 20px #ddd,
-            inset 20px 0 60px violet,
-            inset -20px 0 60px #0ff,
+            inset 20px 0 20px violet,
+            inset -20px 0 20px #0ff,
             inset 20px 0 300px violet,
             inset -20px 0 300px #0ff,
             0 0 20px #ddd,
-            -10px 0 60px violet,
-            10px 0 60px #0ff;
+            -10px 0 20px violet,
+            10px 0 20px #0ff;
 
         /* Bóng nổi bật hơn */
         position: relative;
@@ -93,14 +94,14 @@
         /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15),
             0 20px 40px rgba(0, 0, 0, 0.1); */
         box-shadow:
-            inset 0 0 20px #ccc,
-            inset 20px 0 60px violet,
-            inset -20px 0 60px #0ff,
+            inset 0 0 10px #ccc,
+            inset 20px 0 40px violet,
+            inset -20px 0 40px #0ff,
             inset 20px 0 300px violet,
             inset -20px 0 300px #0ff,
-            0 0 20px #ccc,
-            -10px 0 60px violet,
-            10px 0 60px #0ff;
+            0 0 10px #ccc,
+            -10px 0 40px violet,
+            10px 0 40px #0ff;
     }
 
     .course-card:hover::after {
@@ -492,7 +493,8 @@
 <div class="container mt-4">
     {% if username %}
     {% if role == 'student' %}
-    <h1 style="font-weight: bold; color: #fff; padding-bottom:100px; padding-top: 40px;" class="mb-4">Các khóa học có sẵn</h1>
+    <h1 style="font-weight: bold; color: #fff; padding-bottom:100px; padding-top: 40px;" class="mb-4">Các khóa học có
+        sẵn</h1>
     <div class="row">
         {% if courses %}
         {% for course in courses %}

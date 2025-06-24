@@ -195,7 +195,7 @@
               </a>
             </li> -->
             {% if username %} {% if role == 'student' %}
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.view_courses') }}">
                 <i class="fas fa-book me-1"></i>Khóa học
               </a>
@@ -204,7 +204,7 @@
               <a class="nav-link" href="#">
                 <i class="fas fa-certificate me-1"></i>Chứng chỉ
               </a>
-            </li>
+            </li> -->
             {% elif role == 'lecture' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.manage_courses') }}">

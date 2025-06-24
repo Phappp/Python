@@ -230,10 +230,16 @@
 </div>
 
 <style>
-    #currentPassword{
+    #currentPassword {
+        border: 4px solid rgba(221, 57, 21, 0.25);
+        border-radius: 5px;
+    }
+
+    #currentPassword.has-data {
         border: 4px solid rgba(40, 167, 69, 0.25);
         border-radius: 5px;
     }
+
     .card {
         border-radius: 12px;
         overflow: hidden;
@@ -429,6 +435,14 @@
             button.classList.add('btn-outline-secondary');
         }, 2000);
     }
+
+    document.getElementById("currentPassword").addEventListener("input", function () {
+        if (this.value.trim() !== "") {
+            this.classList.add("has-data");
+        } else {
+            this.classList.remove("has-data");
+        }
+    });
 
     // Toggle 2FA info section
     document.addEventListener('DOMContentLoaded', function () {
