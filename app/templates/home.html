@@ -555,16 +555,17 @@
     </div> -->
     {% endif %}
     {% else %}
-    <div class="welcome-banner">
-        <!-- <h1>Chào mừng bạn đến với nền tảng học tập!</h1> -->
-        <div class="btn-group"> <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+    <!-- <div class="welcome-banner">
+        <h1>Chào mừng bạn đến với nền tảng học tập!</h1>
+        <div class="btn-group">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-sign-in-alt"></i> Đăng nhập
             </a>
             <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
                 <i class="fas fa-user-plus"></i> Đăng ký
             </a>
         </div>
-    </div>
+    </div> -->
     {% endif %}
 </div>
 {% endblock %}

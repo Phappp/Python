@@ -10,7 +10,6 @@
   <style>
     /* Header Styles */
     .header {
-      /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
       background-color: #121212;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
@@ -87,9 +86,7 @@
     }
 
     .dropdown-item:hover {
-      /* background-color: #f8f9fa; */
       background-color: rgba(0, 0, 0, 0.2);
-      /* transform: translateX(5px); */
     }
 
     .dropdown-item i {
@@ -104,7 +101,6 @@
 
     .user-info {
       padding: 1rem 1.5rem;
-      /* background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); */
       background-color: rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       margin: 0 0.5rem 0.5rem 0.5rem;
@@ -178,6 +174,61 @@
       cursor: pointer;
     }
 
+    /* Custom styles for Login and Register buttons */
+    .auth-buttons {
+      position: fixed;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      /* Space between buttons */
+      width: 30%;
+      padding-right: 0;
+      /* Push buttons to the right */
+    }
+
+    .auth-button {
+      padding: 10px 10px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background-size: 200% auto;
+      /* For gradient animation */
+      color: white;
+      font-size: 10px;
+      /* Default text color for gradient buttons */
+      text-decoration: none;
+      /* Remove underline for links */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100px;
+    }
+
+    .auth-button.login {
+      background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .auth-button.register {
+      background-image: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+    }
+
+    .auth-button:hover {
+      background-position: right center;
+      /* Animate gradient */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-button i {
+      margin-right: 8px;
+    }
+
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .dropdown-menu {
@@ -187,12 +238,32 @@
       .user-info {
         padding: 0.75rem 1rem;
       }
+
+      .auth-buttons {
+        margin-left: 0;
+        justify-content: center;
+        margin-right: 20px;
+        gap: 5px;
+      }
+
+      .auth-button {
+        font-size: 8px;
+      }
+
+      .navbar-collapse {
+        order: 3;
+        /* Ensure collapse menu is at the bottom on small screens */
+      }
+
+      .navbar-toggler {
+        margin-left: auto;
+        /* Push toggler to the right */
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- Header -->
   <header class="header">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
@@ -200,28 +271,24 @@
           <i class="fas fa-graduation-cap me-2"></i>EduPlatform
         </a>
 
+        {% if not username %}
+        <div class="auth-buttons d-lg-flex"> {# Hidden on small screens, shown on large #}
+          <a href="{{ url_for('auth.login') }}" class="auth-button login">
+            Đăng nhập
+          </a>
+          <a href="{{ url_for('auth.register') }}" class="auth-button register">
+            Đăng ký
+          </a>
+        </div>
+        {% endif %}
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.home') }}">
-                <i class="fas fa-home me-1"></i>Trang chủ
-              </a>
-            </li> -->
             {% if username %} {% if role == 'student' %}
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('course.view_courses') }}">
-                <i class="fas fa-book me-1"></i>Khóa học
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-certificate me-1"></i>Chứng chỉ
-              </a>
-            </li> -->
             {% elif role == 'lecture' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.manage_courses') }}">
@@ -239,7 +306,6 @@
           <ul class="navbar-nav">
             {% if username %}
 
-            <!-- User Profile Dropdown -->
             <li class="nav-item dropdown user-profile-dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                 data-bs-toggle="dropdown">
@@ -272,21 +338,11 @@
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
-                <!-- <li>
-                  <a class="dropdown-item" href="{{ url_for('auth.profile') }}">
-                    <i class="fas fa-user-circle"></i>
-                    <div>
-                      <div class="fw-bold">Hồ sơ cá nhân</div>
-                      <small class="text-muted">Xem và cập nhật thông tin</small>
-                    </div>
-                  </a>
-                </li> -->
                 <li>
                   <a class="dropdown-item" href="{{ url_for('auth.edit_profile') }}">
                     <i class="fas fa-edit"></i>
                     <div>
                       <div class="fw-bold">Chỉnh sửa hồ sơ</div>
-                      <!-- <small class="text-muted">Cập nhật thông tin cá nhân</small> -->
                     </div>
                   </a>
                 </li>
@@ -295,7 +351,6 @@
                     <i class="fas fa-key"></i>
                     <div>
                       <div class="fw-bold">Đổi mật khẩu</div>
-                      <!-- <small class="text-muted">Bảo mật tài khoản</small> -->
                     </div>
                   </a>
                 </li>
@@ -304,7 +359,6 @@
                     <i class="fas fa-shield-alt"></i>
                     <div>
                       <div class="fw-bold">Bảo mật 2FA</div>
-                      <!-- <small class="text-muted">Cấu hình xác thực 2 yếu tố</small> -->
                     </div>
                   </a>
                 </li>
@@ -323,16 +377,16 @@
               </ul>
             </li>
             {% else %}
-            <!-- <li class="nav-item">
-              <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light me-2">
-                <i class="fas fa-sign-in-alt me-1"></i>Quay lại
+            <li class="nav-item d-lg-none"> {# Shown only on small screens #}
+              <a href="{{ url_for('auth.login') }}" class="nav-link">
+                <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập
               </a>
-            </li> -->
-            <!-- <li class="nav-item">
-              <a href="{{ url_for('auth.register') }}" class="btn btn-light">
-                <i class="fas fa-user-plus me-1"></i>Đăng ký
+            </li>
+            <li class="nav-item d-lg-none"> {# Shown only on small screens #}
+              <a href="{{ url_for('auth.register') }}" class="nav-link">
+                <i class="fas fa-user-plus me-1"></i> Đăng ký
               </a>
-            </li> -->
+            </li>
             {% endif %}
           </ul>
         </div>
