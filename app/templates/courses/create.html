@@ -67,6 +67,16 @@
                         </div>
 
                         <div class="mb-3">
+                            {{ form.course_type.label(class="form-label fw-bold") }}
+                            {{ form.course_type(class="form-select" + (" is-invalid" if form.course_type.errors else "")) }}
+                            {% if form.course_type.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.course_type.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
                             {{ form.icon_class.label(class="form-label fw-bold") }}
                             {{ form.icon_class(class="form-control" + (" is-invalid" if form.icon_class.errors else ""))
                             }}

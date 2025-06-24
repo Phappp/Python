@@ -87,6 +87,7 @@ class CourseForm(FlaskForm):
                       ],
                       default='purple',
                       validators=[DataRequired()])
+    course_type = SelectField('Loại khóa học', choices=[('basic', 'Cơ bản'), ('advanced', 'Nâng cao')], default='basic', validators=[DataRequired()])
     icon_class = StringField('Lớp icon (ví dụ: fas fa-crown)', 
                              default='fas fa-crown',
                              validators=[DataRequired()])

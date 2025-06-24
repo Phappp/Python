@@ -17,7 +17,12 @@ def view_courses():
         return redirect(url_for('main.home'))
     
     courses = list(Course.get_all())
-    return render_template('courses/view_courses.html', courses=courses, title="Danh sách khóa học")
+    basic_courses = [c for c in courses if c.get('course_type') == 'basic']
+    advanced_courses = [c for c in courses if c.get('course_type') == 'advanced']
+    return render_template('courses/view_courses.html', 
+        basic_courses=basic_courses, 
+        advanced_courses=advanced_courses, 
+        title="Danh sách khóa học")
 
 @course_bp.route('/new', methods=['GET', 'POST'])
 @login_required
