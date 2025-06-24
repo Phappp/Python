@@ -10,11 +10,16 @@
   <style>
     /* Header Styles */
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+      background-color: #121212;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
       z-index: 1000;
+    }
+
+    .header a {
+      text-decoration: none;
     }
 
     .navbar-brand {
@@ -58,6 +63,10 @@
       border-color: rgba(255, 255, 255, 0.6);
     }
 
+    #navbarNav>ul:nth-child(2)>li>ul>li:nth-child(3)>a>i {
+      font-size: 28px;
+    }
+
     .dropdown-menu {
       border: none;
       border-radius: 12px;
@@ -74,11 +83,13 @@
       transition: all 0.2s ease;
       border-radius: 8px;
       margin: 0 0.5rem;
+      transform: translateX(-5px);
     }
 
     .dropdown-item:hover {
-      background-color: #f8f9fa;
-      transform: translateX(5px);
+      /* background-color: #f8f9fa; */
+      background-color: rgba(0, 0, 0, 0.2);
+      /* transform: translateX(5px); */
     }
 
     .dropdown-item i {
@@ -93,9 +104,15 @@
 
     .user-info {
       padding: 1rem 1.5rem;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      /* background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); */
+      background-color: rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       margin: 0 0.5rem 0.5rem 0.5rem;
+      transition: .2s ease;
+    }
+
+    .user-info:hover {
+      background-color: rgba(0, 0, 0, 0.3);
     }
 
     .user-name {
@@ -238,22 +255,24 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <div class="user-info">
-                    <div class="user-name">{{ username }}</div>
-                    <div class="user-role">
-                      {% if role == 'student' %}
-                      <i class="fas fa-user-graduate me-1"></i>Học viên {%
-                      elif role == 'lecture' %}
-                      <i class="fas fa-chalkboard-teacher me-1"></i>Giảng viên
-                      {% else %} <i class="fas fa-user me-1"></i>{{ role }} {%
-                      endif %}
+                  <a href="{{ url_for('auth.profile') }}">
+                    <div class="user-info">
+                      <div class="user-name">{{ username }}</div>
+                      <div class="user-role">
+                        {% if role == 'student' %}
+                        <i class="fas fa-user-graduate me-1"></i>Học viên {%
+                        elif role == 'lecture' %}
+                        <i class="fas fa-chalkboard-teacher me-1"></i>Giảng viên
+                        {% else %} <i class="fas fa-user me-1"></i>{{ role }} {%
+                        endif %}
+                      </div>
                     </div>
-                  </div>
+                  </a>
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
-                <li>
+                <!-- <li>
                   <a class="dropdown-item" href="{{ url_for('auth.profile') }}">
                     <i class="fas fa-user-circle"></i>
                     <div>
@@ -261,13 +280,13 @@
                       <small class="text-muted">Xem và cập nhật thông tin</small>
                     </div>
                   </a>
-                </li>
+                </li> -->
                 <li>
                   <a class="dropdown-item" href="{{ url_for('auth.edit_profile') }}">
                     <i class="fas fa-edit"></i>
                     <div>
                       <div class="fw-bold">Chỉnh sửa hồ sơ</div>
-                      <small class="text-muted">Cập nhật thông tin cá nhân</small>
+                      <!-- <small class="text-muted">Cập nhật thông tin cá nhân</small> -->
                     </div>
                   </a>
                 </li>
@@ -276,7 +295,7 @@
                     <i class="fas fa-key"></i>
                     <div>
                       <div class="fw-bold">Đổi mật khẩu</div>
-                      <small class="text-muted">Bảo mật tài khoản</small>
+                      <!-- <small class="text-muted">Bảo mật tài khoản</small> -->
                     </div>
                   </a>
                 </li>
@@ -285,7 +304,7 @@
                     <i class="fas fa-shield-alt"></i>
                     <div>
                       <div class="fw-bold">Bảo mật 2FA</div>
-                      <small class="text-muted">Cấu hình xác thực 2 yếu tố</small>
+                      <!-- <small class="text-muted">Cấu hình xác thực 2 yếu tố</small> -->
                     </div>
                   </a>
                 </li>

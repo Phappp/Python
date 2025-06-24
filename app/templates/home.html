@@ -4,12 +4,21 @@
 <style>
     /* Global Page Styling */
     body {
-        background-color: #2a3037;
+        background-color: #15171a;
         /* Nền rất nhẹ, sạch sẽ */
         font-family: 'Inter', sans-serif;
         /* Font sans-serif hiện đại */
         color: #333;
         /* Chữ tối hơn để dễ đọc */
+    }
+
+    body>div.container.mt-4>h1 {
+        font-weight: bold;
+        font-style: italic;
+        color: #fff;
+        padding-bottom: 100px;
+        padding-top: 40px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     /* --- Course Cards (Chế độ xem của sinh viên) --- */
@@ -493,8 +502,7 @@
 <div class="container mt-4">
     {% if username %}
     {% if role == 'student' %}
-    <h1 style="font-weight: bold; color: #fff; padding-bottom:100px; padding-top: 40px;" class="mb-4">Các khóa học có
-        sẵn</h1>
+    <h1 class="mb-4">Các khóa học có sẵn</h1>
     <div class="row">
         {% if courses %}
         {% for course in courses %}
@@ -505,10 +513,10 @@
                         <h3 class="card-title"><i class="{{ course.icon_class|default('fas fa-book-open') }}"></i> {{
                             course.name }}</h3>
                         <p class="card-text">{{ course.description }}</p>
-                        <p class="price">
+                        <!-- <p class="price">
                             <span class="original-price">{{ course.original_price }}đ</span>
                             <span class="discounted-price">{{ course.discounted_price }}đ</span>
-                        </p>
+                        </p> -->
                         <div class="course-meta">
                             <div class="mb-1">
                                 <i class="fas fa-user-tie"></i>
