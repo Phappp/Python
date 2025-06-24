@@ -69,8 +69,7 @@ class ChangePasswordWithOTPForm(FlaskForm):
 
 class SecuritySettingsForm(FlaskForm):
     two_factor_enabled = BooleanField('Bật xác thực 2 yếu tố (2FA)')
-    current_password = PasswordField('Mật khẩu hiện tại (để xác nhận thay đổi)', 
-                                   validators=[DataRequired()])
+    current_password = PasswordField('Mật khẩu hiện tại (để xác nhận thay đổi)')
     submit = SubmitField('Cập nhật cài đặt bảo mật')
 
 class CourseForm(FlaskForm):

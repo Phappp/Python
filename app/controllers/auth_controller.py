@@ -446,6 +446,10 @@ class AuthController:
                 flash('Không tìm thấy thông tin người dùng!', 'danger')
                 return redirect(url_for('auth.login'))
             
+            if not form.current_password.data:
+                flash('Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!', 'warning')
+                return None
+
             # Kiểm tra mật khẩu để xác nhận thay đổi
             if not User.check_password(user, form.current_password.data):
                 flash('Mật khẩu không đúng!', 'danger')
