@@ -283,7 +283,7 @@
     .welcome-banner {
         padding: 4rem 3rem;
         /* Padding rộng rãi hơn */
-        background: linear-gradient(135deg, #e0f2f7 0%, #d1e9f1 100%);
+        /* background: linear-gradient(135deg, #e0f2f7 0%, #d1e9f1 100%); */
         /* Gradient xanh nhạt mềm mại */
         border-radius: 20px;
         /* Bo góc nhiều hơn */
@@ -307,7 +307,7 @@
 
     /* Điều chỉnh các nút trong welcome-banner */
     .welcome-banner .btn-group {
-        margin-top: 2rem;
+        margin-top: 6rem;
         /* Khoảng cách trên từ tiêu đề */
         display: flex;
         justify-content: center;
@@ -328,7 +328,7 @@
     }
 
     .welcome-banner .btn-primary {
-        background: linear-gradient(45deg, #007bff, #0056b3);
+        /* background: linear-gradient(45deg, #007bff, #0056b3); */
         /* Primary blue gradient */
         border: none;
         box-shadow: 0 5px 15px rgba(0, 123, 255, 0.25);
@@ -339,7 +339,7 @@
     .welcome-banner .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0, 123, 255, 0.35);
-        background: linear-gradient(45deg, #0056b3, #007bff);
+        /* background: linear-gradient(45deg, #0056b3, #007bff); */
         /* Invert gradient */
     }
 
@@ -354,7 +354,7 @@
 
     .welcome-banner .btn-outline-light:hover {
         transform: translateY(-2px);
-        background-color: #007bff;
+        /* background-color: #007bff; */
         /* Nền xanh khi hover */
         color: white;
         /* Chữ trắng khi hover */
@@ -541,7 +541,7 @@
         {% endif %}
     </div>
     {% elif role == 'lecture' %}
-    <div class="welcome-banner">
+    <!-- <div class="welcome-banner">
         <h1>Chào mừng Giảng viên, **{{ username }}**!</h1>
         <p class="lead">Bạn có thể quản lý và thêm các khóa học mới tại đây.</p>
         <div class="d-flex justify-content-center flex-wrap">
@@ -552,11 +552,11 @@
                 <i class="fas fa-tasks"></i> Quản lý khóa học
             </a>
         </div>
-    </div>
+    </div> -->
     {% endif %}
     {% else %}
     <div class="welcome-banner">
-        <h1>Chào mừng bạn đến với nền tảng học tập!</h1>
+        <!-- <h1>Chào mừng bạn đến với nền tảng học tập!</h1> -->
         <div class="btn-group"> <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-sign-in-alt"></i> Đăng nhập
             </a>
