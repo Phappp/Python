@@ -17,7 +17,8 @@ class CourseController:
                     discounted_price=form.discounted_price.data,
                     created_by=session.get('username'),
                     color=form.color.data,
-                    icon_class=form.icon_class.data
+                    icon_class=form.icon_class.data,
+                    course_type=form.course_type.data
                 )
                 flash('Khóa học đã được tạo thành công!', 'success')
                 return redirect(url_for('main.home'))
@@ -50,7 +51,8 @@ class CourseController:
                     'original_price': form.original_price.data,
                     'discounted_price': form.discounted_price.data,
                     'color': form.color.data,
-                    'icon_class': form.icon_class.data
+                    'icon_class': form.icon_class.data,
+                    'course_type': form.course_type.data
                 })
                 flash('Cập nhật khóa học thành công!', 'success')
                 return redirect(url_for('course.manage_courses'))
