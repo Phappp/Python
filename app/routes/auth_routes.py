@@ -1,5 +1,5 @@
 from flask import flash, Blueprint, render_template, request,session,redirect,url_for, jsonify
-from app.forms import RegistrationForm, LoginForm, OTPForm, ProfileEditForm, ChangePasswordRequestForm, SecuritySettingsForm
+from app.forms import RegistrationForm, LoginForm, OTPForm, ProfileEditForm, ChangePasswordRequestForm, SecuritySettingsForm, ForgotPasswordForm, ResetPasswordForm
 from app.controllers.auth_controller import AuthController
 from app.models.user_model import User
 from app.utils.decorators import login_required
@@ -138,3 +138,21 @@ def security_settings():
         form.two_factor_enabled.data = user.get('two_factor_enabled', False)
     
     return render_template('auth/security_settings.html', form=form, user=user)
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        response = AuthController.forgot_password(form)
+        if response:
+            return response
+    return render_template('auth/forgot_password.html', form=form)
+
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        response = AuthController.reset_password(token, form)
+        if response:
+            return response
+    return render_template('auth/reset_password.html', form=form, token=token)

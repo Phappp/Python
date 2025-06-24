@@ -600,6 +600,17 @@
                 {% endif %}
             </div>
 
+            <div class="form-group form-check mb-2">
+                {{ form.remember_me(class="form-check-input", id="rememberMe") }}
+                <label class="form-check-label" for="rememberMe" style="font-size: 14px; color: #2c3e50;">
+                    {{ form.remember_me.label.text }}
+                </label>
+            </div>
+
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none" style="color: #667eea; font-size: 14px; font-weight: 500;">Quên mật khẩu?</a>
+            </div>
+
             <button type="submit" class="btn-login" id="loginBtn">
                 <span class="btn-text">
                     <i class="fas fa-sign-in-alt me-2"></i>{{ form.submit.label }}
