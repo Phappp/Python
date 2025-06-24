@@ -8,6 +8,7 @@ from flask_mail import Message
 from werkzeug.utils import secure_filename
 from app.extensions import mail
 from app.models.user_model import User
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 class AuthController:
     OTP_EXPIRATION = 300  # 5 minutes in seconds
@@ -138,6 +139,7 @@ class AuthController:
             
             username = form.username.data
             password = form.password.data
+            remember_me = form.remember_me.data
             user = User.find_by_username(username)
             
             if user and User.check_password(user, password):
@@ -160,7 +162,7 @@ class AuthController:
                     # Nếu không bật 2FA, đăng nhập trực tiếp
                     session['username'] = user['username']
                     session['role'] = user['role']
-                    session.permanent = True
+                    session.permanent = bool(remember_me)
                     session.modified = True
                     
                     flash('Đăng nhập thành công!', 'success')
@@ -469,3 +471,51 @@ class AuthController:
                 flash('Có lỗi xảy ra khi cập nhật cài đặt bảo mật!', 'danger')
         
         return None
+
+    @staticmethod
+    def forgot_password(form):
+        email = form.email.data
+        user = User.find_by_email(email)
+        if not user:
+            flash('Không tìm thấy tài khoản với email này!', 'danger')
+            return None
+        # Sinh token
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        token = s.dumps(email, salt='reset-password')
+        # Tạo link reset
+        reset_url = url_for('auth.reset_password', token=token, _external=True)
+        # Gửi email
+        try:
+            msg = Message('Đặt lại mật khẩu',
+                          sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                          recipients=[email])
+            msg.body = f'Nhấn vào liên kết sau để đặt lại mật khẩu: {reset_url}\nLiên kết này sẽ hết hạn sau 30 phút.'
+            mail.send(msg)
+            flash('Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư!', 'info')
+        except Exception as e:
+            current_app.logger.error(f'Lỗi gửi email đặt lại mật khẩu: {e}')
+            flash('Không thể gửi email. Vui lòng thử lại sau!', 'danger')
+        return redirect(url_for('auth.login'))
+
+    @staticmethod
+    def reset_password(token, form):
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            email = s.loads(token, salt='reset-password', max_age=1800)  # 30 phút
+        except SignatureExpired:
+            flash('Liên kết đặt lại mật khẩu đã hết hạn!', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+        except BadSignature:
+            flash('Liên kết không hợp lệ!', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+        user = User.find_by_email(email)
+        if not user:
+            flash('Không tìm thấy tài khoản!', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+        password = form.password.data
+        if User.update_password(user['username'], password):
+            flash('Đặt lại mật khẩu thành công! Bạn có thể đăng nhập lại.', 'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Có lỗi xảy ra khi đặt lại mật khẩu!', 'danger')
+            return None

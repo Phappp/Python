@@ -23,6 +23,7 @@ class LoginForm(FlaskForm):
                          validators=[DataRequired(), Length(min=4, max=20)])
     password = PasswordField('Mật khẩu', 
                            validators=[DataRequired()])
+    remember_me = BooleanField('Ghi nhớ đăng nhập')
     submit = SubmitField('Đăng nhập')
 
 class OTPForm(FlaskForm):
@@ -97,3 +98,12 @@ class ChapterForm(FlaskForm):
     title = StringField('Tiêu đề chương', validators=[DataRequired(), Length(min=5, max=100)])
     video_url = StringField('URL Video', validators=[DataRequired()])
     submit = SubmitField('Lưu chương')
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Gửi liên kết đặt lại mật khẩu')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Mật khẩu mới', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Xác nhận mật khẩu mới', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Đặt lại mật khẩu')
