@@ -188,9 +188,10 @@ def student_assignments(course_id):
         flash('Chỉ sinh viên mới được truy cập!', 'danger')
         return redirect(url_for('main.home'))
     from bson.objectid import ObjectId
+    from datetime import datetime
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
     # Nếu chưa chọn khóa học, hiển thị danh sách khóa học sinh viên đã tham gia
     if not course_id:
-        # Giả sử sinh viên được tham gia tất cả khóa học (nếu có bảng enroll thì lọc theo username)
         courses = list(mongo.db.courses.find())
         return render_template('exercises/select_course_student.html', courses=courses)
     # Nếu đã chọn khóa học, hiển thị bài tập của khóa học đó
@@ -226,7 +227,7 @@ def student_assignments(course_id):
         })
         flash('Nộp bài thành công!')
         return redirect(request.url)
-    return render_template('exercises/student_assignments.html', exercises=exercises, submissions=submissions, course=course)
+    return render_template('exercises/student_assignments.html', exercises=exercises, submissions=submissions, course=course, now=now)
 
 @exercise_bp.route('/delete_exercise/<exercise_id>', methods=['POST'])
 def delete_exercise(exercise_id):

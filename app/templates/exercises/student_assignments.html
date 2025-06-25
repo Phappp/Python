@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             {% for ex in exercises %}
-            <tr>
+            {% set expired = ex.due_date and ex.due_date < now %} <tr>
                 <td>{{ ex.title }}</td>
                 <td>
                     <a href="/{{ ex.filepath }}" target="_blank">{{ ex.filename }}</a>
@@ -36,15 +36,19 @@
                 </td>
                 <td>
                     {% if not submissions[ex._id|string] %}
+                    {% if expired %}
+                    <span class="text-danger">Đã hết hạn nộp</span>
+                    {% else %}
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="exercise_id" value="{{ ex._id }}">
                         <input type="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx" required>
                         <button type="submit" class="btn btn-primary btn-sm">Nộp bài</button>
                     </form>
+                    {% endif %}
                     {% else %}Đã nộp{% endif %}
                 </td>
-            </tr>
-            {% endfor %}
+                </tr>
+                {% endfor %}
         </tbody>
     </table>
 </div>
