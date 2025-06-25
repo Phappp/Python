@@ -44,6 +44,7 @@ def create_app():
         SESSION_COOKIE_SECURE=False,  # True in production
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE='Lax',
+        SESSION_COOKIE_MAX_AGE=30*24*60*60,  # 30 days max age for remember me
     
     # Ensure session consistency
         USE_X_SENDFILE=False,
@@ -69,13 +70,36 @@ def create_app():
     @app.context_processor
     def inject_user_info():
         from app.models.user_model import User
+        from app.utils.decorators import remember_me_status
+        
         username = session.get('username')
         role = session.get('role')
         avatar = None
+        remember_me = False
+        
         if username:
             user = User.find_by_username(username)
             if user:
                 avatar = user.get('avatar')
-        return dict(username=username, role=role, avatar=avatar)
+            # Kiểm tra remember me status
+            from flask import session as flask_session
+            remember_me = flask_session.permanent
+        
+        return dict(
+            username=username, 
+            role=role, 
+            avatar=avatar,
+            remember_me=remember_me,
+            session_info=remember_me_status()
+        )
+
+    @app.before_request
+    def before_request():
+        """Middleware để kiểm tra và refresh session cho remember me"""
+        if 'username' in session:
+            # Nếu có remember me, refresh session để kéo dài thời gian
+            from flask import session as flask_session
+            if flask_session.permanent:
+                flask_session.modified = True
 
     return app

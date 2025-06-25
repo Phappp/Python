@@ -149,6 +149,27 @@
                                 tin' }}
                             </p>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Ghi nhớ đăng nhập</label>
+                            <div class="d-flex align-items-center">
+                                {% if remember_me %}
+                                <span class="badge bg-info me-2">
+                                    <i class="fas fa-clock me-1"></i>Đang hoạt động
+                                </span>
+                                <small class="text-muted">(30 ngày)</small>
+                                <form method="POST" action="{{ url_for('auth.clear_remember_me') }}" class="ms-2" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                            onclick="return confirm('Bạn có chắc muốn tắt chức năng ghi nhớ đăng nhập?')">
+                                        <i class="fas fa-times me-1"></i>Tắt
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="badge bg-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>Không hoạt động
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -186,6 +207,14 @@
                             <div>
                                 <div class="fw-bold">Cài đặt bảo mật</div>
                                 <small class="text-muted">Cấu hình 2FA</small>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('auth.session_info') }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-info-circle me-3 text-info"></i>
+                            <div>
+                                <div class="fw-bold">Thông tin phiên làm việc</div>
+                                <small class="text-muted">Xem chi tiết session</small>
                             </div>
                         </a>
                         {% if user.role == 'student' %}

@@ -17,6 +17,7 @@ class Config:
     
     # Cấu hình session
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+    REMEMBER_ME_DURATION = timedelta(days=30)  # 30 ngày cho remember me
     
     # Cấu hình upload file
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size

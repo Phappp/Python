@@ -153,6 +153,7 @@ class AuthController:
                         session['auth_otp_time'] = int(time.time())
                         session['auth_otp_username'] = user['username']
                         session['role'] = user['role']
+                        session['remember_me'] = remember_me  # Lưu trạng thái remember me
 
                         flash('Mã OTP đã được gửi đến email của bạn để xác thực 2 yếu tố.', 'info')
                         return redirect(url_for('auth.verify_otp'))
@@ -162,7 +163,16 @@ class AuthController:
                     # Nếu không bật 2FA, đăng nhập trực tiếp
                     session['username'] = user['username']
                     session['role'] = user['role']
-                    session.permanent = bool(remember_me)
+                    
+                    # Xử lý remember me
+                    if remember_me:
+                        session.permanent = True
+                        # Set session lifetime dài hơn cho remember me
+                        from config import Config
+                        session.permanent_session_lifetime = Config.REMEMBER_ME_DURATION
+                    else:
+                        session.permanent = False
+                    
                     session.modified = True
                     
                     flash('Đăng nhập thành công!', 'success')
@@ -207,7 +217,17 @@ class AuthController:
 
         # Convert to authenticated session
         session['username'] = session.pop('auth_otp_username')
-        session.permanent = True
+        
+        # Xử lý remember me từ session
+        remember_me = session.pop('remember_me', False)
+        if remember_me:
+            session.permanent = True
+            # Set session lifetime dài hơn cho remember me
+            from config import Config
+            session.permanent_session_lifetime = Config.REMEMBER_ME_DURATION
+        else:
+            session.permanent = False
+        
         session.modified = True
         
         # Cleanup OTP-related session data
@@ -218,9 +238,9 @@ class AuthController:
 
     @staticmethod
     def logout():
-        session.pop('username', None)
-        session.pop('role', None)
-
+        # Xóa toàn bộ session để đảm bảo remember me cũng bị xóa
+        session.clear()
+        
         flash('Bạn đã đăng xuất thành công!', 'success')
         return redirect(url_for('main.home'))
 
