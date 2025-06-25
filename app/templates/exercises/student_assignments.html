@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('exercise.student_assignments') }}" class="btn btn-link mb-2"><i class="fas fa-arrow-left"></i>
+        Quay lại</a>
+    <h2>Bài tập đã được giao{% if course %} - {{ course.name }}{% endif %}</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Đề bài</th>
+                <th>Hạn nộp</th>
+                <th>Bài làm của bạn</th>
+                <th>Điểm</th>
+                <th>Nộp bài</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ex in exercises %}
+            <tr>
+                <td>{{ ex.title }}</td>
+                <td>
+                    <a href="/{{ ex.filepath }}" target="_blank">{{ ex.filename }}</a>
+                </td>
+                <td>{{ ex.due_date | datetimeformat }}</td>
+                <td>
+                    {% if submissions[ex._id|string] %}
+                    <a href="/{{ submissions[ex._id|string].filepath }}" target="_blank">{{
+                        submissions[ex._id|string].filename }}</a>
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if submissions[ex._id|string] and submissions[ex._id|string].score is not none %}
+                    {{ submissions[ex._id|string].score }}
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if not submissions[ex._id|string] %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="exercise_id" value="{{ ex._id }}">
+                        <input type="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Nộp bài</button>
+                    </form>
+                    {% else %}Đã nộp{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

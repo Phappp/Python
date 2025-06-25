@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('exercise.manage_exercises', course_id=course_id) }}" class="btn btn-link mb-2"><i
+            class="fas fa-arrow-left"></i> Quay lại</a>
+    <h2>Danh sách sinh viên đã nộp bài: {{ exercise.title }}</h2>
+    <p><strong>Hạn nộp:</strong> {{ exercise.due_date | datetimeformat }}</p>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sinh viên</th>
+                <th>File nộp</th>
+                <th>Điểm</th>
+                <th>Chấm điểm</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub in submissions %}
+            <tr>
+                <td>{{ sub.student_username }}</td>
+                <td>
+                    <a href="/{{ sub.filepath }}" target="_blank">{{ sub.filename }}</a>
+                </td>
+                <td>{% if sub.score is not none %}{{ sub.score }}{% else %}-{% endif %}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('exercise.grade_submission', submission_id=sub._id) }}"
+                        class="d-flex align-items-center">
+                        <input type="number" name="score" min="0" max="10" step="0.1"
+                            class="form-control form-control-sm me-2"
+                            value="{% if sub.score is not none %}{{ sub.score }}{% endif %}" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Chấm</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

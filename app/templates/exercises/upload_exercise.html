@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('exercise.manage_exercises', course_id=request.view_args.course_id) }}"
+        class="btn btn-link mb-2"><i class="fas fa-arrow-left"></i> Quay lại</a>
+    <h2>Thêm bài tập</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Tiêu đề bài tập:</label>
+            <input class="form-control" type="text" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="chapter_id" class="form-label">Chọn chương:</label>
+            <select class="form-control" id="chapter_id" name="chapter_id" required>
+                <option value="">-- Chọn chương --</option>
+                {% for chapter in chapters %}
+                <option value="{{ chapter.chapter_id }}">{{ chapter.chapter_title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-6">
+                <label for="due_date" class="form-label">Hạn nộp (ngày):</label>
+                <input class="form-control" type="date" id="due_date" name="due_date" required placeholder="dd/MM/yyyy">
+            </div>
+            <div class="col-md-6">
+                <label for="due_time" class="form-label">Hạn nộp (giờ):</label>
+                <input class="form-control" type="time" id="due_time" name="due_time" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">Chọn file bài tập (PDF, TXT, hình ảnh, Word):</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx"
+                required>
+        </div>
+        <button type="submit" class="btn btn-primary">Tải lên</button>
+    </form>
+</div>
+{% endblock %}

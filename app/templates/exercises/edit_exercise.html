@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('exercise.manage_exercises', course_id=exercise.course_id) }}" class="btn btn-link mb-2"><i
+            class="fas fa-arrow-left"></i> Quay lại</a>
+    <h2>Sửa bài tập</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="title" class="form-label">Tiêu đề bài tập:</label>
+            <input class="form-control" type="text" id="title" name="title" value="{{ exercise.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="chapter_id" class="form-label">Chọn chương:</label>
+            <select class="form-control" id="chapter_id" name="chapter_id" required>
+                <option value="">-- Chọn chương --</option>
+                {% for chapter in chapters %}
+                <option value="{{ chapter.chapter_id }}" {% if exercise.chapter_id|string==chapter.chapter_id
+                    %}selected{% endif %}>{{ chapter.chapter_title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-6">
+                <label for="due_date" class="form-label">Hạn nộp (ngày):</label>
+                <input class="form-control" type="date" id="due_date" name="due_date" value="{{ due_date }}" required
+                    placeholder="dd/MM/yyyy">
+            </div>
+            <div class="col-md-6">
+                <label for="due_time" class="form-label">Hạn nộp (giờ):</label>
+                <input class="form-control" type="time" id="due_time" name="due_time" value="{{ due_time }}" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        <a href="{{ url_for('exercise.manage_exercises', course_id=exercise.course_id) }}"
+            class="btn btn-secondary ms-2">Quay lại</a>
+    </form>
+</div>
+{% endblock %}

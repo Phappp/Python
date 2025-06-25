@@ -4,6 +4,24 @@ from .extensions import mongo
 from .extensions import mail
 import smtplib
 from datetime import datetime, timedelta, timezone
+
+def datetimeformat(value):
+    try:
+        if isinstance(value, str):
+            # value có thể là '2025-07-20 00:00' hoặc '2025-07-20'
+            try:
+                dt = datetime.strptime(value, '%Y-%m-%d %H:%M')
+            except:
+                try:
+                    dt = datetime.strptime(value, '%Y-%m-%d')
+                except:
+                    return value
+        else:
+            dt = value
+        return dt.strftime('%d/%m/%Y %H:%M')
+    except:
+        return value
+
 def create_app():
     app = Flask(__name__)
     smtplib.SMTP.debuglevel = 1
@@ -38,11 +56,15 @@ def create_app():
     from .routes.auth_routes import auth_bp
     from .routes.main_routes import main_bp
     from .routes.course_routes import course_bp
+    from .routes.exercise_routes import register_exercise_routes
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
+    register_exercise_routes(app)
     mail.init_app(app)
+
+    app.jinja_env.filters['datetimeformat'] = datetimeformat
 
     @app.context_processor
     def inject_user_info():
