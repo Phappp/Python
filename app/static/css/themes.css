@@ -1,0 +1,248 @@
+/* Theme Light */
+body.theme-light {
+  background: #f8fafc !important;
+  color: #222 !important;
+}
+body.theme-light .header {
+  background: #fff !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+body.theme-light .navbar-brand,
+body.theme-light .navbar-nav .nav-link {
+  color: #222 !important;
+}
+body.theme-light .dropdown-menu {
+  background: #fff;
+  color: #222;
+}
+body.theme-light .card,
+body.theme-light .list-group-item {
+  background: #fff;
+  color: #222;
+}
+body.theme-light .btn-primary {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #fff;
+}
+
+/* Course-card trong theme-light - màu nền đơn giản theo màu đã chọn */
+body.theme-light .course-card {
+  color: #fff !important;
+  text-shadow: 1px 1.5px 2px rgba(0,0,0,0.18) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+body.theme-light .course-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Màu nền đơn giản cho các loại course-card trong theme sáng */
+body.theme-light .course-card-purple {
+  background: #6a11cb !important;
+}
+
+body.theme-light .course-card-yellow {
+  background: #FFC700 !important;
+}
+
+body.theme-light .course-card-red {
+  background: #e74c3c !important;
+}
+
+body.theme-light .course-card-blue {
+  background: #3498db !important;
+}
+
+body.theme-light .course-card-green {
+  background: #2ecc71 !important;
+}
+
+/* Màu chữ và icon trong course-card theme sáng */
+body.theme-light .course-card .card-title,
+body.theme-light .course-card .card-text,
+body.theme-light .course-card .course-meta {
+  color: #ffffff !important;
+}
+
+body.theme-light .course-card .card-title i {
+  color: #fff !important;
+  opacity: 0.95;
+}
+
+/* Đặc biệt cho course-card-yellow (nền vàng) */
+body.theme-light .course-card-yellow .card-title,
+body.theme-light .course-card-yellow .card-text,
+body.theme-light .course-card-yellow .course-meta {
+  color: #ffffff !important;
+}
+
+body.theme-light .course-card-yellow .card-title i {
+  color: #ffffff !important;
+}
+
+/* Theme Dark */
+body.theme-dark {
+  background: #181a1b !important;
+  color: #e0e0e0 !important;
+}
+
+body.theme-dark .header {
+  background: #23242a !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+body.theme-dark .navbar-brand,
+body.theme-dark .navbar-nav .nav-link {
+  color: #e0e0e0 !important;
+}
+body.theme-dark .dropdown-menu {
+  background: #23242a;
+  color: #e0e0e0;
+}
+body.theme-dark .card,
+body.theme-dark .list-group-item {
+  background: #23242a;
+  color: #e0e0e0;
+}
+body.theme-dark .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+/* Dropdown icon highlight */
+.nav-link[aria-expanded="true"] i {
+  color: #007bff;
+}
+
+body.theme-light h1.mb-4 {
+  color: #222 !important;
+  text-shadow: none !important;
+}
+
+/* Theme switcher button: màu trắng ở dark và modern */
+body.theme-dark #themeDropdown,
+body.theme-dark #themeDropdown i,
+body.theme-dark #themeDropdown .nav-link,
+#themeDropdown,
+#themeDropdown i,
+#themeDropdown .nav-link {
+  color: #fff !important;
+}
+
+body.theme-dark .dropdown-menu[aria-labelledby="themeDropdown"] .dropdown-item {
+  color: #fff !important;
+}
+
+/* Đảm bảo màu trắng ở theme hiện đại (mặc định) */
+#themeDropdown,
+#themeDropdown i,
+#themeDropdown .nav-link {
+  color: #fff !important;
+}
+
+body.theme-light #themeDropdown,
+body.theme-light #themeDropdown i,
+body.theme-light #themeDropdown .nav-link {
+  color: #222 !important;
+}
+
+body.theme-light .dropdown-menu[aria-labelledby="themeDropdown"] .dropdown-item {
+  color: #222 !important;
+}
+
+body.theme-dark .course-card {
+  color: #fff !important;
+  text-shadow: 1px 1.5px 2px rgba(0,0,0,0.18) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18) !important;
+  transition: all 0.3s ease !important;
+}
+
+body.theme-dark .course-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.theme-dark .course-card-purple {
+  background: #6a11cb !important;
+}
+body.theme-dark .course-card-yellow {
+  background: #FFC700 !important;
+}
+body.theme-dark .course-card-red {
+  background: #e74c3c !important;
+}
+body.theme-dark .course-card-blue {
+  background: #3498db !important;
+}
+body.theme-dark .course-card-green {
+  background: #2ecc71 !important;
+}
+
+body.theme-dark .course-card .card-title,
+body.theme-dark .course-card .card-text,
+body.theme-dark .course-card .course-meta {
+  color: #fff !important;
+}
+body.theme-dark .course-card .card-title i {
+  color: #fff !important;
+  opacity: 0.95;
+}
+
+body.theme-dark .user-profile-dropdown .dropdown-menu,
+body.theme-dark .user-profile-dropdown .dropdown-menu *,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .dropdown-menu,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .dropdown-menu * {
+  background: #181a1b !important;
+  color: #fff !important;
+}
+
+body.theme-dark .user-profile-dropdown .dropdown-item,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .dropdown-item {
+  background: transparent !important;
+  color: #fff !important;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+body.theme-dark .user-profile-dropdown .dropdown-item:hover,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .dropdown-item:hover {
+  background: #23242a !important;
+  color: #fff !important;
+}
+
+body.theme-dark .user-profile-dropdown .dropdown-item i,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .dropdown-item i {
+  color: #fff !important;
+}
+
+body.theme-dark .user-profile-dropdown .user-info,
+body:not(.theme-light):not(.theme-dark) .user-profile-dropdown .user-info {
+  background: #23242a !important;
+  color: #fff !important;
+}
+
+/* Vị trí nút theme switcher cạnh menu user (giữ nguyên) */
+
+/* Khi ở trang đăng nhập, nút theme switcher cách nút đăng nhập 1cm (38px) */
+.auth-buttons + .theme-switcher-login {
+  margin-left: 38px !important;
+}
+
+/* Nếu theme switcher nằm trong .auth-buttons (trường hợp mobile/small screen) */
+.auth-buttons .theme-switcher-login {
+  margin-left: 16px !important;
+}
+
+body.theme-dark .dropdown-menu[aria-labelledby="themeDropdownLanding"] .dropdown-item {
+  color: #fff !important;
+}
+body.theme-dark .dropdown-menu[aria-labelledby="themeDropdownLanding"] .dropdown-item i {
+  color: #fff !important;
+}
+
+#themeDropdownLanding i {
+  color: #888 !important;
+} 

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
   <style>
     /* Header Styles */
     .header {
@@ -260,10 +261,82 @@
         /* Push toggler to the right */
       }
     }
+
+    /* Theme Light */
+    body.theme-light {
+      background: #f8fafc !important;
+      color: #222 !important;
+    }
+    body.theme-light .header {
+      background: #fff !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+    body.theme-light .navbar-brand,
+    body.theme-light .navbar-nav .nav-link {
+      color: #222 !important;
+    }
+    body.theme-light .dropdown-menu {
+      background: #fff;
+      color: #222;
+    }
+    body.theme-light .card,
+    body.theme-light .list-group-item {
+      background: #fff;
+      color: #222;
+    }
+    body.theme-light .btn-primary {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: #fff;
+    }
+    /* Theme Dark */
+    body.theme-dark {
+      background: #181a1b !important;
+      color: #e0e0e0 !important;
+    }
+    body.theme-dark .header {
+      background: #23242a !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    body.theme-dark .navbar-brand,
+    body.theme-dark .navbar-nav .nav-link {
+      color: #e0e0e0 !important;
+    }
+    body.theme-dark .dropdown-menu {
+      background: #23242a;
+      color: #e0e0e0;
+    }
+    body.theme-dark .card,
+    body.theme-dark .list-group-item {
+      background: #23242a;
+      color: #e0e0e0;
+    }
+    body.theme-dark .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    /* Dropdown icon highlight */
+    .nav-link[aria-expanded="true"] i {
+      color: #007bff;
+    }
   </style>
 </head>
 
 <body>
+  {% if not username %}
+  <!-- Theme switcher cho trang landing page (chưa đăng nhập) -->
+  <div style="position: fixed; top: 24px; right: 120px; z-index: 2000;">
+    <div class="dropdown">
+      <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdownLanding" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
+        <i class="fas fa-circle-half-stroke fa-lg"></i>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdownLanding">
+        <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện đại</a></li>
+        <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a></li>
+        <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a></li>
+      </ul>
+    </div>
+  </div>
+  {% endif %}
   <header class="header">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
@@ -313,7 +386,17 @@
 
           <ul class="navbar-nav">
             {% if username %}
-
+            <!-- Theme switcher button (chỉ hiện khi đã đăng nhập) -->
+            <li class="nav-item dropdown d-flex align-items-center" style="margin-left: 30px;">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
+                <i class="fas fa-circle-half-stroke fa-lg"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
+                <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện đại</a></li>
+                <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a></li>
+                <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a></li>
+              </ul>
+            </li>
             <li class="nav-item dropdown user-profile-dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                 data-bs-toggle="dropdown">
@@ -428,6 +511,28 @@
           const alert = new bootstrap.Alert(message);
           alert.close();
         }, 5000); // 5 seconds
+      });
+    });
+  </script>
+  <script>
+    // Theme switcher logic
+    function setTheme(theme) {
+      document.body.classList.remove('theme-light', 'theme-dark');
+      if (theme === 'light') document.body.classList.add('theme-light');
+      else if (theme === 'dark') document.body.classList.add('theme-dark');
+      // Modern = mặc định, không thêm class
+      localStorage.setItem('theme', theme);
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      // Đọc theme từ localStorage
+      const savedTheme = localStorage.getItem('theme') || 'modern';
+      setTheme(savedTheme);
+      // Xử lý click chọn theme
+      document.querySelectorAll('.theme-select').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          setTheme(this.getAttribute('data-theme'));
+        });
       });
     });
   </script>

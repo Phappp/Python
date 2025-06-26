@@ -664,4 +664,18 @@
     });
 </script>
 
+<!-- Theme switcher riêng cho trang đăng nhập -->
+<div style="position: fixed; top: 24px; right: 32px; z-index: 2000;">
+  <div class="dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdownLogin" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
+      <i class="fas fa-circle-half-stroke fa-lg"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdownLogin">
+      <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện đại</a></li>
+      <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a></li>
+      <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a></li>
+    </ul>
+  </div>
+</div>
+
 {% endblock %}
