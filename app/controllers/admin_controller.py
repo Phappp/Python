@@ -176,4 +176,14 @@ class AdminController:
         output = io.BytesIO()
         wb.save(output)
         output.seek(0)
-        return send_file(output, as_attachment=True, download_name='bao_cao_thong_ke.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') 
+        return send_file(output, as_attachment=True, download_name='bao_cao_thong_ke.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    @staticmethod
+    def roles():
+        # Quyền mặc định cho từng role
+        roles_permissions = {
+            'admin': ['Quản lý người dùng', 'Quản lý khóa học', 'Thống kê & báo cáo', 'Cấu hình hệ thống'],
+            'lecture': ['Quản lý khóa học', 'Quản lý bài tập'],
+            'student': ['Xem khóa học', 'Làm bài tập']
+        }
+        return render_template('admin/roles.html', roles_permissions=roles_permissions) 

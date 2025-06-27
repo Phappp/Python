@@ -81,4 +81,9 @@ def stats():
 @admin_bp.route('/export/excel')
 @role_required('admin')
 def export_excel():
-    return AdminController.export_excel() 
+    return AdminController.export_excel()
+
+@admin_bp.route('/roles')
+@role_required('admin')
+def roles():
+    return AdminController.roles() 
