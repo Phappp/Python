@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_admin_nav.html' %}
+<div class="container mt-4">
+    <h2>Thống kê & Báo cáo</h2>
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Học sinh</h5>
+                    <p class="display-5">{{ num_students }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Giáo viên</h5>
+                    <p class="display-5">{{ num_lectures }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Admin</h5>
+                    <p class="display-5">{{ num_admins }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Khóa học</h5>
+                    <p class="display-5">{{ num_courses }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Tỷ lệ hoàn thành bài tập</h5>
+                    <p class="display-6">{% if completion_rate is not none %}{{ completion_rate }}%{% else %}Chưa có dữ liệu{% endif %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <a href="{{ url_for('admin.export_excel') }}" class="btn btn-success btn-lg w-100">Xuất báo cáo (Excel)</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

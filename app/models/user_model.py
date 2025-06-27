@@ -105,3 +105,11 @@ class User:
         except Exception as e:
             print(f"Error updating security settings: {e}")
             return False
+
+    @staticmethod
+    def get_all():
+        return mongo.db.users.find()
+
+    @staticmethod
+    def delete(username):
+        return mongo.db.users.delete_one({'username': username})
