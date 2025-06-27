@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('programming_exercise.manage_exercises') }}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">{{ title }}</h1>
+            <p class="text-muted mb-0">Chỉnh sửa bài tập: {{ exercise.title }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Form -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> Chỉnh sửa bài tập</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">Thông tin cơ bản</h6>
+
+                            <div class="mb-3">
+                                {{ form.title.label(class="form-label fw-bold") }}
+                                {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                                {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.description.label(class="form-label fw-bold") }}
+                                {{ form.description(class="form-control", rows="6" + (" is-invalid" if
+                                form.description.errors else "")) }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Language and Limits -->
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">Cấu hình kỹ thuật</h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.language_supported.label(class="form-label fw-bold") }}
+                                        {{ form.language_supported(class="form-select" + (" is-invalid" if
+                                        form.language_supported.errors else "")) }}
+                                        {% if form.language_supported.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.language_supported.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.is_visible.label(class="form-label fw-bold") }}
+                                        <div class="form-check form-switch">
+                                            {{ form.is_visible(class="form-check-input") }}
+                                            <label class="form-check-label" for="{{ form.is_visible.id }}">
+                                                Hiển thị cho sinh viên
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.time_limit.label(class="form-label fw-bold") }}
+                                        {{ form.time_limit(class="form-control" + (" is-invalid" if
+                                        form.time_limit.errors else "")) }}
+                                        {% if form.time_limit.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.time_limit.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.memory_limit.label(class="form-label fw-bold") }}
+                                        {{ form.memory_limit(class="form-control" + (" is-invalid" if
+                                        form.memory_limit.errors else "")) }}
+                                        {% if form.memory_limit.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.memory_limit.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Test Cases -->
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">Test Cases</h6>
+
+                            <div class="mb-3">
+                                {{ form.test_cases_json.label(class="form-label fw-bold") }}
+                                {{ form.test_cases_json(class="form-control", rows="12" + (" is-invalid" if
+                                form.test_cases_json.errors else "")) }}
+                                {% if form.test_cases_json.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.test_cases_json.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Test Case Template -->
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">Mẫu Test Case JSON:</h6>
+                                <pre class="mb-0"><code>[
+  {
+    "input": "5\n3 1 4 1 5",
+    "expected_output": "14",
+    "description": "Test case cơ bản",
+    "is_hidden": false
+  },
+  {
+    "input": "0",
+    "expected_output": "0",
+    "description": "Test case với input rỗng",
+    "is_hidden": true
+  }
+]</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('programming_exercise.manage_exercises') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Cập nhật bài tập
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-question-circle"></i> Hướng dẫn</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-info">📝 Mô tả bài tập</h6>
+                        <ul class="small text-muted">
+                            <li>Viết rõ ràng yêu cầu và ràng buộc</li>
+                            <li>Đưa ra ví dụ input/output cụ thể</li>
+                            <li>Giải thích thuật toán mong muốn</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-info">🧪 Test Cases</h6>
+                        <ul class="small text-muted">
+                            <li>Tạo test cases đa dạng</li>
+                            <li>Bao gồm edge cases</li>
+                            <li>Test cases ẩn để tránh gian lận</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-info">⚙️ Cấu hình</h6>
+                        <ul class="small text-muted">
+                            <li>Chọn ngôn ngữ phù hợp</li>
+                            <li>Đặt giới hạn thời gian hợp lý</li>
+                            <li>Ẩn bài tập khi chưa hoàn thiện</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Lưu ý:</strong> Việc chỉnh sửa bài tập có thể ảnh hưởng đến các bài nộp đã có!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sticky-top {
+        z-index: 1020;
+    }
+
+    pre code {
+        font-size: 0.8rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .card-header {
+        border-bottom: none;
+    }
+
+    .alert-heading {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    // Auto-resize textarea
+    document.addEventListener('DOMContentLoaded', function () {
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        });
+    });
+</script>
+{% endblock %}

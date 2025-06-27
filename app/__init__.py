@@ -22,6 +22,12 @@ def datetimeformat(value):
     except:
         return value
 
+def nl2br(value):
+    """Convert newlines to <br> tags for HTML display"""
+    if value is None:
+        return ""
+    return str(value).replace('\n', '<br>')
+
 def create_app():
     app = Flask(__name__)
     smtplib.SMTP.debuglevel = 1
@@ -58,14 +64,17 @@ def create_app():
     from .routes.main_routes import main_bp
     from .routes.course_routes import course_bp
     from .routes.exercise_routes import register_exercise_routes
+    from .routes.programming_exercise_routes import programming_exercise_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
+    app.register_blueprint(programming_exercise_bp)
     register_exercise_routes(app)
     mail.init_app(app)
 
     app.jinja_env.filters['datetimeformat'] = datetimeformat
+    app.jinja_env.filters['nl2br'] = nl2br
 
     @app.context_processor
     def inject_user_info():
