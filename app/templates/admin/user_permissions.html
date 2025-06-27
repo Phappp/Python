@@ -2,42 +2,115 @@
 {% block content %}
 {% include 'admin/_admin_nav.html' %}
 <div class="container mt-4">
-    <h2>Quản lý quyền cho tài khoản: {{ user.username }}</h2>
-    <div class="mb-3">
-        <strong>Vai trò:</strong> {{ role|capitalize }}<br>
-        <strong>Quyền mặc định từ vai trò:</strong>
-        <ul>
-            {% if role == 'admin' %}
-                <li>manage_users</li>
-                <li>manage_courses</li>
-                <li>manage_exercises</li>
-                <li>view_stats</li>
-                <li>config_system</li>
-            {% elif role == 'lecture' %}
-                <li>manage_courses</li>
-                <li>manage_exercises</li>
-            {% elif role == 'student' %}
-                <li>view_courses</li>
-                <li>do_exercises</li>
-            {% endif %}
-        </ul>
-    </div>
-    <form method="POST">
-        <div class="mb-3">
-            <label class="form-label">Quyền riêng cho tài khoản này:</label>
-            <select name="permissions" class="form-select" multiple size="6">
-                {% for perm in all_permissions %}
-                    <option value="{{ perm }}" {% if perm in user_permissions %}selected{% endif %}>{{ perm }}</option>
-                {% endfor %}
-            </select>
-            <div class="form-text">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều quyền.</div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-shield me-2"></i>
+                        Quản lý quyền cho tài khoản: {{ user.username }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Thông tin tài khoản</h6>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Vai trò:</strong> 
+                                <span class="badge bg-info">{{ role|capitalize }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Quyền mặc định từ vai trò</h6>
+                            <ul class="list-unstyled">
+                                {% for perm in default_permissions %}
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>{{ permission_display_names.get(perm, perm) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-crown me-2 text-warning"></i>
+                                Quyền riêng cho tài khoản này:
+                            </label>
+                            <div class="row">
+                                {% for perm in available_custom_permissions %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="permissions" value="{{ perm }}" 
+                                               id="perm_{{ perm }}"
+                                               {% if perm in user_permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm_{{ perm }}">
+                                            {{ permission_display_names.get(perm, perm) }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Các quyền này sẽ được thêm vào quyền mặc định của vai trò.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Lưu quyền riêng
+                            </button>
+                            <button type="submit" name="reset_permissions" value="1" 
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc muốn xóa toàn bộ quyền riêng và trả về mặc định?');">
+                                <i class="fas fa-trash me-2"></i>Xóa quyền riêng
+                            </button>
+                            <a href="{{ url_for('admin.users_by_role', role_name=role) }}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-success">Lưu quyền riêng</button>
-        <button type="submit" name="reset_permissions" value="1" class="btn btn-danger"
-            onclick="return confirm('Bạn có chắc muốn xóa toàn bộ quyền riêng và trả về mặc định?');">
-            Xóa quyền riêng (trả về mặc định)
-        </button>
-        <a href="{{ url_for('admin.users_by_role', role_name=role) }}" class="btn btn-secondary">Quay lại</a>
-    </form>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Hướng dẫn
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-primary me-2"></i>
+                            <strong>Quyền mặc định:</strong> Tự động có theo vai trò
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-warning me-2"></i>
+                            <strong>Quyền riêng:</strong> Có thể cấp thêm cho từng tài khoản
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <strong>Tổng quyền:</strong> Mặc định + Riêng
+                        </li>
+                    </ul>
+                    
+                    <div class="alert alert-info mt-3">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Lưu ý:</strong> Khi user có quyền riêng, họ sẽ thấy button "Quyền riêng" 
+                            trong giao diện của mình để truy cập nhanh vào trang này.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %} 

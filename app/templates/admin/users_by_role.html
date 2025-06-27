@@ -2,40 +2,105 @@
 {% block content %}
 {% include 'admin/_admin_nav.html' %}
 <div class="container mt-4">
-    <h2>Danh sách tài khoản vai trò: {{ role_name|capitalize }}</h2>
-    <table class="table table-bordered table-hover rounded-4 shadow-sm overflow-hidden">
-        <thead class="table-light">
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Họ tên</th>
-                <th>Quyền riêng</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.full_name }}</td>
-                <td>
-                    {% if user.permissions %}
-                        {{ user.permissions|join(', ') }}
-                        <a href="#" class="btn btn-outline-warning btn-sm ms-2 btn-outline-main" title="Quyền riêng" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bs-title="{{ user.permissions|join('<br>') }}">
-                            <i class="fas fa-key"></i> Quyền riêng
-                        </a>
-                    {% else %}
-                        <span class="text-muted">Mặc định</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ url_for('admin.view_user_permissions', username=user.username) }}" class="btn btn-outline-main btn-sm"><i class="fas fa-user-cog"></i> Quản lý quyền</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ url_for('admin.roles') }}" class="btn btn-secondary mt-3">Quay lại</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-users me-2"></i>
+            Danh sách {{ role_name|capitalize }}s
+        </h2>
+        <a href="{{ url_for('admin.roles') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại cấu hình vai trò
+        </a>
+    </div>
+
+    {% if users %}
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                Tổng cộng: {{ users|length }} {{ role_name|capitalize }}{{ 's' if users|length > 1 else '' }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Họ tên</th>
+                            <th>Quyền riêng</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <strong>{{ user.username }}</strong>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.full_name or 'Chưa cập nhật' }}</td>
+                            <td>
+                                {% if user.permissions %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-crown me-1"></i>
+                                        {{ user.permissions|length }} quyền
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Chỉ quyền mặc định</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.active is defined and not user.active %}
+                                    <span class="badge bg-danger">Tạm khóa</span>
+                                {% else %}
+                                    <span class="badge bg-success">Hoạt động</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin.view_user_permissions', username=user.username) }}" 
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Quản lý quyền riêng">
+                                        <i class="fas fa-crown"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.edit_user', username=user.username) }}" 
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="Chỉnh sửa thông tin">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            onclick="confirmDelete('{{ user.username }}')"
+                                            title="Xóa tài khoản">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Chưa có {{ role_name|capitalize }} nào trong hệ thống.
+    </div>
+    {% endif %}
 </div>
+
+<script>
+function confirmDelete(username) {
+    if (confirm('Bạn có chắc muốn xóa tài khoản ' + username + '?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin.delete_user", username="") }}' + username;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
 {% endblock %} 

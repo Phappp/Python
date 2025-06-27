@@ -144,3 +144,43 @@ class User:
         perms = set(user.get('permissions', []))
         perms.discard(permission)
         return User.set_permissions(username, list(perms))
+
+    @staticmethod
+    def has_custom_permission(username, permission):
+        """Kiểm tra user có quyền riêng cụ thể không"""
+        user = User.find_by_username(username)
+        if not user:
+            return False
+        return permission in user.get('permissions', [])
+
+    @staticmethod
+    def get_custom_permissions(username):
+        """Lấy danh sách quyền riêng của user"""
+        user = User.find_by_username(username)
+        if not user:
+            return []
+        return user.get('permissions', [])
+
+    @staticmethod
+    def has_any_custom_permission(username):
+        """Kiểm tra user có bất kỳ quyền riêng nào không"""
+        user = User.find_by_username(username)
+        if not user:
+            return False
+        return len(user.get('permissions', [])) > 0
+
+    @staticmethod
+    def get_available_custom_permissions():
+        """Lấy danh sách tất cả quyền riêng có thể cấp"""
+        return [
+            'manage_users',
+            'manage_courses', 
+            'manage_exercises',
+            'view_stats',
+            'config_system',
+            'export_data',
+            'manage_roles',
+            'view_logs',
+            'manage_backups',
+            'system_monitoring'
+        ]

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Demo: Xem thống kê hệ thống
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Thành công!</strong> Bạn đã truy cập được trang này nhờ quyền riêng "Xem thống kê".
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <h5>150</h5>
+                                    <p class="mb-0">Tổng người dùng</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-book fa-2x mb-2"></i>
+                                    <h5>25</h5>
+                                    <p class="mb-0">Khóa học</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tasks fa-2x mb-2"></i>
+                                    <h5>180</h5>
+                                    <p class="mb-0">Bài tập</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-download fa-2x mb-2"></i>
+                                    <h5>1,250</h5>
+                                    <p class="mb-0">Lượt tải</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Biểu đồ hoạt động</h5>
+                        <div class="bg-light p-4 rounded">
+                            <p class="text-muted text-center">
+                                <i class="fas fa-chart-line fa-3x mb-3"></i><br>
+                                Đây là nơi hiển thị biểu đồ thống kê chi tiết...
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{{ url_for('admin.view_my_permissions') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại trang quyền riêng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

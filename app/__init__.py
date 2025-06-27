@@ -4,6 +4,7 @@ from .extensions import mongo
 from .extensions import mail
 import smtplib
 from datetime import datetime, timedelta, timezone
+from app.utils.decorators import saved_credentials_status, has_custom_permission, has_any_custom_permission, get_custom_permissions_count
 
 def datetimeformat(value):
     try:
@@ -28,10 +29,10 @@ def nl2br(value):
         return ""
     return str(value).replace('\n', '<br>')
 
-def create_app():
+def create_app(config_class=Config):
     app = Flask(__name__)
     smtplib.SMTP.debuglevel = 1
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
     # Cấu hình Flask-Mail
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
@@ -100,7 +101,10 @@ def create_app():
             role=role, 
             avatar=avatar,
             saved_credentials=saved_credentials,
-            session_info=saved_credentials_status()
+            session_info=saved_credentials_status(),
+            has_custom_permission=has_custom_permission,
+            has_any_custom_permission=has_any_custom_permission,
+            get_custom_permissions_count=get_custom_permissions_count
         )
 
     @app.before_request

@@ -232,8 +232,10 @@ class PermissionUserController:
         if not user:
             flash('Không tìm thấy người dùng!', 'danger')
             return redirect(url_for('admin.list_users'))
+        
         role = user.get('role')
         user_permissions = user.get('permissions', [])
+        
         # Quyền mặc định từ role
         if role == 'admin':
             default_permissions = ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system']
@@ -243,9 +245,34 @@ class PermissionUserController:
             default_permissions = ['view_courses', 'do_exercises']
         else:
             default_permissions = []
+        
+        # Danh sách tất cả quyền có thể cấp
+        all_available_permissions = User.get_available_custom_permissions()
+        
         # Chỉ hiển thị các quyền không phải mặc định
-        all_permissions = [p for p in ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system'] if p not in default_permissions]
-        return render_template('admin/user_permissions.html', user=user, role=role, user_permissions=user_permissions, all_permissions=all_permissions)
+        available_custom_permissions = [p for p in all_available_permissions if p not in default_permissions]
+        
+        # Tạo mapping tên hiển thị cho các quyền
+        permission_display_names = {
+            'manage_users': 'Quản lý người dùng',
+            'manage_courses': 'Quản lý khóa học',
+            'manage_exercises': 'Quản lý bài tập',
+            'view_stats': 'Xem thống kê',
+            'config_system': 'Cấu hình hệ thống',
+            'export_data': 'Xuất dữ liệu',
+            'manage_roles': 'Quản lý vai trò',
+            'view_logs': 'Xem nhật ký hệ thống',
+            'manage_backups': 'Quản lý sao lưu',
+            'system_monitoring': 'Giám sát hệ thống'
+        }
+        
+        return render_template('admin/user_permissions.html', 
+                             user=user, 
+                             role=role, 
+                             user_permissions=user_permissions, 
+                             available_custom_permissions=available_custom_permissions,
+                             default_permissions=default_permissions,
+                             permission_display_names=permission_display_names)
 
     @staticmethod
     def update_user_permissions(username):
@@ -253,6 +280,7 @@ class PermissionUserController:
         if not user:
             flash('Không tìm thấy người dùng!', 'danger')
             return redirect(url_for('admin.list_users'))
+        
         if 'reset_permissions' in request.form:
             User.set_permissions(username, [])
             flash('Đã xóa toàn bộ quyền riêng, chỉ còn quyền mặc định!', 'success')
@@ -260,4 +288,5 @@ class PermissionUserController:
             perms = request.form.getlist('permissions')
             User.set_permissions(username, perms)
             flash('Cập nhật quyền cho tài khoản thành công!', 'success')
+        
         return redirect(url_for('admin.view_user_permissions', username=username)) 

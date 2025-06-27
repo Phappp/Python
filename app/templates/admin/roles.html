@@ -2,32 +2,108 @@
 {% block content %}
 {% include 'admin/_admin_nav.html' %}
 <div class="container mt-4">
-    <h2>Cấu hình vai trò & quyền hạn</h2>
-    <table class="table table-bordered table-hover mt-4">
-        <thead class="thead-light">
-            <tr>
-                <th>Vai trò</th>
-                <th>Quyền hạn</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for role, permissions in roles_permissions.items() %}
-            <tr>
-                <td><strong><a href="{{ url_for('admin.users_by_role', role_name=role) }}">{{ role|capitalize }}</a></strong></td>
-                <td>
-                    <ul class="mb-0">
-                        {% for perm in permissions %}
-                        <li>{{ perm }}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="alert alert-info mt-3">
-        <i class="fas fa-info-circle me-1"></i>
-        <strong>Lưu ý:</strong> Các quyền này là mặc định. 
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-tag me-2"></i>
+                        Cấu hình vai trò & quyền hạn
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Vai trò</th>
+                                    <th>Quyền hạn mặc định</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for role, permissions in roles_permissions.items() %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if role == 'admin' %}
+                                                <i class="fas fa-user-shield text-danger me-2"></i>
+                                            {% elif role == 'lecture' %}
+                                                <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                            {% elif role == 'student' %}
+                                                <i class="fas fa-user-graduate text-success me-2"></i>
+                                            {% endif %}
+                                            <strong>{{ role|capitalize }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for perm in permissions %}
+                                                <span class="badge bg-info">{{ perm }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin.users_by_role', role_name=role) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-users me-1"></i>
+                                            Xem danh sách
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Thông tin hệ thống
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Quyền riêng
+                        </h6>
+                        <p class="mb-0">
+                            Ngoài quyền mặc định, admin có thể cấp thêm <strong>quyền riêng</strong> 
+                            cho từng tài khoản cụ thể.
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-crown me-2"></i>
+                            Tính năng mới
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Quản lý quyền riêng cho từng user</li>
+                            <li>Button "Quyền riêng" trong giao diện user</li>
+                            <li>Phân quyền chi tiết và linh hoạt</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('admin.list_users') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>
+                            Quản lý tất cả người dùng
+                        </a>
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %} 

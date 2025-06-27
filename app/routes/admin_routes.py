@@ -1,8 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 from app.controllers.admin_controller import AdminController, PermissionUserController
 from app.forms import RegistrationForm, ProfileEditForm, CourseForm
 from app.models.course_model import Course
-from app.utils.decorators import role_required
+from app.models.user_model import User
+from app.utils.decorators import role_required, custom_permission_required
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -99,6 +100,78 @@ def view_user_permissions(username):
     if request.method == 'POST':
         return PermissionUserController.update_user_permissions(username)
     return PermissionUserController.view_user_permissions(username)
+
+@admin_bp.route('/my-permissions')
+def view_my_permissions():
+    """Route cho lecture và student xem quyền riêng của mình"""
+    if 'username' not in session:
+        flash('Vui lòng đăng nhập để truy cập trang này!', 'warning')
+        return redirect(url_for('auth.login'))
+    
+    username = session['username']
+    user = User.find_by_username(username)
+    if not user:
+        flash('Không tìm thấy thông tin người dùng!', 'danger')
+        return redirect(url_for('main.home'))
+    
+    role = user.get('role')
+    user_permissions = user.get('permissions', [])
+    
+    # Quyền mặc định từ role
+    if role == 'admin':
+        default_permissions = ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system']
+    elif role == 'lecture':
+        default_permissions = ['manage_courses', 'manage_exercises']
+    elif role == 'student':
+        default_permissions = ['view_courses', 'do_exercises']
+    else:
+        default_permissions = []
+    
+    # Tạo mapping tên hiển thị cho các quyền
+    permission_display_names = {
+        'manage_users': 'Quản lý người dùng',
+        'manage_courses': 'Quản lý khóa học',
+        'manage_exercises': 'Quản lý bài tập',
+        'view_stats': 'Xem thống kê',
+        'config_system': 'Cấu hình hệ thống',
+        'export_data': 'Xuất dữ liệu',
+        'manage_roles': 'Quản lý vai trò',
+        'view_logs': 'Xem nhật ký hệ thống',
+        'manage_backups': 'Quản lý sao lưu',
+        'system_monitoring': 'Giám sát hệ thống'
+    }
+    
+    return render_template('admin/my_permissions.html', 
+                         user=user, 
+                         role=role, 
+                         user_permissions=user_permissions,
+                         default_permissions=default_permissions,
+                         permission_display_names=permission_display_names)
+
+# Demo routes cho các quyền riêng
+@admin_bp.route('/demo/view-stats')
+@custom_permission_required('view_stats')
+def demo_view_stats():
+    """Demo route cho quyền xem thống kê"""
+    return render_template('admin/demo_view_stats.html')
+
+@admin_bp.route('/demo/export-data')
+@custom_permission_required('export_data')
+def demo_export_data():
+    """Demo route cho quyền xuất dữ liệu"""
+    return render_template('admin/demo_export_data.html')
+
+@admin_bp.route('/demo/system-monitoring')
+@custom_permission_required('system_monitoring')
+def demo_system_monitoring():
+    """Demo route cho quyền giám sát hệ thống"""
+    return render_template('admin/demo_system_monitoring.html')
+
+@admin_bp.route('/demo/view-logs')
+@custom_permission_required('view_logs')
+def demo_view_logs():
+    """Demo route cho quyền xem nhật ký"""
+    return render_template('admin/demo_view_logs.html')
 
 @admin_bp.route('/dashboard')
 @role_required('admin')

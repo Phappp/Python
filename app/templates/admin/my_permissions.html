@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-crown me-2"></i>
+                        Quyền riêng của tôi
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Thông tin tài khoản</h6>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Vai trò:</strong> 
+                                <span class="badge bg-info">{{ role|capitalize }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Quyền mặc định từ vai trò</h6>
+                            <ul class="list-unstyled">
+                                {% for perm in default_permissions %}
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>{{ permission_display_names.get(perm, perm) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">
+                            <i class="fas fa-crown me-2 text-warning"></i>
+                            Quyền riêng được cấp:
+                        </h6>
+                        {% if user_permissions %}
+                            <div class="row">
+                                {% for perm in user_permissions %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="alert alert-warning mb-0">
+                                        <i class="fas fa-star me-2"></i>
+                                        <strong>{{ permission_display_names.get(perm, perm) }}</strong>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Bạn chưa được cấp quyền riêng nào. Chỉ có quyền mặc định từ vai trò {{ role|capitalize }}.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Tổng quyền của bạn
+                        </h6>
+                        <p class="mb-0">
+                            <strong>Quyền mặc định:</strong> {{ default_permissions|length }} quyền<br>
+                            <strong>Quyền riêng:</strong> {{ user_permissions|length }} quyền<br>
+                            <strong>Tổng cộng:</strong> {{ default_permissions|length + user_permissions|length }} quyền
+                        </p>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Về trang chủ
+                        </a>
+                        {% if role == 'lecture' %}
+                            <a href="{{ url_for('course.manage_courses') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-tasks me-2"></i>Quản lý khóa học
+                            </a>
+                        {% elif role == 'student' %}
+                            <a href="{{ url_for('course.view_courses') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-book me-2"></i>Xem khóa học
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
