@@ -3,7 +3,7 @@
 {% include 'admin/_admin_nav.html' %}
 <div class="container mt-4">
     <h2>Quản lý người dùng</h2>
-    <a href="{{ url_for('admin.add_user') }}" class="btn btn-primary mb-3">Thêm người dùng</a>
+    <a href="{{ url_for('admin.add_user') }}" class="btn btn-main mb-3"><i class="fas fa-user-plus"></i> Thêm người dùng</a>
     <table class="table table-bordered table-hover">
         <thead class="thead-light">
             <tr>
@@ -24,26 +24,28 @@
                 <td>{{ user.role }}</td>
                 <td>{% if user.active is defined and not user.active %}<span class="text-danger">Tạm khóa</span>{% else %}<span class="text-success">Hoạt động</span>{% endif %}</td>
                 <td>
-                    <a href="{{ url_for('admin.edit_user', username=user.username) }}" class="btn btn-sm btn-info">Sửa</a>
-                    <form action="{{ url_for('admin.delete_user', username=user.username) }}" method="post" style="display:inline-block" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
-                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                    </form>
-                    <form action="{{ url_for('admin.change_role', username=user.username) }}" method="post" style="display:inline-block">
-                        <select name="role" class="form-control form-control-sm d-inline-block w-auto">
-                            <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
-                            <option value="lecture" {% if user.role == 'lecture' %}selected{% endif %}>Lecture</option>
-                            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-secondary">Đổi vai trò</button>
-                    </form>
-                    <form action="{{ url_for('admin.reset_password', username=user.username) }}" method="post" style="display:inline-block">
-                        <input type="password" name="new_password" placeholder="Mật khẩu mới" class="form-control form-control-sm d-inline-block w-auto" required>
-                        <button type="submit" class="btn btn-sm btn-warning">Đặt lại MK</button>
-                    </form>
-                    <form action="{{ url_for('admin.toggle_active', username=user.username) }}" method="post" style="display:inline-block">
-                        <input type="hidden" name="active" value="{% if user.active is defined and not user.active %}true{% else %}false{% endif %}">
-                        <button type="submit" class="btn btn-sm {% if user.active is defined and not user.active %}btn-success{% else %}btn-dark{% endif %}">{% if user.active is defined and not user.active %}Mở khóa{% else %}Khóa{% endif %}</button>
-                    </form>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('admin.edit_user', username=user.username) }}" class="btn btn-outline-main btn-sm"><i class="fas fa-edit"></i> Sửa</a>
+                        <form action="{{ url_for('admin.delete_user', username=user.username) }}" method="post" style="display:inline-block" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
+                            <button type="submit" class="btn btn-outline-main btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                        </form>
+                        <form action="{{ url_for('admin.change_role', username=user.username) }}" method="post" style="display:inline-block">
+                            <select name="role" class="form-control form-control-sm d-inline-block w-auto">
+                                <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+                                <option value="lecture" {% if user.role == 'lecture' %}selected{% endif %}>Lecture</option>
+                                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                            <button type="submit" class="btn btn-outline-main btn-sm"><i class="fas fa-user-shield"></i> Đổi vai trò</button>
+                        </form>
+                        <form action="{{ url_for('admin.reset_password', username=user.username) }}" method="post" style="display:inline-block">
+                            <input type="password" name="new_password" placeholder="Mật khẩu mới" class="form-control form-control-sm d-inline-block w-auto" required>
+                            <button type="submit" class="btn btn-outline-main btn-sm"><i class="fas fa-key"></i> Đặt lại MK</button>
+                        </form>
+                        <form action="{{ url_for('admin.toggle_active', username=user.username) }}" method="post" style="display:inline-block">
+                            <input type="hidden" name="active" value="{% if user.active is defined and not user.active %}true{% else %}false{% endif %}">
+                            <button type="submit" class="btn btn-outline-main btn-sm">{% if user.active is defined and not user.active %}<i class="fas fa-unlock"></i> Mở khóa{% else %}<i class="fas fa-lock"></i> Khóa{% endif %}</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}

@@ -49,6 +49,9 @@ class ProfileEditForm(FlaskForm):
                        validators=[DataRequired(), Email()])
     bio = TextAreaField('Giới thiệu bản thân', 
                        validators=[Optional(), Length(max=500)])
+    role = SelectField('Vai trò', 
+        choices=[('student', 'Sinh viên'), ('lecture', 'Giảng viên'), ('admin', 'Admin')],
+        default='student')
     submit = SubmitField('Cập nhật thông tin')
 
 class ChangePasswordRequestForm(FlaskForm):

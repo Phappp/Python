@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 import io
 import openpyxl
+from app.forms import ProfileEditForm, CourseForm
 
 class AdminController:
     @staticmethod
@@ -41,6 +42,8 @@ class AdminController:
             User.update_profile(username, update_data)
             flash('Cập nhật thông tin thành công!', 'success')
             return redirect(url_for('admin.list_users'))
+        if request.method == 'GET':
+            form = ProfileEditForm(data=user)
         return render_template('admin/edit_user.html', form=form, user=user)
 
     @staticmethod
@@ -106,6 +109,8 @@ class AdminController:
             Course.update(course_id, update_data)
             flash('Cập nhật khóa học thành công!', 'success')
             return redirect(url_for('admin.list_courses'))
+        if request.method == 'GET':
+            form = CourseForm(data=course)
         return render_template('admin/edit_course.html', form=form, course=course)
 
     @staticmethod
@@ -227,12 +232,19 @@ class PermissionUserController:
         if not user:
             flash('Không tìm thấy người dùng!', 'danger')
             return redirect(url_for('admin.list_users'))
-        # Quyền mặc định từ role
         role = user.get('role')
-        # Quyền riêng
         user_permissions = user.get('permissions', [])
-        # Gợi ý một số quyền phổ biến
-        all_permissions = ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system']
+        # Quyền mặc định từ role
+        if role == 'admin':
+            default_permissions = ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system']
+        elif role == 'lecture':
+            default_permissions = ['manage_courses', 'manage_exercises']
+        elif role == 'student':
+            default_permissions = ['view_courses', 'do_exercises']
+        else:
+            default_permissions = []
+        # Chỉ hiển thị các quyền không phải mặc định
+        all_permissions = [p for p in ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system'] if p not in default_permissions]
         return render_template('admin/user_permissions.html', user=user, role=role, user_permissions=user_permissions, all_permissions=all_permissions)
 
     @staticmethod
@@ -241,7 +253,11 @@ class PermissionUserController:
         if not user:
             flash('Không tìm thấy người dùng!', 'danger')
             return redirect(url_for('admin.list_users'))
-        perms = request.form.getlist('permissions')
-        User.set_permissions(username, perms)
-        flash('Cập nhật quyền cho tài khoản thành công!', 'success')
+        if 'reset_permissions' in request.form:
+            User.set_permissions(username, [])
+            flash('Đã xóa toàn bộ quyền riêng, chỉ còn quyền mặc định!', 'success')
+        else:
+            perms = request.form.getlist('permissions')
+            User.set_permissions(username, perms)
+            flash('Cập nhật quyền cho tài khoản thành công!', 'success')
         return redirect(url_for('admin.view_user_permissions', username=username)) 

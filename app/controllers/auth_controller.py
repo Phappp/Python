@@ -142,6 +142,9 @@ class AuthController:
             save_credentials = form.save_credentials.data
             user = User.find_by_username(username)
             
+            if user and not user.get('active', True):
+                flash('Tài khoản của bạn đã bị khóa!', 'danger')
+                return None
             if user and User.check_password(user, password):
                 # Kiểm tra xem người dùng có bật 2FA không
                 if user.get('two_factor_enabled', False):

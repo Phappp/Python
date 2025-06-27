@@ -33,6 +33,10 @@
             <div class="form-text">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều quyền.</div>
         </div>
         <button type="submit" class="btn btn-success">Lưu quyền riêng</button>
+        <button type="submit" name="reset_permissions" value="1" class="btn btn-danger"
+            onclick="return confirm('Bạn có chắc muốn xóa toàn bộ quyền riêng và trả về mặc định?');">
+            Xóa quyền riêng (trả về mặc định)
+        </button>
         <a href="{{ url_for('admin.users_by_role', role_name=role) }}" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>

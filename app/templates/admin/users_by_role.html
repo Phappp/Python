@@ -3,8 +3,8 @@
 {% include 'admin/_admin_nav.html' %}
 <div class="container mt-4">
     <h2>Danh sách tài khoản vai trò: {{ role_name|capitalize }}</h2>
-    <table class="table table-bordered table-hover">
-        <thead>
+    <table class="table table-bordered table-hover rounded-4 shadow-sm overflow-hidden">
+        <thead class="table-light">
             <tr>
                 <th>Username</th>
                 <th>Email</th>
@@ -22,12 +22,15 @@
                 <td>
                     {% if user.permissions %}
                         {{ user.permissions|join(', ') }}
+                        <a href="#" class="btn btn-outline-warning btn-sm ms-2 btn-outline-main" title="Quyền riêng" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bs-title="{{ user.permissions|join('<br>') }}">
+                            <i class="fas fa-key"></i> Quyền riêng
+                        </a>
                     {% else %}
                         <span class="text-muted">Mặc định</span>
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('admin.view_user_permissions', username=user.username) }}" class="btn btn-sm btn-primary">Quản lý quyền</a>
+                    <a href="{{ url_for('admin.view_user_permissions', username=user.username) }}" class="btn btn-outline-main btn-sm"><i class="fas fa-user-cog"></i> Quản lý quyền</a>
                 </td>
             </tr>
             {% endfor %}
