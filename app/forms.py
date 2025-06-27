@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, BooleanField, DateField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, BooleanField, DateField, IntegerField, FloatField, FieldList, FormField
+from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, ValidationError
+from wtforms.widgets import TextArea
+import re
 
 class RegistrationForm(FlaskForm):
     username = StringField('Tên người dùng', 
@@ -107,3 +109,82 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('Mật khẩu mới', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Xác nhận mật khẩu mới', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Đặt lại mật khẩu')
+
+class TestCaseForm(FlaskForm):
+    """Form cho test case"""
+    input_data = TextAreaField('Input', validators=[DataRequired()], widget=TextArea())
+    expected_output = TextAreaField('Expected Output', validators=[DataRequired()], widget=TextArea())
+    description = StringField('Mô tả (tùy chọn)', validators=[Optional()])
+    is_hidden = BooleanField('Test case ẩn')
+
+class ProgrammingExerciseForm(FlaskForm):
+    """Form cho bài tập lập trình"""
+    title = StringField('Tiêu đề bài tập', validators=[DataRequired(), Length(min=5, max=200)])
+    description = TextAreaField('Mô tả chi tiết', validators=[DataRequired(), Length(min=20)], widget=TextArea())
+    language_supported = SelectField('Ngôn ngữ lập trình', 
+                                   choices=[
+                                       ('python', 'Python'),
+                                       ('java', 'Java'),
+                                       ('cpp', 'C++'),
+                                       ('javascript', 'JavaScript'),
+                                       ('csharp', 'C#'),
+                                       ('php', 'PHP'),
+                                       ('ruby', 'Ruby'),
+                                       ('go', 'Go'),
+                                       ('rust', 'Rust'),
+                                       ('swift', 'Swift')
+                                   ],
+                                   validators=[DataRequired()])
+    time_limit = IntegerField('Giới hạn thời gian (giây)', validators=[Optional()], default=5)
+    memory_limit = IntegerField('Giới hạn bộ nhớ (MB)', validators=[Optional()], default=128)
+    is_visible = BooleanField('Hiển thị cho sinh viên', default=True)
+    
+    # Test cases sẽ được xử lý riêng trong controller
+    test_cases_json = TextAreaField('Test Cases (JSON)', widget=TextArea())
+
+class CodeSubmissionForm(FlaskForm):
+    """Form cho nộp bài code"""
+    code = TextAreaField('Mã nguồn', validators=[DataRequired()], widget=TextArea())
+    language = SelectField('Ngôn ngữ', 
+                          choices=[
+                              ('python', 'Python'),
+                              ('java', 'Java'),
+                              ('cpp', 'C++'),
+                              ('javascript', 'JavaScript'),
+                              ('csharp', 'C#'),
+                              ('php', 'PHP'),
+                              ('ruby', 'Ruby'),
+                              ('go', 'Go'),
+                              ('rust', 'Rust'),
+                              ('swift', 'Swift')
+                          ],
+                          validators=[DataRequired()])
+
+class ExerciseFilterForm(FlaskForm):
+    """Form lọc bài tập"""
+    language = SelectField('Ngôn ngữ', 
+                          choices=[
+                              ('', 'Tất cả'),
+                              ('python', 'Python'),
+                              ('java', 'Java'),
+                              ('cpp', 'C++'),
+                              ('javascript', 'JavaScript'),
+                              ('csharp', 'C#'),
+                              ('php', 'PHP'),
+                              ('ruby', 'Ruby'),
+                              ('go', 'Go'),
+                              ('rust', 'Rust'),
+                              ('swift', 'Swift')
+                          ])
+    status = SelectField('Trạng thái',
+                        choices=[
+                            ('', 'Tất cả'),
+                            ('visible', 'Đang hiển thị'),
+                            ('hidden', 'Đang ẩn')
+                        ])
+    search = StringField('Tìm kiếm theo tên')
+
+class ManualFeedbackForm(FlaskForm):
+    """Form cho phản hồi thủ công của giảng viên"""
+    manual_feedback = TextAreaField('Phản hồi thủ công', widget=TextArea())
+    score_adjustment = FloatField('Điều chỉnh điểm (±)', validators=[Optional()])

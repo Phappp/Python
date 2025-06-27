@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        {% if session.role == 'lecture' %}
+        <a href="{{ url_for('programming_exercise.view_submissions', exercise_id=exercise._id) }}"
+            class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        {% else %}
+        <a href="{{ url_for('programming_exercise.student_exercises') }}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        {% endif %}
+        <div>
+            <h1 class="mb-1">{{ title }}</h1>
+            <p class="text-muted mb-0">{{ exercise.title }} - {{ submission.user_id }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Submission Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin bài nộp</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Sinh viên:</strong> {{ submission.user_id }}</p>
+                            <p><strong>Thời gian nộp:</strong> {{ submission.submitted_at|datetimeformat }}</p>
+                            <p><strong>Ngôn ngữ:</strong>
+                                <span class="badge bg-secondary">{{ submission.language|upper }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Điểm:</strong>
+                                {% if submission.score is not none %}
+                                <span
+                                    class="badge {% if submission.score >= 8 %}bg-success{% elif submission.score >= 6 %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                                    {{ "%.1f"|format(submission.score) }}/10
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">Chưa chấm</span>
+                                {% endif %}
+                            </p>
+                            {% if submission.execution_time %}
+                            <p><strong>Thời gian chạy:</strong> {{ submission.execution_time }}s</p>
+                            {% endif %}
+                            {% if submission.memory_used %}
+                            <p><strong>Bộ nhớ sử dụng:</strong> {{ submission.memory_used }}MB</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if session.role == 'student' %}
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('programming_exercise.submit_exercise', exercise_id=exercise._id) }}"
+                            class="btn btn-outline-primary">
+                            <i class="fas fa-redo"></i> Nộp lại/Làm lại
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Submission History for Students -->
+            {% if session.role == 'student' and submission_history and submission_history|length > 1 %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử các lần nộp</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Thời gian nộp</th>
+                                    <th>Điểm</th>
+                                    <th>Trạng thái</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sub in submission_history|sort(attribute='submitted_at', reverse=True) %}
+                                <tr {% if sub._id==submission._id %}class="table-primary" {% endif %}>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ sub.submitted_at|datetimeformat }}</td>
+                                    <td>
+                                        {% if sub.score is not none %}
+                                        <span
+                                            class="badge {% if sub.score >= 8 %}bg-success{% elif sub.score >= 6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ "%.1f"|format(sub.score) }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Chưa chấm</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sub._id == submission._id %}
+                                        <span class="badge bg-primary">Lần xem</span>
+                                        {% else %}
+                                        <span class="badge bg-light text-dark">Trước đó</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('programming_exercise.view_submission', submission_id=sub._id) }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            Xem
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Code Display -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-code"></i> Mã nguồn</h5>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-{{ submission.language }}">{{ submission.code }}</code></pre>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            {% if submission.test_results %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-vial"></i> Kết quả test cases</h5>
+                </div>
+                <div class="card-body">
+                    {% set passed = submission.test_results|selectattr('passed')|select()|list|length %}
+                    {% set total = submission.test_results|length %}
+                    <div class="mb-3">
+                        <strong>Kết quả:</strong>
+                        <span class="badge bg-success">{{ passed }}/{{ total }} test case đúng</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Test Case</th>
+                                    <th>Input</th>
+                                    <th>Expected</th>
+                                    <th>Actual</th>
+                                    <th>Kết quả</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in submission.test_results %}
+                                <tr>
+                                    <td>{{ result.test_case }}</td>
+                                    <td><code>{{ result.input|truncate(30) }}</code></td>
+                                    <td><code>{{ result.expected|truncate(30) }}</code></td>
+                                    <td><code>{{ result.actual|truncate(30) }}</code></td>
+                                    <td>
+                                        {% if result.passed %}
+                                        <span class="badge bg-success">Pass</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Fail</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- AI Feedback -->
+            {% if submission.llm_feedback %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-robot"></i> Phản hồi AI</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" style="white-space: pre-line;">
+                        {{ submission.llm_feedback|replace('<br>', '\n')|replace('<br />', '\n')|replace('<br />',
+                        '\n')|safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Manual Feedback (for lecturers) -->
+            {% if session.role == 'lecture' %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> Phản hồi thủ công</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST"
+                        action="{{ url_for('programming_exercise.add_manual_feedback', submission_id=submission._id) }}">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.manual_feedback.label(class="form-label fw-bold") }}
+                            {{ form.manual_feedback(class="form-control", rows="4") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.score_adjustment.label(class="form-label fw-bold") }}
+                            {{ form.score_adjustment(class="form-control", placeholder="±0.5") }}
+                            <small class="form-text text-muted">Điều chỉnh điểm (có thể âm hoặc dương)</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Lưu phản hồi
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Exercise Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> Thông tin bài tập</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ exercise.title }}</h6>
+                    <p class="text-muted">{{ exercise.description|truncate(150) }}</p>
+
+                    <div class="mb-2">
+                        <strong>Ngôn ngữ:</strong>
+                        {% for lang in exercise.language_supported %}
+                        <span class="badge bg-secondary me-1">{{ lang|upper }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Giới hạn:</strong>
+                        <small>{{ exercise.time_limit }}s, {{ exercise.memory_limit }}MB</small>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Test cases:</strong>
+                        <small>{{ exercise.test_cases|length }} cases</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Breakdown -->
+            {% if submission.score is not none %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Phân tích điểm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Test Cases (70%)</span>
+                            <span>{{ "%.1f"|format((submission.score or 0) * 0.7) }}</span>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" style="width: {{ (submission.score or 0) * 7 }}%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>AI Analysis (30%)</span>
+                            <span>{{ "%.1f"|format((submission.score or 0) * 0.3) }}</span>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-info" style="width: {{ (submission.score or 0) * 3 }}%"></div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Tổng điểm:</strong>
+                        <strong class="text-primary">{{ "%.1f"|format(submission.score or 0) }}/10</strong>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            {% if session.role == 'lecture' %}
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> Hành động nhanh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('programming_exercise.view_submissions', exercise_id=exercise._id) }}"
+                            class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-list"></i> Xem tất cả bài nộp
+                        </a>
+                        <a href="{{ url_for('programming_exercise.edit_exercise', exercise_id=exercise._id) }}"
+                            class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i> Sửa bài tập
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Code Highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    pre {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin: 0;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    code {
+        font-family: 'Courier New', monospace;
+    }
+
+    .progress {
+        height: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    .table-sm td,
+    .table-sm th {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
+
+<script>
+    // Auto-resize textarea
+    document.addEventListener('DOMContentLoaded', function () {
+        const textarea = document.querySelector('textarea');
+        if (textarea) {
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
+    });
+</script>
+{% endblock %}

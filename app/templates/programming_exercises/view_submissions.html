@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('programming_exercise.manage_exercises') }}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">{{ title }}</h1>
+            <p class="text-muted mb-0">{{ exercise.title }}</p>
+        </div>
+        <div class="ms-auto">
+            <a href="{{ url_for('programming_exercise.export_submissions', exercise_id=exercise._id) }}"
+                class="btn btn-outline-success">
+                <i class="fas fa-download"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    {% if stats %}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.total_submissions }}</h4>
+                            <small>Tổng bài nộp</small>
+                        </div>
+                        <i class="fas fa-file-alt fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ "%.1f"|format(stats.avg_score or 0) }}</h4>
+                            <small>Điểm trung bình</small>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ "%.1f"|format(stats.max_score or 0) }}</h4>
+                            <small>Điểm cao nhất</small>
+                        </div>
+                        <i class="fas fa-trophy fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ "%.1f"|format(stats.min_score or 0) }}</h4>
+                            <small>Điểm thấp nhất</small>
+                        </div>
+                        <i class="fas fa-chart-bar fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Exercise Info -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin bài tập</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Tiêu đề:</strong> {{ exercise.title }}</p>
+                    <p><strong>Ngôn ngữ:</strong>
+                        {% for lang in exercise.language_supported %}
+                        <span class="badge bg-secondary me-1">{{ lang|upper }}</span>
+                        {% endfor %}
+                    </p>
+                    <p><strong>Test cases:</strong> {{ exercise.test_cases|length }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Giới hạn thời gian:</strong> {{ exercise.time_limit }}s</p>
+                    <p><strong>Giới hạn bộ nhớ:</strong> {{ exercise.memory_limit }}MB</p>
+                    <p><strong>Ngày tạo:</strong> {{ exercise.created_at|datetimeformat }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submissions List -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Danh sách bài nộp</h5>
+        </div>
+        <div class="card-body">
+            {% if submissions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sinh viên</th>
+                            <th>Thời gian nộp</th>
+                            <th>Ngôn ngữ</th>
+                            <th>Điểm</th>
+                            <th>Thời gian chạy</th>
+                            <th>Bộ nhớ</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in submissions %}
+                        <tr>
+                            <td>
+                                <strong>{{ submission.user_id }}</strong>
+                            </td>
+                            <td>
+                                <small>{{ submission.submitted_at|datetimeformat }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ submission.language|upper }}</span>
+                            </td>
+                            <td>
+                                {% if submission.score is not none %}
+                                <span
+                                    class="badge {% if submission.score >= 8 %}bg-success{% elif submission.score >= 6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ "%.1f"|format(submission.score) }}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">Chưa chấm</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if submission.execution_time %}
+                                <small>{{ submission.execution_time }}s</small>
+                                {% else %}
+                                <small class="text-muted">-</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if submission.memory_used %}
+                                <small>{{ submission.memory_used }}MB</small>
+                                {% else %}
+                                <small class="text-muted">-</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if submission.score is not none %}
+                                <span class="badge bg-success">Đã chấm</span>
+                                {% else %}
+                                <span class="badge bg-warning">Chờ chấm</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('programming_exercise.view_submission', submission_id=submission._id) }}"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Chưa có bài nộp nào</h4>
+                <p class="text-muted">Sinh viên chưa nộp bài cho bài tập này.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Score Distribution Chart -->
+    {% if submissions and stats and stats.total_submissions > 0 %}
+    <div class="card shadow-sm mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Phân bố điểm</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <canvas id="scoreChart" width="400" height="200"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <div class="mt-3">
+                        <h6>Thống kê chi tiết:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Tổng bài nộp:</strong> {{ stats.total_submissions }}</li>
+                            <li><strong>Điểm trung bình:</strong> {{ "%.1f"|format(stats.avg_score or 0) }}</li>
+                            <li><strong>Điểm cao nhất:</strong> {{ "%.1f"|format(stats.max_score or 0) }}</li>
+                            <li><strong>Điểm thấp nhất:</strong> {{ "%.1f"|format(stats.min_score or 0) }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    .opacity-50 {
+        opacity: 0.5;
+    }
+</style>
+
+{% if submissions and stats and stats.total_submissions > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+
+        // Tính toán phân bố điểm
+        const scoreRanges = {
+            '9-10': 0,
+            '8-9': 0,
+            '7-8': 0,
+            '6-7': 0,
+            '0-6': 0
+        };
+
+        {% for submission in submissions %}
+        {% if submission.score is not none %}
+        const score = {{ submission.score | tojson
+    }};
+    if (score >= 9) scoreRanges['9-10']++;
+    else if (score >= 8) scoreRanges['8-9']++;
+    else if (score >= 7) scoreRanges['7-8']++;
+    else if (score >= 6) scoreRanges['6-7']++;
+    else scoreRanges['0-6']++;
+    {% endif %}
+    {% endfor %}
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(scoreRanges),
+            datasets: [{
+                data: Object.values(scoreRanges),
+                backgroundColor: [
+                    '#28a745', // 9-10: green
+                    '#20c997', // 8-9: teal
+                    '#ffc107', // 7-8: yellow
+                    '#fd7e14', // 6-7: orange
+                    '#dc3545'  // 0-6: red
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    });
+</script>
+{% endif %}
+{% endblock %}

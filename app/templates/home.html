@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4 mb-3">
-  
+
 </div>
 
 <style>
@@ -512,11 +512,12 @@
         gap: 24px;
         background: rgba(30, 30, 40, 0.97);
         border-radius: 22px;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.13);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.13);
         padding: 24px 10px;
         align-items: center;
         width: 70px;
     }
+
     .vertical-toolbar .toolbar-item {
         display: flex;
         flex-direction: column;
@@ -531,15 +532,18 @@
         padding-bottom: 0;
         text-decoration: none;
     }
+
     .vertical-toolbar .toolbar-item:hover {
         background: #23242a;
     }
+
     .vertical-toolbar .toolbar-item i {
         font-size: 2rem;
         color: #fff;
         margin-right: 0;
         transition: color 0.2s;
     }
+
     .vertical-toolbar .toolbar-label {
         opacity: 0;
         max-height: 0;
@@ -552,14 +556,15 @@
         margin-top: 0;
         margin-left: 0;
         margin-bottom: 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-        transition: opacity 0.2s, max-height 0.25s cubic-bezier(.4,1.6,.6,1), padding 0.2s, margin 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        transition: opacity 0.2s, max-height 0.25s cubic-bezier(.4, 1.6, .6, 1), padding 0.2s, margin 0.2s;
         pointer-events: none;
         white-space: nowrap;
         text-align: center;
         overflow: hidden;
         text-decoration: none;
     }
+
     .vertical-toolbar .toolbar-item:hover .toolbar-label {
         opacity: 1;
         max-height: 50px;
@@ -568,8 +573,11 @@
         margin-bottom: 6px;
         text-decoration: none;
     }
+
     @media (max-width: 768px) {
-        .vertical-toolbar { display: none; }
+        .vertical-toolbar {
+            display: none;
+        }
     }
 </style>
 
@@ -660,7 +668,15 @@
         <i class="fas fa-clipboard-list"></i>
         <span class="toolbar-label">Bài tập</span>
     </a>
+<<<<<<< HEAD
+    <a class="toolbar-item" tabindex="0" href="{{ url_for('programming_exercise.student_exercises') }}">
+        <i class="fas fa-code"></i>
+        <span class="toolbar-label">Lập trình</span>
+    </a>
+    <div class="toolbar-item" tabindex="0">
+=======
     <a class="toolbar-item" tabindex="0" href="#">
+>>>>>>> 4e8207088d5a285d97e388410300a3b9e65b86a4
         <i class="fas fa-file-alt"></i>
         <span class="toolbar-label">Tài liệu</span>
     </a>

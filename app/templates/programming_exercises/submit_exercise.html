@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('programming_exercise.student_exercises') }}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">{{ title }}</h1>
+            <p class="text-muted mb-0">{{ exercise.title }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Exercise Description -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> Đề bài</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ exercise.title }}</h6>
+                    <div class="mb-3">
+                        <p class="text-muted">{{ exercise.description|nl2br }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Ngôn ngữ:</strong>
+                        {% for lang in exercise.language_supported %}
+                        <span class="badge bg-secondary me-1">{{ lang|upper }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Giới hạn:</strong>
+                        <ul class="list-unstyled small text-muted">
+                            <li><i class="fas fa-clock me-1"></i>Thời gian: {{ exercise.time_limit }}s</li>
+                            <li><i class="fas fa-memory me-1"></i>Bộ nhớ: {{ exercise.memory_limit }}MB</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Test cases:</strong>
+                        <ul class="list-unstyled small text-muted">
+                            <li><i class="fas fa-vial me-1"></i>{{ exercise.test_cases|length }} test cases</li>
+                            <li><i class="fas fa-eye-slash me-1"></i>Một số test cases ẩn</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Test Cases -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-vial"></i> Test cases mẫu</h5>
+                </div>
+                <div class="card-body">
+                    {% for test_case in exercise.test_cases %}
+                    {% if not test_case.is_hidden %}
+                    <div class="mb-3 p-2 border rounded">
+                        <small class="text-muted">Test case {{ loop.index }}</small>
+                        <div class="mt-1">
+                            <strong>Input:</strong>
+                            <pre class="mb-1"><code>{{ test_case.input }}</code></pre>
+                            <strong>Expected Output:</strong>
+                            <pre class="mb-0"><code>{{ test_case.expected_output }}</code></pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Editor -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-code"></i> Viết code</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.language.label(class="form-label fw-bold") }}
+                            {{ form.language(class="form-select" + (" is-invalid" if form.language.errors else "")) }}
+                            {% if form.language.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.language.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.code.label(class="form-label fw-bold") }}
+                            {{ form.code(class="form-control code-editor" + (" is-invalid" if form.code.errors else ""),
+                            rows="20") }}
+                            {% if form.code.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.code.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Test Code Section -->
+                        <div class="mb-4">
+                            <h6 class="text-primary">🧪 Test code trước khi nộp</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Input test:</label>
+                                    <textarea id="testInput" class="form-control" rows="3"
+                                        placeholder="Nhập input để test..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Kết quả:</label>
+                                    <div id="testOutput" class="form-control bg-light"
+                                        style="height: 80px; overflow-y: auto;">
+                                        <small class="text-muted">Kết quả sẽ hiển thị ở đây...</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button type="button" id="testBtn" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-play"></i> Test code
+                                </button>
+                                <span id="testStatus" class="ms-2"></span>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('programming_exercise.student_exercises') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Nộp bài
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Code Highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .code-editor {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.4;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+
+    .code-editor:focus {
+        background-color: #fff;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    pre {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.375rem;
+        padding: 0.5rem;
+        margin: 0;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    code {
+        font-family: 'Courier New', monospace;
+        background-color: #f1f3f4;
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    #testOutput {
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+    }
+
+    .test-success {
+        color: #198754;
+    }
+
+    .test-error {
+        color: #dc3545;
+    }
+
+    .test-warning {
+        color: #fd7e14;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const codeEditor = document.querySelector('.code-editor');
+        const testBtn = document.getElementById('testBtn');
+        const testInput = document.getElementById('testInput');
+        const testOutput = document.getElementById('testOutput');
+        const testStatus = document.getElementById('testStatus');
+        const languageSelect = document.getElementById('language');
+
+        // Auto-resize textarea
+        if (codeEditor) {
+            codeEditor.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
+
+        // Test code functionality
+        testBtn.addEventListener('click', function () {
+            const code = codeEditor.value;
+            const input = testInput.value;
+            const language = languageSelect.value;
+
+            if (!code.trim()) {
+                testOutput.innerHTML = '<span class="test-error">Vui lòng nhập code trước khi test!</span>';
+                return;
+            }
+
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang test...';
+            testStatus.innerHTML = '';
+
+            // Call API to test code
+            fetch('{{ url_for("programming_exercise.test_code") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: code,
+                    language: language,
+                    input: input
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        testOutput.innerHTML = `<span class="test-error">Lỗi: ${data.error}</span>`;
+                        testStatus.innerHTML = '<span class="test-error">❌ Test thất bại</span>';
+                    } else {
+                        let output = '';
+                        if (data.output) {
+                            output += `<strong>Output:</strong>\n${data.output}`;
+                        }
+                        if (data.error) {
+                            output += `\n\n<strong>Error:</strong>\n${data.error}`;
+                        }
+                        if (data.execution_time) {
+                            output += `\n\n<strong>Thời gian chạy:</strong> ${data.execution_time}s`;
+                        }
+                        if (data.memory_used) {
+                            output += `\n<strong>Bộ nhớ sử dụng:</strong> ${data.memory_used}MB`;
+                        }
+
+                        testOutput.innerHTML = output.replace(/\n/g, '<br>');
+                        testStatus.innerHTML = '<span class="test-success">✅ Test thành công</span>';
+                    }
+                })
+                .catch(error => {
+                    testOutput.innerHTML = `<span class="test-error">Lỗi kết nối: ${error.message}</span>`;
+                    testStatus.innerHTML = '<span class="test-error">❌ Test thất bại</span>';
+                })
+                .finally(() => {
+                    testBtn.disabled = false;
+                    testBtn.innerHTML = '<i class="fas fa-play"></i> Test code';
+                });
+        });
+
+        // Auto-fill sample code based on language
+        languageSelect.addEventListener('change', function () {
+            const language = this.value;
+            let sampleCode = '';
+
+            switch (language) {
+                case 'python':
+                    sampleCode = `# Viết code Python của bạn ở đây
+def main():
+    # Đọc input
+    n = int(input())
+    arr = list(map(int, input().split()))
+    
+    # Xử lý logic
+    result = sum(arr)
+    
+    # In kết quả
+    print(result)
+
+if __name__ == "__main__":
+    main()`;
+                    break;
+                case 'java':
+                    sampleCode = `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        // Đọc input
+        int n = sc.nextInt();
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = sc.nextInt();
+        }
+        
+        // Xử lý logic
+        int result = 0;
+        for (int num : arr) {
+            result += num;
+        }
+        
+        // In kết quả
+        System.out.println(result);
+        
+        sc.close();
+    }
+}`;
+                    break;
+                case 'cpp':
+                    sampleCode = `#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    // Đọc input
+    int n;
+    cin >> n;
+    
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+    
+    // Xử lý logic
+    int result = 0;
+    for (int num : arr) {
+        result += num;
+    }
+    
+    // In kết quả
+    cout << result << endl;
+    
+    return 0;
+}`;
+                    break;
+                default:
+                    sampleCode = `// Viết code ${language.toUpperCase()} của bạn ở đây
+// Đọc input và xử lý logic theo yêu cầu bài tập`;
+            }
+
+            if (!codeEditor.value.trim() || confirm('Bạn có muốn thay đổi code mẫu cho ngôn ngữ ' + language.toUpperCase() + '?')) {
+                codeEditor.value = sampleCode;
+                codeEditor.style.height = 'auto';
+                codeEditor.style.height = codeEditor.scrollHeight + 'px';
+            }
+        });
+
+        // Trigger language change on load
+        languageSelect.dispatchEvent(new Event('change'));
+    });
+</script>
+{% endblock %}

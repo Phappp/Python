@@ -267,53 +267,65 @@
       background: #f8fafc !important;
       color: #222 !important;
     }
+
     body.theme-light .header {
       background: #fff !important;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
     }
+
     body.theme-light .navbar-brand,
     body.theme-light .navbar-nav .nav-link {
       color: #222 !important;
     }
+
     body.theme-light .dropdown-menu {
       background: #fff;
       color: #222;
     }
+
     body.theme-light .card,
     body.theme-light .list-group-item {
       background: #fff;
       color: #222;
     }
+
     body.theme-light .btn-primary {
       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       color: #fff;
     }
+
     /* Theme Dark */
     body.theme-dark {
       background: #181a1b !important;
       color: #e0e0e0 !important;
     }
+
     body.theme-dark .header {
       background: #23242a !important;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
     }
+
     body.theme-dark .navbar-brand,
     body.theme-dark .navbar-nav .nav-link {
       color: #e0e0e0 !important;
     }
+
     body.theme-dark .dropdown-menu {
       background: #23242a;
       color: #e0e0e0;
     }
+
     body.theme-dark .card,
     body.theme-dark .list-group-item {
       background: #23242a;
       color: #e0e0e0;
     }
+
     body.theme-dark .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
     }
+
     /* Dropdown icon highlight */
     .nav-link[aria-expanded="true"] i {
       color: #007bff;
@@ -326,13 +338,17 @@
   <!-- Theme switcher cho trang landing page (chưa đăng nhập) -->
   <div style="position: fixed; top: 24px; right: 120px; z-index: 2000;">
     <div class="dropdown">
-      <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdownLanding" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
+      <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdownLanding" role="button"
+        data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
         <i class="fas fa-circle-half-stroke fa-lg"></i>
       </a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdownLanding">
-        <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện đại</a></li>
-        <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a></li>
-        <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a></li>
+        <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện
+            đại</a></li>
+        <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a>
+        </li>
+        <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -376,6 +392,11 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('programming_exercise.manage_exercises') }}">
+                <i class="fas fa-code me-1"></i>Bài tập lập trình
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.create_course') }}">
                 <i class="fas fa-plus me-1"></i>Tạo khóa học
               </a>
@@ -394,13 +415,17 @@
             {% if username %}
             <!-- Theme switcher button (chỉ hiện khi đã đăng nhập) -->
             <li class="nav-item dropdown d-flex align-items-center" style="margin-left: 30px;">
-              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false" title="Chọn giao diện">
                 <i class="fas fa-circle-half-stroke fa-lg"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
-                <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i class="fas fa-star me-2"></i>Hiện đại</a></li>
-                <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i class="fas fa-sun me-2"></i>Sáng</a></li>
-                <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i class="fas fa-moon me-2"></i>Tối</a></li>
+                <li><a class="dropdown-item theme-select" href="#" data-theme="modern"><i
+                      class="fas fa-star me-2"></i>Hiện đại</a></li>
+                <li><a class="dropdown-item theme-select" href="#" data-theme="light"><i
+                      class="fas fa-sun me-2"></i>Sáng</a></li>
+                <li><a class="dropdown-item theme-select" href="#" data-theme="dark"><i
+                      class="fas fa-moon me-2"></i>Tối</a></li>
               </ul>
             </li>
             <li class="nav-item dropdown user-profile-dropdown">
