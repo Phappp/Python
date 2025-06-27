@@ -30,20 +30,20 @@ def role_required(required_role):
         return decorated_function
     return decorator
 
-def remember_me_status():
-    """Kiểm tra trạng thái remember me của session hiện tại"""
+def saved_credentials_status():
+    """Kiểm tra trạng thái saved credentials của session hiện tại"""
     if 'username' in session:
-        # Kiểm tra xem session có permanent không (remember me)
+        # Kiểm tra xem có thông tin đăng nhập đã lưu không
         from flask import session as flask_session
         return {
             'is_logged_in': True,
-            'remember_me': flask_session.permanent,
+            'saved_credentials': session.get('save_credentials', False),
             'username': session.get('username'),
             'role': session.get('role')
         }
     return {
         'is_logged_in': False,
-        'remember_me': False,
+        'saved_credentials': False,
         'username': None,
         'role': None
     } 

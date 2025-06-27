@@ -139,7 +139,7 @@ class AuthController:
             
             username = form.username.data
             password = form.password.data
-            remember_me = form.remember_me.data
+            save_credentials = form.save_credentials.data
             user = User.find_by_username(username)
             
             if user and User.check_password(user, password):
@@ -153,7 +153,7 @@ class AuthController:
                         session['auth_otp_time'] = int(time.time())
                         session['auth_otp_username'] = user['username']
                         session['role'] = user['role']
-                        session['remember_me'] = remember_me  # Lưu trạng thái remember me
+                        session['save_credentials'] = save_credentials  # Lưu trạng thái save credentials
 
                         flash('Mã OTP đã được gửi đến email của bạn để xác thực 2 yếu tố.', 'info')
                         return redirect(url_for('auth.verify_otp'))
@@ -164,14 +164,8 @@ class AuthController:
                     session['username'] = user['username']
                     session['role'] = user['role']
                     
-                    # Xử lý remember me
-                    if remember_me:
-                        session.permanent = True
-                        # Set session lifetime dài hơn cho remember me
-                        from config import Config
-                        session.permanent_session_lifetime = Config.REMEMBER_ME_DURATION
-                    else:
-                        session.permanent = False
+                    # Xử lý save credentials (không cần xử lý session permanent nữa)
+                    # Thông tin đăng nhập sẽ được lưu ở client-side
                     
                     session.modified = True
                     
@@ -218,15 +212,8 @@ class AuthController:
         # Convert to authenticated session
         session['username'] = session.pop('auth_otp_username')
         
-        # Xử lý remember me từ session
-        remember_me = session.pop('remember_me', False)
-        if remember_me:
-            session.permanent = True
-            # Set session lifetime dài hơn cho remember me
-            from config import Config
-            session.permanent_session_lifetime = Config.REMEMBER_ME_DURATION
-        else:
-            session.permanent = False
+        # Xử lý save credentials từ session
+        save_credentials = session.pop('save_credentials', False)
         
         session.modified = True
         
@@ -238,7 +225,7 @@ class AuthController:
 
     @staticmethod
     def logout():
-        # Xóa toàn bộ session để đảm bảo remember me cũng bị xóa
+        # Xóa toàn bộ session để đảm bảo save credentials cũng bị xóa
         session.clear()
         
         flash('Bạn đã đăng xuất thành công!', 'success')

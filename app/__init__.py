@@ -70,36 +70,33 @@ def create_app():
     @app.context_processor
     def inject_user_info():
         from app.models.user_model import User
-        from app.utils.decorators import remember_me_status
+        from app.utils.decorators import saved_credentials_status
         
         username = session.get('username')
         role = session.get('role')
         avatar = None
-        remember_me = False
+        saved_credentials = False
         
         if username:
             user = User.find_by_username(username)
             if user:
                 avatar = user.get('avatar')
-            # Kiểm tra remember me status
-            from flask import session as flask_session
-            remember_me = flask_session.permanent
+            # Kiểm tra saved credentials status
+            saved_credentials = session.get('save_credentials', False)
         
         return dict(
             username=username, 
             role=role, 
             avatar=avatar,
-            remember_me=remember_me,
-            session_info=remember_me_status()
+            saved_credentials=saved_credentials,
+            session_info=saved_credentials_status()
         )
 
     @app.before_request
     def before_request():
-        """Middleware để kiểm tra và refresh session cho remember me"""
+        """Middleware để kiểm tra và refresh session"""
         if 'username' in session:
-            # Nếu có remember me, refresh session để kéo dài thời gian
-            from flask import session as flask_session
-            if flask_session.permanent:
-                flask_session.modified = True
+            # Refresh session để duy trì trạng thái đăng nhập
+            session.modified = True
 
     return app

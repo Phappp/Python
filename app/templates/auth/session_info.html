@@ -34,16 +34,16 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted small">
-                                <i class="fas fa-clock me-2"></i>Trạng thái ghi nhớ
+                                <i class="fas fa-save me-2"></i>Trạng thái lưu thông tin
                             </label>
                             <p class="mb-0">
-                                {% if session_data.is_permanent %}
+                                {% if session_data.saved_credentials %}
                                 <span class="badge bg-success">
-                                    <i class="fas fa-check me-1"></i>Đang hoạt động
+                                    <i class="fas fa-check me-1"></i>Đã lưu
                                 </span>
                                 {% else %}
                                 <span class="badge bg-secondary">
-                                    <i class="fas fa-times me-1"></i>Không hoạt động
+                                    <i class="fas fa-times me-1"></i>Chưa lưu
                                 </span>
                                 {% endif %}
                             </p>
@@ -62,15 +62,9 @@
                                 <i class="fas fa-hourglass-half me-2"></i>Thời gian còn lại
                             </label>
                             <p class="mb-0">
-                                {% if session_data.is_permanent %}
-                                <span class="text-success">
-                                    <i class="fas fa-calendar me-1"></i>{{ session_data.expires_in.days }} ngày
-                                </span>
-                                {% else %}
                                 <span class="text-warning">
                                     <i class="fas fa-clock me-1"></i>{{ session_data.expires_in.seconds // 60 }} phút
                                 </span>
-                                {% endif %}
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -89,12 +83,12 @@
                         <div>
                             <h6 class="mb-1">Hướng dẫn sử dụng</h6>
                             <small class="text-muted">
-                                {% if session_data.is_permanent %}
-                                Phiên làm việc của bạn sẽ được duy trì trong 30 ngày. 
-                                Bạn có thể tắt chức năng này bất cứ lúc nào.
+                                {% if session_data.saved_credentials %}
+                                Thông tin đăng nhập của bạn đã được lưu trong trình duyệt. 
+                                Lần sau khi truy cập, thông tin sẽ được tự động điền vào form đăng nhập.
                                 {% else %}
-                                Phiên làm việc của bạn sẽ hết hạn sau 30 phút. 
-                                Để kéo dài thời gian, hãy đăng nhập lại và chọn "Ghi nhớ đăng nhập".
+                                Thông tin đăng nhập chưa được lưu. 
+                                Để thuận tiện hơn, hãy chọn "Lưu tài khoản và mật khẩu" khi đăng nhập.
                                 {% endif %}
                             </small>
                         </div>
@@ -102,14 +96,6 @@
                             <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-arrow-left me-1"></i>Quay lại
                             </a>
-                            {% if session_data.is_permanent %}
-                            <form method="POST" action="{{ url_for('auth.clear_remember_me') }}" class="d-inline ms-2">
-                                <button type="submit" class="btn btn-warning btn-sm" 
-                                        onclick="return confirm('Bạn có chắc muốn tắt chức năng ghi nhớ đăng nhập?')">
-                                    <i class="fas fa-times me-1"></i>Tắt ghi nhớ
-                                </button>
-                            </form>
-                            {% endif %}
                         </div>
                     </div>
                 </div>

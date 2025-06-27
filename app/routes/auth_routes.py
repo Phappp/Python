@@ -157,40 +157,20 @@ def reset_password(token):
             return response
     return render_template('auth/reset_password.html', form=form, token=token)
 
-@auth_bp.route('/clear-remember-me', methods=['POST'])
-@login_required
-def clear_remember_me():
-    """Xóa remember me session nhưng vẫn giữ đăng nhập"""
-    if session.get('remember_me'):
-        session.pop('remember_me', None)
-        session.permanent = False
-        session.modified = True
-        flash('Đã tắt chức năng ghi nhớ đăng nhập!', 'info')
-    else:
-        flash('Chức năng ghi nhớ đăng nhập chưa được bật!', 'info')
-    return redirect(url_for('auth.profile'))
-
 @auth_bp.route('/session-info')
 @login_required
 def session_info():
     """Hiển thị thông tin chi tiết về session"""
-    from flask import session as flask_session
     from datetime import datetime, timedelta
     
     session_data = {
         'username': session.get('username'),
         'role': session.get('role'),
-        'is_permanent': flask_session.permanent,
-        'session_id': flask_session.sid if hasattr(flask_session, 'sid') else 'N/A'
+        'saved_credentials': session.get('save_credentials', False)
     }
     
     # Tính thời gian còn lại của session
-    if flask_session.permanent:
-        from config import Config
-        session_data['expires_in'] = Config.REMEMBER_ME_DURATION
-        session_data['expires_at'] = datetime.now() + Config.REMEMBER_ME_DURATION
-    else:
-        session_data['expires_in'] = timedelta(minutes=30)
-        session_data['expires_at'] = datetime.now() + timedelta(minutes=30)
+    session_data['expires_in'] = timedelta(minutes=30)
+    session_data['expires_at'] = datetime.now() + timedelta(minutes=30)
     
     return render_template('auth/session_info.html', session_data=session_data)

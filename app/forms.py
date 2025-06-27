@@ -23,7 +23,7 @@ class LoginForm(FlaskForm):
                          validators=[DataRequired(), Length(min=4, max=20)])
     password = PasswordField('Mật khẩu', 
                            validators=[DataRequired()])
-    remember_me = BooleanField('Ghi nhớ đăng nhập')
+    save_credentials = BooleanField('Lưu tài khoản và mật khẩu')
     submit = SubmitField('Đăng nhập')
 
 class OTPForm(FlaskForm):
