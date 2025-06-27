@@ -65,11 +65,13 @@ def create_app():
     from .routes.course_routes import course_bp
     from .routes.exercise_routes import register_exercise_routes
     from .routes.programming_exercise_routes import programming_exercise_bp
-    
+    from app.routes.admin_routes import admin_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
     app.register_blueprint(programming_exercise_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+
     register_exercise_routes(app)
     mail.init_app(app)
 
