@@ -58,11 +58,13 @@ def create_app():
     from .routes.main_routes import main_bp
     from .routes.course_routes import course_bp
     from .routes.exercise_routes import register_exercise_routes
+    from .routes.admin_routes import admin_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
     register_exercise_routes(app)
+    app.register_blueprint(admin_bp)
     mail.init_app(app)
 
     app.jinja_env.filters['datetimeformat'] = datetimeformat

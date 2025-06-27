@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_admin_nav.html' %}
+<div class="container mt-4">
+    <h2>Quản lý khóa học</h2>
+    <a href="{{ url_for('admin.add_course') }}" class="btn btn-primary mb-3">Thêm khóa học</a>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Tên khóa học</th>
+                <th>Mô tả</th>
+                <th>Giá gốc</th>
+                <th>Giá ưu đãi</th>
+                <th>Người tạo</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.description }}</td>
+                <td>{{ course.original_price }}</td>
+                <td>{{ course.discounted_price }}</td>
+                <td>{{ course.created_by }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_course', course_id=course._id) }}" class="btn btn-sm btn-info">Sửa</a>
+                    <form action="{{ url_for('admin.delete_course', course_id=course._id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                    </form>
+                    <a href="{{ url_for('admin.view_course_students', course_id=course._id) }}" class="btn btn-sm btn-secondary">Xem học sinh</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

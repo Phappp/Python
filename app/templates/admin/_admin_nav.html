@@ -1,0 +1,24 @@
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'admin.list_users' %}active{% endif %}" href="{{ url_for('admin.list_users') }}">
+                <i class="fas fa-users me-1"></i>Quản lý người dùng
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'admin.list_courses' %}active{% endif %}" href="{{ url_for('admin.list_courses') }}">
+                <i class="fas fa-book me-1"></i>Quản lý khóa học
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'admin.stats' %}active{% endif %}" href="{{ url_for('admin.stats') }}">
+                <i class="fas fa-chart-bar me-1"></i>Thống kê & báo cáo
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">
+                <i class="fas fa-cogs me-1"></i>Cấu hình hệ thống
+            </a>
+        </li>
+    </ul>
+</div> 
