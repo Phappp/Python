@@ -19,7 +19,8 @@ class User:
             'birth_date': None,
             'two_factor_enabled': False,
             'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow()
+            'updated_at': datetime.utcnow(),
+            'permissions': []
         })
     
     @staticmethod
@@ -113,3 +114,33 @@ class User:
     @staticmethod
     def delete(username):
         return mongo.db.users.delete_one({'username': username})
+
+    @staticmethod
+    def get_permissions(username):
+        user = User.find_by_username(username)
+        return user.get('permissions', []) if user else []
+
+    @staticmethod
+    def set_permissions(username, permissions):
+        return mongo.db.users.update_one(
+            {'username': username},
+            {'$set': {'permissions': permissions, 'updated_at': datetime.utcnow()}}
+        )
+
+    @staticmethod
+    def add_permission(username, permission):
+        user = User.find_by_username(username)
+        if not user:
+            return None
+        perms = set(user.get('permissions', []))
+        perms.add(permission)
+        return User.set_permissions(username, list(perms))
+
+    @staticmethod
+    def remove_permission(username, permission):
+        user = User.find_by_username(username)
+        if not user:
+            return None
+        perms = set(user.get('permissions', []))
+        perms.discard(permission)
+        return User.set_permissions(username, list(perms))

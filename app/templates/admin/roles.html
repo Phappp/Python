@@ -13,7 +13,7 @@
         <tbody>
             {% for role, permissions in roles_permissions.items() %}
             <tr>
-                <td><strong>{{ role|capitalize }}</strong></td>
+                <td><strong><a href="{{ url_for('admin.users_by_role', role_name=role) }}">{{ role|capitalize }}</a></strong></td>
                 <td>
                     <ul class="mb-0">
                         {% for perm in permissions %}

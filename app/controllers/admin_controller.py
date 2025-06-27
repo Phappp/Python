@@ -186,4 +186,35 @@ class AdminController:
             'lecture': ['Quản lý khóa học', 'Quản lý bài tập'],
             'student': ['Xem khóa học', 'Làm bài tập']
         }
-        return render_template('admin/roles.html', roles_permissions=roles_permissions) 
+        return render_template('admin/roles.html', roles_permissions=roles_permissions)
+
+class PermissionUserController:
+    @staticmethod
+    def users_by_role(role_name):
+        users = [u for u in User.get_all() if u.get('role') == role_name]
+        return render_template('admin/users_by_role.html', users=users, role_name=role_name)
+
+    @staticmethod
+    def view_user_permissions(username):
+        user = User.find_by_username(username)
+        if not user:
+            flash('Không tìm thấy người dùng!', 'danger')
+            return redirect(url_for('admin.list_users'))
+        # Quyền mặc định từ role
+        role = user.get('role')
+        # Quyền riêng
+        user_permissions = user.get('permissions', [])
+        # Gợi ý một số quyền phổ biến
+        all_permissions = ['manage_users', 'manage_courses', 'manage_exercises', 'view_stats', 'config_system']
+        return render_template('admin/user_permissions.html', user=user, role=role, user_permissions=user_permissions, all_permissions=all_permissions)
+
+    @staticmethod
+    def update_user_permissions(username):
+        user = User.find_by_username(username)
+        if not user:
+            flash('Không tìm thấy người dùng!', 'danger')
+            return redirect(url_for('admin.list_users'))
+        perms = request.form.getlist('permissions')
+        User.set_permissions(username, perms)
+        flash('Cập nhật quyền cho tài khoản thành công!', 'success')
+        return redirect(url_for('admin.view_user_permissions', username=username)) 

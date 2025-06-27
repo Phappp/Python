@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from app.controllers.admin_controller import AdminController
+from app.controllers.admin_controller import AdminController, PermissionUserController
 from app.forms import RegistrationForm, ProfileEditForm, CourseForm
 from app.models.course_model import Course
 from app.utils.decorators import role_required
@@ -86,4 +86,16 @@ def export_excel():
 @admin_bp.route('/roles')
 @role_required('admin')
 def roles():
-    return AdminController.roles() 
+    return AdminController.roles()
+
+@admin_bp.route('/roles/<role_name>/users')
+@role_required('admin')
+def users_by_role(role_name):
+    return PermissionUserController.users_by_role(role_name)
+
+@admin_bp.route('/users/<username>/permissions', methods=['GET', 'POST'])
+@role_required('admin')
+def view_user_permissions(username):
+    if request.method == 'POST':
+        return PermissionUserController.update_user_permissions(username)
+    return PermissionUserController.view_user_permissions(username) 

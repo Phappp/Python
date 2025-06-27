@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_admin_nav.html' %}
+<div class="container mt-4">
+    <h2>Danh sách tài khoản vai trò: {{ role_name|capitalize }}</h2>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Họ tên</th>
+                <th>Quyền riêng</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.full_name }}</td>
+                <td>
+                    {% if user.permissions %}
+                        {{ user.permissions|join(', ') }}
+                    {% else %}
+                        <span class="text-muted">Mặc định</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('admin.view_user_permissions', username=user.username) }}" class="btn btn-sm btn-primary">Quản lý quyền</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin.roles') }}" class="btn btn-secondary mt-3">Quay lại</a>
+</div>
+{% endblock %} 

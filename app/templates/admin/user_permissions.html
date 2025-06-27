@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_admin_nav.html' %}
+<div class="container mt-4">
+    <h2>Quản lý quyền cho tài khoản: {{ user.username }}</h2>
+    <div class="mb-3">
+        <strong>Vai trò:</strong> {{ role|capitalize }}<br>
+        <strong>Quyền mặc định từ vai trò:</strong>
+        <ul>
+            {% if role == 'admin' %}
+                <li>manage_users</li>
+                <li>manage_courses</li>
+                <li>manage_exercises</li>
+                <li>view_stats</li>
+                <li>config_system</li>
+            {% elif role == 'lecture' %}
+                <li>manage_courses</li>
+                <li>manage_exercises</li>
+            {% elif role == 'student' %}
+                <li>view_courses</li>
+                <li>do_exercises</li>
+            {% endif %}
+        </ul>
+    </div>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Quyền riêng cho tài khoản này:</label>
+            <select name="permissions" class="form-select" multiple size="6">
+                {% for perm in all_permissions %}
+                    <option value="{{ perm }}" {% if perm in user_permissions %}selected{% endif %}>{{ perm }}</option>
+                {% endfor %}
+            </select>
+            <div class="form-text">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều quyền.</div>
+        </div>
+        <button type="submit" class="btn btn-success">Lưu quyền riêng</button>
+        <a href="{{ url_for('admin.users_by_role', role_name=role) }}" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>
+{% endblock %} 
