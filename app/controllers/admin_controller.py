@@ -188,6 +188,33 @@ class AdminController:
         }
         return render_template('admin/roles.html', roles_permissions=roles_permissions)
 
+    @staticmethod
+    def admin_dashboard():
+        from app.models.user_model import User
+        from app.models.course_model import Course
+        from app.models.exercise_model import Exercise
+        users = list(User.get_all())
+        courses = list(Course.get_all())
+        try:
+            from app.models.exercise_model import Exercise
+            exercises = list(Exercise.get_all())
+        except Exception:
+            exercises = []
+        num_students = sum(1 for u in users if u.get('role') == 'student')
+        num_lectures = sum(1 for u in users if u.get('role') == 'lecture')
+        num_admins = sum(1 for u in users if u.get('role') == 'admin')
+        num_locked = sum(1 for u in users if not u.get('active', True))
+        num_courses = len(courses)
+        num_exercises = len(exercises)
+        return render_template('admin/dashboard.html',
+            num_students=num_students,
+            num_lectures=num_lectures,
+            num_admins=num_admins,
+            num_locked=num_locked,
+            num_courses=num_courses,
+            num_exercises=num_exercises
+        )
+
 class PermissionUserController:
     @staticmethod
     def users_by_role(role_name):

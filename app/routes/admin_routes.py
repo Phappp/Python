@@ -98,4 +98,9 @@ def users_by_role(role_name):
 def view_user_permissions(username):
     if request.method == 'POST':
         return PermissionUserController.update_user_permissions(username)
-    return PermissionUserController.view_user_permissions(username) 
+    return PermissionUserController.view_user_permissions(username)
+
+@admin_bp.route('/dashboard')
+@role_required('admin')
+def admin_dashboard():
+    return AdminController.admin_dashboard() 

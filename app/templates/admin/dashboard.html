@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_admin_nav.html' %}
+<div class="container mt-4">
+    <h2 class="mb-4">Bảng điều khiển quản trị</h2>
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Admin</h6>
+                    <p class="display-6">{{ num_admins }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Giảng viên</h6>
+                    <p class="display-6">{{ num_lectures }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Học sinh</h6>
+                    <p class="display-6">{{ num_students }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Tài khoản khóa</h6>
+                    <p class="display-6 text-danger">{{ num_locked }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Khóa học</h6>
+                    <p class="display-6">{{ num_courses }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Bài tập</h6>
+                    <p class="display-6">{{ num_exercises }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">Truy cập nhanh</div>
+                <div class="card-body">
+                    <a href="{{ url_for('admin.list_users') }}" class="btn btn-outline-primary mb-2"><i class="fas fa-users me-1"></i> Quản lý người dùng</a>
+                    <a href="{{ url_for('admin.list_courses') }}" class="btn btn-outline-success mb-2"><i class="fas fa-book me-1"></i> Quản lý khóa học</a>
+                    <a href="{{ url_for('admin.stats') }}" class="btn btn-outline-info mb-2"><i class="fas fa-chart-bar me-1"></i> Thống kê & báo cáo</a>
+                    <a href="{{ url_for('admin.roles') }}" class="btn btn-outline-secondary mb-2"><i class="fas fa-cogs me-1"></i> Cấu hình vai trò & quyền hạn</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">Thông báo hệ thống</div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Chào mừng bạn đến với trang quản trị!<br>
+                        Các thông báo hệ thống sẽ hiển thị tại đây.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">Biểu đồ & Phân tích (Placeholder)</div>
+                <div class="card-body text-center text-muted">
+                    <em>Biểu đồ thống kê sẽ được tích hợp tại đây (Chart.js, ...)</em>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
