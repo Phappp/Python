@@ -19,9 +19,10 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
     
     # Cấu hình upload file
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB max file size
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'static', 'uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt', 'ppt', 'pptx', 'xls', 'xlsx'}
     
     # Cấu hình OTP
     OTP_EXPIRATION = 300  # 5 minutes in seconds

@@ -66,12 +66,14 @@ def create_app(config_class=Config):
     from .routes.course_routes import course_bp
     from .routes.exercise_routes import register_exercise_routes
     from .routes.programming_exercise_routes import programming_exercise_bp
+    from .routes.document_routes import document_bp
     from app.routes.admin_routes import admin_bp
     from app.controllers.chatbot_controller import chatbot_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
     app.register_blueprint(programming_exercise_bp)
+    app.register_blueprint(document_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(chatbot_bp)
 
