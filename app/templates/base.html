@@ -739,8 +739,21 @@
     const input = form.querySelector('input');
     const messages = document.getElementById('gemini-chatbot-messages');
     if (btn) {
-      btn.onclick = () => {
+      btn.onclick = async () => {
         box.style.display = 'flex';
+        // Khi mở chatbot, load lại lịch sử chat
+        messages.innerHTML = '';
+        try {
+          const res = await fetch('/api/gemini_chat_history');
+          const data = await res.json();
+          if (data.messages && Array.isArray(data.messages)) {
+            data.messages.forEach(msg => {
+              addMsg(msg.role, msg.text);
+            });
+          }
+        } catch (e) {
+          addMsg('bot', '<i>Lỗi khi tải lịch sử chat.</i>');
+        }
       };
     }
     if (closeBtn) {
