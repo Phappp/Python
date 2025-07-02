@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Tải lên Tài liệu{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-upload me-2"></i>Tải lên Tài liệu Mới
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading me-1"></i>Tiêu đề <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                value="{{ request.form.get('title', '') }}" required>
+                            <div class="form-text">Nhập tiêu đề mô tả nội dung tài liệu</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Mô tả
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                placeholder="Mô tả chi tiết về tài liệu...">{{ request.form.get('description', '') }}</textarea>
+                            <div class="form-text">Mô tả nội dung, mục đích sử dụng của tài liệu</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document_file" class="form-label">
+                                <i class="fas fa-file me-1"></i>Chọn File <span class="text-danger">*</span>
+                            </label>
+                            <input type="file" class="form-control" id="document_file" name="document_file"
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" required>
+                            <div class="form-text">
+                                Định dạng hỗ trợ: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX (Tối đa 50MB)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_visible" name="is_visible"
+                                    checked>
+                                <label class="form-check-label" for="is_visible">
+                                    <i class="fas fa-eye me-1"></i>Hiển thị cho sinh viên
+                                </label>
+                                <div class="form-text">Bỏ chọn nếu muốn ẩn tài liệu khỏi sinh viên</div>
+                            </div>
+                        </div>
+
+                        <!-- Preview file info -->
+                        <div class="mb-3" id="filePreview" style="display: none;">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-info-circle me-1"></i>Thông tin File
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Tên file:</strong> <span id="fileName"></span></p>
+                                            <p class="mb-1"><strong>Loại file:</strong> <span id="fileType"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Kích thước:</strong> <span id="fileSize"></span></p>
+                                            <p class="mb-0"><strong>Trạng thái:</strong> <span id="fileStatus"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('document.manage_documents') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-upload me-1"></i>Tải lên
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Hướng dẫn -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Hướng dẫn
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check-circle text-success me-1"></i>Định dạng hỗ trợ:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-file-pdf text-danger me-1"></i>PDF (.pdf)</li>
+                                <li><i class="fas fa-file-word text-primary me-1"></i>Word (.doc, .docx)</li>
+                                <li><i class="fas fa-file-powerpoint text-warning me-1"></i>PowerPoint (.ppt, .pptx)
+                                </li>
+                                <li><i class="fas fa-file-excel text-success me-1"></i>Excel (.xls, .xlsx)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-info-circle text-info me-1"></i>Lưu ý:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-arrow-right text-muted me-1"></i>Kích thước tối đa: 50MB</li>
+                                <li><i class="fas fa-arrow-right text-muted me-1"></i>Tên file sẽ được mã hóa</li>
+                                <li><i class="fas fa-arrow-right text-muted me-1"></i>Có thể chỉnh sửa sau khi tải lên
+                                </li>
+                                <li><i class="fas fa-arrow-right text-muted me-1"></i>Có thể ẩn/hiện cho sinh viên</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('document_file').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('filePreview');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (file) {
+            // Hiển thị thông tin file
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileType').textContent = file.type || 'Không xác định';
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+
+            // Kiểm tra kích thước file
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            if (file.size > maxSize) {
+                document.getElementById('fileStatus').innerHTML = '<span class="text-danger">File quá lớn (>50MB)</span>';
+                submitBtn.disabled = true;
+            } else {
+                document.getElementById('fileStatus').innerHTML = '<span class="text-success">File hợp lệ</span>';
+                submitBtn.disabled = false;
+            }
+
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Validate form
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        const title = document.getElementById('title').value.trim();
+        const file = document.getElementById('document_file').files[0];
+
+        if (!title) {
+            e.preventDefault();
+            alert('Vui lòng nhập tiêu đề tài liệu!');
+            document.getElementById('title').focus();
+            return false;
+        }
+
+        if (!file) {
+            e.preventDefault();
+            alert('Vui lòng chọn file để tải lên!');
+            document.getElementById('document_file').focus();
+            return false;
+        }
+
+        // Kiểm tra kích thước file
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+            e.preventDefault();
+            alert('File quá lớn! Kích thước tối đa là 50MB.');
+            return false;
+        }
+
+        // Disable submit button để tránh double submit
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang tải lên...';
+    });
+</script>
+{% endblock %}

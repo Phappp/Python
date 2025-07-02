@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Chỉnh sửa Tài liệu{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa Tài liệu
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="editForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading me-1"></i>Tiêu đề <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ document.title }}"
+                                required>
+                            <div class="form-text">Nhập tiêu đề mô tả nội dung tài liệu</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Mô tả
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                placeholder="Mô tả chi tiết về tài liệu...">{{ document.description or '' }}</textarea>
+                            <div class="form-text">Mô tả nội dung, mục đích sử dụng của tài liệu</div>
+                        </div>
+
+                        <!-- Thông tin file hiện tại -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-file me-1"></i>File hiện tại
+                            </label>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Tên file:</strong> {{ document.file_name }}</p>
+                                            <p class="mb-1"><strong>Loại file:</strong>
+                                                <span class="badge bg-secondary">{{ document.file_type.upper() }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Kích thước:</strong>
+                                                {% set size_mb = (document.file_size / (1024 * 1024)) | round(2) %}
+                                                {{ size_mb }} MB
+                                            </p>
+                                            <p class="mb-0"><strong>Lượt tải:</strong>
+                                                <span class="badge bg-info">{{ document.download_count }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a href="{{ url_for('document.download_document', document_id=document._id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download me-1"></i>Tải xuống file hiện tại
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document_file" class="form-label">
+                                <i class="fas fa-file me-1"></i>Thay đổi File (Tùy chọn)
+                            </label>
+                            <input type="file" class="form-control" id="document_file" name="document_file"
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
+                            <div class="form-text">
+                                Chỉ chọn file mới nếu muốn thay thế file hiện tại. Định dạng hỗ trợ: PDF, DOC, DOCX,
+                                PPT, PPTX, XLS, XLSX (Tối đa 50MB)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_visible" name="is_visible" {% if
+                                    document.is_visible %}checked{% endif %}>
+                                <label class="form-check-label" for="is_visible">
+                                    <i class="fas fa-eye me-1"></i>Hiển thị cho sinh viên
+                                </label>
+                                <div class="form-text">Bỏ chọn nếu muốn ẩn tài liệu khỏi sinh viên</div>
+                            </div>
+                        </div>
+
+                        <!-- Preview file mới nếu có -->
+                        <div class="mb-3" id="filePreview" style="display: none;">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>File mới sẽ thay thế file hiện
+                                        tại
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Tên file:</strong> <span id="fileName"></span></p>
+                                            <p class="mb-1"><strong>Loại file:</strong> <span id="fileType"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Kích thước:</strong> <span id="fileSize"></span></p>
+                                            <p class="mb-0"><strong>Trạng thái:</strong> <span id="fileStatus"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('document.manage_documents') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                            <div>
+                                <a href="{{ url_for('document.document_details', document_id=document._id) }}"
+                                    class="btn btn-outline-info me-2">
+                                    <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                </a>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save me-1"></i>Lưu thay đổi
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Thông tin bổ sung -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Thông tin Tài liệu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Người tải lên:</strong> {{ document.uploaded_by }}</p>
+                            <p><strong>Ngày tạo:</strong> {{ document.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Lần cập nhật cuối:</strong> {{ document.updated_at.strftime('%d/%m/%Y %H:%M') }}
+                            </p>
+                            <p><strong>Trạng thái:</strong>
+                                {% if document.is_visible %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-eye me-1"></i>Đang hiển thị
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-eye-slash me-1"></i>Đang ẩn
+                                </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('document_file').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('filePreview');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (file) {
+            // Hiển thị thông tin file mới
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileType').textContent = file.type || 'Không xác định';
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+
+            // Kiểm tra kích thước file
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            if (file.size > maxSize) {
+                document.getElementById('fileStatus').innerHTML = '<span class="text-danger">File quá lớn (>50MB)</span>';
+                submitBtn.disabled = true;
+            } else {
+                document.getElementById('fileStatus').innerHTML = '<span class="text-success">File hợp lệ</span>';
+                submitBtn.disabled = false;
+            }
+
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Validate form
+    document.getElementById('editForm').addEventListener('submit', function (e) {
+        const title = document.getElementById('title').value.trim();
+        const file = document.getElementById('document_file').files[0];
+
+        if (!title) {
+            e.preventDefault();
+            alert('Vui lòng nhập tiêu đề tài liệu!');
+            document.getElementById('title').focus();
+            return false;
+        }
+
+        if (file) {
+            // Kiểm tra kích thước file mới
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            if (file.size > maxSize) {
+                e.preventDefault();
+                alert('File quá lớn! Kích thước tối đa là 50MB.');
+                return false;
+            }
+        }
+
+        // Disable submit button để tránh double submit
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...';
+    });
+</script>
+{% endblock %}

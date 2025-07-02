@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.title }} - Chi tiết Tài liệu{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Thông tin chính -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-file-alt me-2"></i>{{ document.title }}
+                        </h4>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('document.download_document', document_id=document._id) }}"
+                                class="btn btn-success">
+                                <i class="fas fa-download me-1"></i>Tải xuống
+                            </a>
+                            {% if session.role == 'lecture' and document.uploaded_by == session.username %}
+                            <a href="{{ url_for('document.edit_document', document_id=document._id) }}"
+                                class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Mô tả -->
+                    {% if document.description %}
+                    <div class="mb-4">
+                        <h6><i class="fas fa-align-left me-1"></i>Mô tả</h6>
+                        <p class="text-muted">{{ document.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Thông tin file -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-info-circle me-1"></i>Thông tin File</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Tên file:</strong></td>
+                                    <td>{{ document.file_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Loại file:</strong></td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ document.file_type.upper() }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kích thước:</strong></td>
+                                    <td>
+                                        {% set size_mb = (document.file_size / (1024 * 1024)) | round(2) %}
+                                        {{ size_mb }} MB
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lượt tải:</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">{{ document.download_count }}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user me-1"></i>Thông tin Upload</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Người tải lên:</strong></td>
+                                    <td>
+                                        {% if uploader %}
+                                        {{ uploader.full_name or uploader.username }}
+                                        {% else %}
+                                        {{ document.uploaded_by }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ngày tạo:</strong></td>
+                                    <td>{{ document.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lần cập nhật:</strong></td>
+                                    <td>{{ document.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Trạng thái:</strong></td>
+                                    <td>
+                                        {% if document.is_visible %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-eye me-1"></i>Đang hiển thị
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-eye-slash me-1"></i>Đang ẩn
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Preview file (nếu là PDF) -->
+                    {% if document.file_type.lower() == 'pdf' %}
+                    <div class="mb-4">
+                        <h6><i class="fas fa-eye me-1"></i>Xem trước</h6>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="{{ url_for('document.download_document', document_id=document._id) }}"
+                                class="border rounded"></iframe>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('document.view_documents') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
+                        </a>
+                        <div>
+                            <a href="{{ url_for('document.download_document', document_id=document._id) }}"
+                                class="btn btn-primary">
+                                <i class="fas fa-download me-1"></i>Tải xuống
+                            </a>
+                            {% if session.role == 'lecture' and document.uploaded_by == session.username %}
+                            <a href="{{ url_for('document.edit_document', document_id=document._id) }}"
+                                class="btn btn-warning ms-2">
+                                <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Thống kê nhanh -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-1"></i>Thống kê
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-primary">{{ document.download_count }}</h5>
+                            <small class="text-muted">Lượt tải</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-success">
+                                {% set size_mb = (document.file_size / (1024 * 1024)) | round(2) %}
+                                {{ size_mb }}
+                            </h5>
+                            <small class="text-muted">MB</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tài liệu liên quan -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-link me-1"></i>Tài liệu liên quan
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for doc in recent_documents[:5] %}
+                        {% if doc._id != document._id %}
+                        <a href="{{ url_for('document.document_details', document_id=doc._id) }}"
+                            class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ doc.title[:25] }}{% if doc.title|length > 25 %}...{% endif %}</h6>
+                                <small class="text-muted">{{ doc.file_type.upper() }}</small>
+                            </div>
+                            <small class="text-muted">{{ doc.created_at.strftime('%d/%m/%Y') }}</small>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin bổ sung -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-1"></i>Thông tin bổ sung
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar text-primary me-1"></i>
+                            <strong>Ngày tạo:</strong><br>
+                            <small class="text-muted">{{ document.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-warning me-1"></i>
+                            <strong>Cập nhật:</strong><br>
+                            <small class="text-muted">{{ document.updated_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-user text-success me-1"></i>
+                            <strong>Upload bởi:</strong><br>
+                            <small class="text-muted">
+                                {% if uploader %}
+                                {{ uploader.full_name or uploader.username }}
+                                {% else %}
+                                {{ document.uploaded_by }}
+                                {% endif %}
+                            </small>
+                        </li>
+                        <li>
+                            <i class="fas fa-eye text-info me-1"></i>
+                            <strong>Trạng thái:</strong><br>
+                            <small class="text-muted">
+                                {% if document.is_visible %}
+                                <span class="text-success">Đang hiển thị cho sinh viên</span>
+                                {% else %}
+                                <span class="text-warning">Đang ẩn khỏi sinh viên</span>
+                                {% endif %}
+                            </small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download confirmation modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-download me-2"></i>Xác nhận tải xuống
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn tải xuống tài liệu "<strong>{{ document.title }}</strong>"?</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Thông tin file:</strong><br>
+                    <small>
+                        Tên: {{ document.file_name }}<br>
+                        Kích thước: {% set size_mb = (document.file_size / (1024 * 1024)) | round(2) %}{{ size_mb }}
+                        MB<br>
+                        Loại: {{ document.file_type.upper() }}
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <a href="{{ url_for('document.download_document', document_id=document._id) }}" class="btn btn-success">
+                    <i class="fas fa-download me-1"></i>Tải xuống
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Download confirmation
+    document.querySelectorAll('a[href*="download-document"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            new bootstrap.Modal(document.getElementById('downloadModal')).show();
+        });
+    });
+
+    // Auto-download after confirmation
+    document.querySelector('#downloadModal .btn-success').addEventListener('click', function () {
+        // The download will start automatically when the link is clicked
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('downloadModal')).hide();
+        }, 1000);
+    });
+</script>
+{% endblock %}
