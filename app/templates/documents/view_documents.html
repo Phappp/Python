@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Tài liệu Học tập{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar với thống kê và tài liệu phổ biến -->
+        <div class="col-md-3">
+            <!-- Thống kê -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Thống kê
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ stats.visible_documents }}</h4>
+                            <small class="text-muted">Tài liệu</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ stats.total_downloads }}</h4>
+                            <small class="text-muted">Lượt tải</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tài liệu phổ biến -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-fire me-2"></i>Phổ biến
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_documents %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in popular_documents %}
+                        <a href="{{ url_for('document.document_details', document_id=doc._id) }}"
+                            class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ doc.title[:30] }}{% if doc.title|length > 30 %}...{% endif %}</h6>
+                                <small class="text-muted">{{ doc.download_count }} lượt</small>
+                            </div>
+                            <small class="text-muted">{{ doc.file_type.upper() }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Chưa có tài liệu nào</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tài liệu mới nhất -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Mới nhất
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_documents %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in recent_documents %}
+                        <a href="{{ url_for('document.document_details', document_id=doc._id) }}"
+                            class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ doc.title[:30] }}{% if doc.title|length > 30 %}...{% endif %}</h6>
+                                <small class="text-muted">{{ doc.created_at.strftime('%d/%m') }}</small>
+                            </div>
+                            <small class="text-muted">{{ doc.file_type.upper() }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Chưa có tài liệu nào</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-file-alt me-2"></i>Tài liệu Học tập
+                        </h4>
+                        <div class="d-flex">
+                            <!-- Search form -->
+                            <form class="d-flex me-2" method="GET">
+                                <input class="form-control me-2" type="search" name="search"
+                                    placeholder="Tìm kiếm tài liệu..." value="{{ search_query }}">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                            {% if search_query %}
+                            <a href="{{ url_for('document.view_documents') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if search_query %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-search me-1"></i>
+                        Kết quả tìm kiếm cho: "<strong>{{ search_query }}</strong>"
+                        <span class="badge bg-primary ms-2">{{ documents|length }} tài liệu</span>
+                    </div>
+                    {% endif %}
+
+                    {% if documents %}
+                    <div class="row">
+                        {% for document in documents %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ document.title }}</h6>
+                                        <span class="badge bg-secondary">{{ document.file_type.upper() }}</span>
+                                    </div>
+
+                                    {% if document.description %}
+                                    <p class="card-text text-muted small">
+                                        {{ document.description[:100] }}{% if document.description|length > 100 %}...{%
+                                        endif %}
+                                    </p>
+                                    {% endif %}
+
+                                    <div class="row text-center mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted">Kích thước</small>
+                                            <br>
+                                            <strong>
+                                                {% set size_mb = (document.file_size / (1024 * 1024)) | round(2) %}
+                                                {{ size_mb }} MB
+                                            </strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Lượt tải</small>
+                                            <br>
+                                            <strong class="text-info">{{ document.download_count }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            {{ document.created_at.strftime('%d/%m/%Y') }}
+                                        </small>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('document.document_details', document_id=document._id) }}"
+                                                class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('document.download_document', document_id=document._id) }}"
+                                                class="btn btn-sm btn-outline-success" title="Tải xuống">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        {% if search_query %}
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Không tìm thấy tài liệu nào</h5>
+                        <p class="text-muted">Thử tìm kiếm với từ khóa khác</p>
+                        <a href="{{ url_for('document.view_documents') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-1"></i>Xem tất cả tài liệu
+                        </a>
+                        {% else %}
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Chưa có tài liệu nào</h5>
+                        <p class="text-muted">Giảng viên sẽ tải lên tài liệu sớm</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick search modal -->
+<div class="modal fade" id="quickSearchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>Tìm kiếm Nhanh
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="quickSearchInput"
+                        placeholder="Nhập từ khóa tìm kiếm...">
+                    <button class="btn btn-primary" type="button" onclick="performQuickSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div id="quickSearchResults"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Quick search functionality
+    function performQuickSearch() {
+        const query = document.getElementById('quickSearchInput').value.trim();
+        const resultsDiv = document.getElementById('quickSearchResults');
+
+        if (!query) {
+            resultsDiv.innerHTML = '<p class="text-muted">Vui lòng nhập từ khóa tìm kiếm</p>';
+            return;
+        }
+
+        resultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</div>';
+
+        fetch(`/api/search-documents?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.documents && data.documents.length > 0) {
+                    let html = '<div class="list-group">';
+                    data.documents.forEach(doc => {
+                        html += `
+                        <a href="/document-details/${doc._id}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${doc.title}</h6>
+                                <small class="text-muted">${doc.file_type.toUpperCase()}</small>
+                            </div>
+                            <p class="mb-1 text-muted">${doc.description || 'Không có mô tả'}</p>
+                            <small class="text-muted">${doc.download_count} lượt tải</small>
+                        </a>
+                    `;
+                    });
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = '<p class="text-muted">Không tìm thấy tài liệu nào</p>';
+                }
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = '<p class="text-danger">Có lỗi xảy ra khi tìm kiếm</p>';
+                console.error('Search error:', error);
+            });
+    }
+
+    // Enter key for quick search
+    document.getElementById('quickSearchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            performQuickSearch();
+        }
+    });
+
+    // Auto-focus search input when modal opens
+    document.getElementById('quickSearchModal').addEventListener('shown.bs.modal', function () {
+        document.getElementById('quickSearchInput').focus();
+    });
+</script>
+{% endblock %}
