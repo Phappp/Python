@@ -638,7 +638,11 @@
           <ul class="navbar-nav me-auto">
             {% if username %}
             {% if role == 'student' %}
-            <!-- Đã xóa mục Bài tập khỏi navbar cho sinh viên -->
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('document.view_documents') }}">
+                <i class="fas fa-file-alt me-1"></i>Tài liệu học tập
+              </a>
+            </li>
             {% elif role == 'lecture' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.manage_courses') }}">
@@ -653,6 +657,11 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('programming_exercise.manage_exercises') }}">
                 <i class="fas fa-code me-1"></i>Bài tập lập trình
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('document.manage_documents') }}">
+                <i class="fas fa-file-alt me-1"></i>Quản lý tài liệu
               </a>
             </li>
             <li class="nav-item">

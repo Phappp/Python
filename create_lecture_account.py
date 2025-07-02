@@ -8,7 +8,7 @@ def create_lecture_account():
         existing_lecture = User.find_by_username('lecture')
         if existing_lecture is None:
             # Tạo tài khoản lecture mặc định
-            User.create('lecture', 'lecture123', 'lecture')
+            User.create('lecture', 'lecture@example.com', 'lecture123', 'lecture')
             print("Đã tạo tài khoản lecture thành công!")
             print("Username: lecture")
             print("Password: lecture123")
