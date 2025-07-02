@@ -41,7 +41,8 @@ def create_course():
 @login_required
 @role_required('lecture')
 def manage_courses():
-    courses = list(Course.find_by_creator(session['username']))
+    # Hiển thị tất cả các khóa học cho lecture (bao gồm cả admin tạo và mình tạo)
+    courses = list(Course.get_all())
     return render_template('courses/manage_courses.html', courses=courses, title="Quản lý khóa học")
 
 @course_bp.route('/<course_id>/edit', methods=['GET', 'POST'])
@@ -49,8 +50,13 @@ def manage_courses():
 @role_required('lecture')
 def edit_course(course_id):
     course = Course.find_by_id(course_id)
-    if not course or course['created_by'] != session['username']:
-        flash('Khóa học không tồn tại hoặc bạn không có quyền chỉnh sửa.', 'danger')
+    if not course:
+        flash('Khóa học không tồn tại.', 'danger')
+        return redirect(url_for('course.manage_courses'))
+    
+    # Cho phép lecture chỉnh sửa khóa học do mình tạo hoặc do admin tạo
+    if course['created_by'] != session['username'] and session.get('role') != 'admin':
+        flash('Bạn không có quyền chỉnh sửa khóa học này.', 'danger')
         return redirect(url_for('course.manage_courses'))
         
     form = CourseForm(data=course)
@@ -62,8 +68,13 @@ def edit_course(course_id):
 @role_required('lecture')
 def delete_course(course_id):
     course = Course.find_by_id(course_id)
-    if not course or course['created_by'] != session['username']:
-        flash('Khóa học không tồn tại hoặc bạn không có quyền xóa.', 'danger')
+    if not course:
+        flash('Khóa học không tồn tại.', 'danger')
+        return redirect(url_for('course.manage_courses'))
+    
+    # Chỉ cho phép lecture xóa khóa học do chính mình tạo
+    if course['created_by'] != session['username']:
+        flash('Bạn chỉ có thể xóa khóa học do mình tạo.', 'warning')
         return redirect(url_for('course.manage_courses'))
     
     return CourseController.delete_course(course_id)
@@ -73,10 +84,11 @@ def delete_course(course_id):
 @role_required('lecture')
 def manage_chapters(course_id):
     course = Course.find_by_id(course_id)
-    if not course or course['created_by'] != session['username']:
-        flash('Khóa học không tồn tại hoặc bạn không có quyền quản lý.', 'danger')
+    if not course:
+        flash('Khóa học không tồn tại.', 'danger')
         return redirect(url_for('course.manage_courses'))
 
+    # Cho phép lecture quản lý chương của mọi khóa học (cả do mình tạo và do admin tạo)
     form = ChapterForm()
     response = CourseController.add_chapter(course_id, form)
     
@@ -97,10 +109,11 @@ def manage_chapters(course_id):
 @role_required('lecture')
 def delete_chapter(course_id, chapter_id):
     course = Course.find_by_id(course_id)
-    if not course or course['created_by'] != session['username']:
-        flash('Bạn không có quyền thực hiện hành động này.', 'danger')
+    if not course:
+        flash('Khóa học không tồn tại.', 'danger')
         return redirect(url_for('course.manage_courses'))
-        
+
+    # Cho phép lecture xóa chương của mọi khóa học (cả do mình tạo và do admin tạo)
     Course.delete_chapter(course_id, chapter_id)
     flash('Đã xóa chương thành công!', 'success')
     return redirect(url_for('course.manage_chapters', course_id=course_id))
@@ -110,9 +123,11 @@ def delete_chapter(course_id, chapter_id):
 @role_required('lecture')
 def edit_chapter(course_id, chapter_id):
     course = Course.find_by_id(course_id)
-    if not course or course['created_by'] != session['username']:
-        flash('Bạn không có quyền chỉnh sửa chương này.', 'danger')
-        return redirect(url_for('course.manage_courses'))
+    if not course:
+        flash('Khóa học không tồn tại.', 'danger')
+        return redirect(url_for('course.manage_chapters', course_id=course_id))
+
+    # Cho phép lecture chỉnh sửa chương của mọi khóa học (cả do mình tạo và do admin tạo)
     chapter_data = Course.find_chapter(course_id, chapter_id)
     if not chapter_data or not chapter_data.get('chapters'):
         flash('Chương không tồn tại.', 'danger')
