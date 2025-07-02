@@ -81,6 +81,15 @@ def gemini_chat():
             reply = data['candidates'][0]['content']['parts'][0]['text'] if data.get('candidates') else 'Không có phản hồi.'
             # Lưu vào session hiện tại
             if session_id:
+                # Kiểm tra nếu là tin nhắn đầu tiên thì cập nhật tiêu đề
+                chat_doc = mongo.db.chat_sessions.find_one({'_id': ObjectId(session_id), 'username': username})
+                if chat_doc and len(chat_doc.get('messages', [])) == 0:
+                    # Lấy 8 từ đầu làm tiêu đề
+                    title = ' '.join(message.split()[:8])
+                    mongo.db.chat_sessions.update_one(
+                        {'_id': ObjectId(session_id), 'username': username},
+                        {'$set': {'name': title}}
+                    )
                 mongo.db.chat_sessions.update_one(
                     {'_id': ObjectId(session_id), 'username': username},
                     {'$push': {'messages': {'$each': [
