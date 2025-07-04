@@ -32,6 +32,8 @@
                                     class="btn btn-sm btn-warning me-1">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
+                                <!-- Nút xóa khóa học - chỉ hiển thị nếu khóa học do lecture tạo -->
+                                {% if course.created_by == session.username %}
                                 <form action="{{ url_for('course.delete_course', course_id=course._id) }}" method="POST"
                                     class="d-inline"
                                     onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
@@ -39,6 +41,7 @@
                                         <i class="fas fa-trash-alt"></i> Xóa
                                     </button>
                                 </form>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

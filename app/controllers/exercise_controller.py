@@ -18,10 +18,21 @@ def allowed_file(filename):
 @exercise_bp.route('/upload_exercise/<course_id>', methods=['GET', 'POST'])
 def upload_exercise(course_id):
     from bson.objectid import ObjectId
+    # Kiểm tra quyền: chỉ lecture mới được upload bài tập
+    if session.get('role') != 'lecture':
+        flash('Chỉ giảng viên mới được upload bài tập!', 'danger')
+        return redirect(url_for('main.home'))
+    
     course = mongo.db.courses.find_one({'_id': ObjectId(course_id)})
     if not course:
         flash('Không tìm thấy khóa học!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
+    
+    # Kiểm tra quyền: lecture chỉ có thể upload bài tập cho khóa học do mình tạo hoặc do admin tạo
+    if course.get('created_by') != session.get('username') and session.get('role') != 'admin':
+        flash('Bạn không có quyền upload bài tập cho khóa học này!', 'danger')
+        return redirect(url_for('exercise.manage_exercises'))
+    
     chapters = []
     for chapter in course.get('chapters', []):
         chapters.append({
@@ -77,15 +88,27 @@ def upload_exercise(course_id):
 @exercise_bp.route('/manage_exercises/<course_id>')
 def manage_exercises(course_id):
     from flask import session
-    # Nếu chưa chọn khóa học, hiển thị danh sách khóa học của giảng viên
+    # Kiểm tra quyền: chỉ lecture mới được quản lý bài tập
+    if session.get('role') != 'lecture':
+        flash('Chỉ giảng viên mới được quản lý bài tập!', 'danger')
+        return redirect(url_for('main.home'))
+    
+    # Nếu chưa chọn khóa học, hiển thị danh sách tất cả khóa học (bao gồm cả admin tạo)
     if not course_id:
-        courses = list(mongo.db.courses.find({'created_by': session.get('username')}))
+        courses = list(mongo.db.courses.find())
         return render_template('exercises/select_course.html', courses=courses)
+    
     # Nếu đã chọn khóa học, hiển thị bài tập của khóa học đó
     course = mongo.db.courses.find_one({'_id': ObjectId(course_id)})
     if not course:
         flash('Không tìm thấy khóa học!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
+    
+    # Kiểm tra quyền: lecture chỉ có thể quản lý bài tập của khóa học do mình tạo hoặc do admin tạo
+    if course.get('created_by') != session.get('username') and session.get('role') != 'admin':
+        flash('Bạn không có quyền quản lý bài tập của khóa học này!', 'danger')
+        return redirect(url_for('exercise.manage_exercises'))
+    
     # Lấy tất cả chương của khóa học
     chapter_ids = [chapter['_id'] for chapter in course.get('chapters', [])]
     # Lấy tất cả bài tập thuộc các chương này

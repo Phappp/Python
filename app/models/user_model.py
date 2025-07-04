@@ -144,7 +144,6 @@ class User:
         perms = set(user.get('permissions', []))
         perms.discard(permission)
         return User.set_permissions(username, list(perms))
-
     @staticmethod
     def has_custom_permission(username, permission):
         """Kiểm tra user có quyền riêng cụ thể không"""
