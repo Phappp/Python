@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Làm Quiz{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/quiz/list-page" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">Làm Quiz</h1>
+            <p class="text-muted mb-0">Trả lời các câu hỏi trắc nghiệm</p>
+        </div>
+    </div>
+
+    <div class="card shadow-lg">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0"><i class="fas fa-question-circle"></i> Làm Quiz</h3>
+        </div>
+        <div class="card-body">
+            <form id="doQuizForm">
+                <div id="quizContent"></div>
+                <button type="submit" class="btn btn-success mt-3">
+                    <i class="fas fa-paper-plane"></i> Nộp bài
+                </button>
+            </form>
+            <div id="quizResult" class="alert alert-info mt-4" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+<script>
+    async function loadQuiz() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const quiz_id = urlParams.get('quiz_id');
+        const student_id = '{{ session.username if session.username else "student" }}';
+
+        // Kiểm tra sinh viên đã làm quiz này chưa
+        const checkRes = await fetch(`/quiz/${quiz_id}/my_submission?student_id=${student_id}`);
+        const checkData = await checkRes.json();
+        if (checkData.submission) {
+            const scoreClass = checkData.submission.score >= 8 ? 'text-success' : checkData.submission.score >= 6 ? 'text-warning' : 'text-danger';
+            const statusClass = checkData.submission.score >= 8 ? 'bg-success' : checkData.submission.score >= 6 ? 'bg-warning' : 'bg-danger';
+            const statusText = checkData.submission.score >= 8 ? 'Xuất sắc' : checkData.submission.score >= 6 ? 'Khá' : 'Cần cải thiện';
+
+            document.getElementById('quizContent').innerHTML = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-check-circle"></i> Bạn đã làm quiz này rồi!</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="${scoreClass}"><strong>Điểm của bạn: ${checkData.submission.score}</strong></p>
+                            <p><strong>Thời gian nộp:</strong> ${new Date(checkData.submission.submitted_at).toLocaleString()}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Trạng thái:</strong> <span class="badge ${statusClass}">${statusText}</span></p>
+                            <p><strong>Số câu trả lời:</strong> ${Object.keys(checkData.submission.answers).length}</p>
+                        </div>
+                    </div>
+                    <a href="/quiz/my_quiz_result?quiz_id=${quiz_id}" class="btn btn-info">
+                        <i class="fas fa-eye"></i> Xem chi tiết kết quả
+                    </a>
+                </div>
+            `;
+            document.querySelector('button[type="submit"]').style.display = 'none';
+            return;
+        }
+
+        const res = await fetch(`/quiz/${quiz_id}`);
+        const data = await res.json();
+        if (data.quiz) {
+            let html = `<h4 class="mb-4">${data.quiz.title}</h4>`;
+            data.quiz.questions.forEach((q, idx) => {
+                html += `<div class='mb-4 p-3 border rounded'>`;
+                html += `<h6 class="mb-3"><b>Câu ${idx + 1}:</b> ${q.question_text}</h6>`;
+                html += `<div class="ms-3">`;
+                (q.options || []).forEach((opt, oidx) => {
+                    html += `<div class='form-check mb-2'>`;
+                    html += `<input class='form-check-input' type='radio' name='q_${q._id}' value='${opt}' id='q_${q._id}_${oidx}' required>`;
+                    html += `<label class='form-check-label' for='q_${q._id}_${oidx}'>${opt}</label>`;
+                    html += `</div>`;
+                });
+                html += '</div></div>';
+            });
+            document.getElementById('quizContent').innerHTML = html;
+        }
+    }
+    loadQuiz();
+    document.getElementById('doQuizForm').onsubmit = async function (e) {
+        e.preventDefault();
+        const urlParams = new URLSearchParams(window.location.search);
+        const quiz_id = urlParams.get('quiz_id');
+        let student_id = '{{ session.username if session.username else "student" }}';
+        const form = e.target;
+        const answers = {};
+        form.querySelectorAll('input[type=radio]:checked').forEach(input => {
+            const qid = input.name.replace('q_', '');
+            answers[qid] = input.value;
+        });
+
+        if (Object.keys(answers).length === 0) {
+            alert('Vui lòng chọn ít nhất một câu trả lời!');
+            return;
+        }
+
+        const res = await fetch(`/quiz/${quiz_id}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_id, answers })
+        });
+        const data = await res.json();
+
+        const scoreClass = data.score >= 8 ? 'alert-success' : data.score >= 6 ? 'alert-warning' : 'alert-danger';
+        const statusClass = data.score >= 8 ? 'bg-success' : data.score >= 6 ? 'bg-warning' : 'bg-danger';
+        const statusText = data.score >= 8 ? 'Xuất sắc' : data.score >= 6 ? 'Khá' : 'Cần cải thiện';
+
+        document.getElementById('quizResult').innerHTML = `
+            <div class="${scoreClass}">
+                <h5><i class="fas fa-trophy"></i> Kết quả bài làm</h5>
+                <p><strong>Điểm của bạn: ${data.score}</strong></p>
+                <p><strong>Trạng thái:</strong> <span class="badge ${statusClass}">${statusText}</span></p>
+                <p><strong>Thông báo:</strong> ${data.message}</p>
+                <a href="/quiz/my_quiz_result?quiz_id=${quiz_id}" class="btn btn-info">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        `;
+        document.getElementById('quizResult').style.display = 'block';
+        // Ẩn nút nộp bài sau khi đã nộp
+        document.querySelector('button[type="submit"]').style.display = 'none';
+    }
+</script>
+{% endblock %}

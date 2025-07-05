@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% block title %}Danh Sách Sinh Viên Đã Làm Quiz{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/quiz/list-page" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">{{ quiz.title }}</h1>
+            <p class="text-muted mb-0">Danh sách sinh viên đã làm quiz</p>
+        </div>
+    </div>
+
+    <!-- Quiz Info -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin Quiz</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Tiêu đề:</strong> {{ quiz.title }}</p>
+                    <p><strong>Mức độ:</strong>
+                        <span
+                            class="badge {% if quiz.difficulty == 'easy' %}bg-success{% elif quiz.difficulty == 'medium' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ quiz.difficulty|title }}
+                        </span>
+                    </p>
+                    <p><strong>Trạng thái:</strong>
+                        <span class="badge {% if quiz.status == 'active' %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ quiz.status|title }}
+                        </span>
+                    </p>
+                    <p><strong>Ngày tạo:</strong> {{ quiz.created_at|datetimeformat }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Thống kê</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats %}
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ stats.total_submissions }}</h4>
+                            <small class="text-muted">Tổng số bài nộp</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ "%.1f"|format(stats.avg_score) }}</h4>
+                            <small class="text-muted">Điểm trung bình</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-success">{{ "%.1f"|format(stats.max_score) }}</h5>
+                            <small class="text-muted">Điểm cao nhất</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-danger">{{ "%.1f"|format(stats.min_score) }}</h5>
+                            <small class="text-muted">Điểm thấp nhất</small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Chưa có sinh viên nào làm quiz này.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submissions List -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Danh sách sinh viên đã làm quiz</h5>
+        </div>
+        <div class="card-body">
+            {% if submissions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Mã sinh viên</th>
+                            <th>Điểm</th>
+                            <th>Thời gian nộp</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in submissions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <strong>{{ submission.student_id }}</strong>
+                            </td>
+                            <td>
+                                <span
+                                    class="badge {% if submission.score >= 8 %}bg-success{% elif submission.score >= 6 %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                                    {{ "%.1f"|format(submission.score) }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ submission.submitted_at|datetimeformat }}</small>
+                            </td>
+                            <td>
+                                {% if submission.score >= 8 %}
+                                <span class="badge bg-success">Xuất sắc</span>
+                                {% elif submission.score >= 6 %}
+                                <span class="badge bg-warning">Khá</span>
+                                {% else %}
+                                <span class="badge bg-danger">Cần cải thiện</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm"
+                                    onclick="viewSubmissionDetails('{{ submission._id }}')" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Chưa có sinh viên nào làm quiz này</h5>
+                <p class="text-muted">Sinh viên sẽ xuất hiện ở đây sau khi họ nộp bài.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for submission details -->
+<div class="modal fade" id="submissionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết bài nộp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="submissionDetails">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function viewSubmissionDetails(submissionId) {
+        // Load submission details via AJAX
+        fetch(`/quiz/submission/${submissionId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.submission) {
+                    let html = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Mã sinh viên:</strong> ${data.submission.student_id}</p>
+                            <p><strong>Điểm:</strong> <span class="badge ${data.submission.score >= 8 ? 'bg-success' : data.submission.score >= 6 ? 'bg-warning' : 'bg-danger'}">${data.submission.score}</span></p>
+                            <p><strong>Thời gian nộp:</strong> ${new Date(data.submission.submitted_at).toLocaleString()}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Tổng số câu hỏi:</strong> ${Object.keys(data.submission.answers).length}</p>
+                            <p><strong>Trạng thái:</strong> 
+                                <span class="badge ${data.submission.score >= 8 ? 'bg-success' : data.submission.score >= 6 ? 'bg-warning' : 'bg-danger'}">
+                                    ${data.submission.score >= 8 ? 'Xuất sắc' : data.submission.score >= 6 ? 'Khá' : 'Cần cải thiện'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Đáp án của sinh viên:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Câu hỏi ID</th>
+                                    <th>Đáp án</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                    for (const [questionId, answer] of Object.entries(data.submission.answers)) {
+                        html += `
+                        <tr>
+                            <td>${questionId}</td>
+                            <td>${answer}</td>
+                        </tr>
+                    `;
+                    }
+
+                    html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                    document.getElementById('submissionDetails').innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('submissionModal')).show();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading submission details:', error);
+                alert('Có lỗi khi tải chi tiết bài nộp.');
+            });
+    }
+</script>
+
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .badge {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

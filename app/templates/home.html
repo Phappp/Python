@@ -682,10 +682,56 @@
         <i class="fas fa-terminal"></i>
         <span class="toolbar-label">Coding</span>
     </a>
+    <a class="toolbar-item" tabindex="0" href="/quiz/list-page">
+        <i class="fas fa-question-circle"></i>
+        <span class="toolbar-label">Quiz</span>
+    </a>
     <!-- <div class="toolbar-item" tabindex="0">
         <i class="fas fa-certificate"></i>
         <span class="toolbar-label">Chứng chỉ</span>
     </div> -->
+</div>
+{% endif %}
+
+{% if username and role == 'lecture' %}
+<div class="container mt-4">
+    <div class="welcome-banner">
+        <h1>Chào mừng Giảng viên, <b>{{ username }}</b>!</h1>
+        <p class="lead">Bạn có thể quản lý và thêm các khóa học mới tại đây.</p>
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="{{ url_for('course.create_course') }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-plus-circle"></i> Thêm khóa học mới
+            </a>
+            <a href="{{ url_for('course.manage_courses') }}" class="btn btn-secondary btn-lg mt-3">
+                <i class="fas fa-tasks"></i> Quản lý khóa học
+            </a>
+            <a href="/quiz/create-page" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-question-circle"></i> Tạo Quiz mới
+            </a>
+            <a href="/quiz/list-page" class="btn btn-info btn-lg mt-3">
+                <i class="fas fa-list"></i> Danh sách Quiz
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if username and role == 'student' %}
+<div class="container mt-4">
+    <div class="welcome-banner">
+        <h1>Chào mừng Sinh viên, <b>{{ username }}</b>!</h1>
+        <p class="lead">Bạn có thể tham gia các khóa học và làm bài tập tại đây.</p>
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="/quiz/list-page" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-question-circle"></i> Làm Quiz
+            </a>
+            <a href="{{ url_for('exercise.student_assignments') }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-clipboard-list"></i> Bài tập
+            </a>
+            <a href="{{ url_for('programming_exercise.student_exercises') }}" class="btn btn-info btn-lg mt-3">
+                <i class="fas fa-code"></i> Bài tập lập trình
+            </a>
+        </div>
+    </div>
 </div>
 {% endif %}
 {% endblock %}
