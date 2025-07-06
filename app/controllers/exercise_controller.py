@@ -28,8 +28,8 @@ def upload_exercise(course_id):
         flash('Không tìm thấy khóa học!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
     
-    # Kiểm tra quyền: lecture chỉ có thể upload bài tập cho khóa học do mình tạo hoặc do admin tạo
-    if course.get('created_by') != session.get('username') and session.get('role') != 'admin':
+    # Kiểm tra quyền: lecture có thể upload bài tập cho tất cả khóa học (bao gồm cả admin tạo)
+    if course.get('created_by') != session.get('username') and session.get('role') not in ['admin', 'lecture']:
         flash('Bạn không có quyền upload bài tập cho khóa học này!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
     
@@ -104,8 +104,8 @@ def manage_exercises(course_id):
         flash('Không tìm thấy khóa học!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
     
-    # Kiểm tra quyền: lecture chỉ có thể quản lý bài tập của khóa học do mình tạo hoặc do admin tạo
-    if course.get('created_by') != session.get('username') and session.get('role') != 'admin':
+    # Kiểm tra quyền: lecture có thể quản lý tất cả bài tập (bao gồm cả admin tạo)
+    if course.get('created_by') != session.get('username') and session.get('role') not in ['admin', 'lecture']:
         flash('Bạn không có quyền quản lý bài tập của khóa học này!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
     
@@ -122,6 +122,11 @@ def manage_exercises(course_id):
 
 @exercise_bp.route('/deploy_exercise/<exercise_id>', methods=['POST'])
 def deploy_exercise(exercise_id):
+    # Kiểm tra quyền: chỉ lecture và admin mới được deploy bài tập
+    if session.get('role') not in ['lecture', 'admin']:
+        flash('Bạn không có quyền triển khai bài tập!', 'danger')
+        return redirect(url_for('exercise.manage_exercises'))
+    
     mongo.db.exercises.update_one({'_id': ObjectId(exercise_id)}, {'$set': {'status': 'Đang triển khai'}})
     flash('Bài tập đã được triển khai!')
     return redirect(url_for('exercise.manage_exercises'))
@@ -150,6 +155,11 @@ def view_submissions(exercise_id):
 
 @exercise_bp.route('/grade_submission/<submission_id>', methods=['POST'])
 def grade_submission(submission_id):
+    # Kiểm tra quyền: chỉ lecture và admin mới được chấm điểm
+    if session.get('role') not in ['lecture', 'admin']:
+        flash('Bạn không có quyền chấm điểm!', 'danger')
+        return redirect(request.referrer)
+    
     score = request.form.get('score')
     try:
         score = float(score)
@@ -255,6 +265,11 @@ def student_assignments(course_id):
 @exercise_bp.route('/delete_exercise/<exercise_id>', methods=['POST'])
 def delete_exercise(exercise_id):
     from bson.objectid import ObjectId
+    # Kiểm tra quyền: chỉ lecture và admin mới được xóa bài tập
+    if session.get('role') not in ['lecture', 'admin']:
+        flash('Bạn không có quyền xóa bài tập!', 'danger')
+        return redirect(url_for('exercise.manage_exercises'))
+    
     mongo.db.exercises.delete_one({'_id': ObjectId(exercise_id)})
     flash('Đã xóa bài tập!')
     return redirect(url_for('exercise.manage_exercises'))
@@ -262,6 +277,11 @@ def delete_exercise(exercise_id):
 @exercise_bp.route('/edit_exercise/<exercise_id>', methods=['GET', 'POST'])
 def edit_exercise(exercise_id):
     from bson.objectid import ObjectId
+    # Kiểm tra quyền: chỉ lecture và admin mới được chỉnh sửa bài tập
+    if session.get('role') not in ['lecture', 'admin']:
+        flash('Bạn không có quyền chỉnh sửa bài tập!', 'danger')
+        return redirect(url_for('exercise.manage_exercises'))
+    
     exercise = mongo.db.exercises.find_one({'_id': ObjectId(exercise_id)})
     # Lấy danh sách chương
     courses = list(mongo.db.courses.find())

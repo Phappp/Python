@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Tiến độ khóa học - {{ stats.course.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-chart-bar text-primary"></i>
+                    Tiến độ khóa học: {{ stats.course.name }}
+                </h1>
+                <a href="{{ url_for('statistics.lecture_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê tổng quan khóa học -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Sinh viên
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ stats.course.total_students }}
+                            </div>
+                            <small class="text-muted">Tổng số sinh viên</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Bài tập
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ stats.course.total_exercises }}
+                            </div>
+                            <small class="text-muted">Tổng số bài tập</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-code fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Tỷ lệ hoàn thành TB
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% set avg_completion = stats.exercise_stats | map(attribute='completion_rate') | list | sum / stats.exercise_stats | length if stats.exercise_stats else 0 %}
+                                {{ "%.1f"|format(avg_completion) }}%
+                            </div>
+                            <small class="text-muted">Trung bình các bài tập</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Điểm TB
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% set avg_score = stats.exercise_stats | map(attribute='avg_score') | list | sum / stats.exercise_stats | length if stats.exercise_stats else 0 %}
+                                {{ "%.1f"|format(avg_score) }}/10
+                            </div>
+                            <small class="text-muted">Trung bình các bài tập</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê bài tập -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thống kê bài tập</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="exerciseTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Tên bài tập</th>
+                                    <th>Tổng bài nộp</th>
+                                    <th>Đã hoàn thành</th>
+                                    <th>Tỷ lệ hoàn thành</th>
+                                    <th>Điểm trung bình</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exercise in stats.exercise_stats %}
+                                <tr>
+                                    <td>{{ exercise.title }}</td>
+                                    <td>{{ exercise.total_submissions }}</td>
+                                    <td>{{ exercise.completed_submissions }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ exercise.completion_rate }}%"
+                                                 aria-valuenow="{{ exercise.completion_rate }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.1f"|format(exercise.completion_rate) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if exercise.avg_score > 0 %}
+                                            <span class="badge badge-success">{{ "%.1f"|format(exercise.avg_score) }}/10</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Chưa có điểm</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> Xem chi tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê sinh viên -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thống kê sinh viên</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="studentTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Họ tên</th>
+                                    <th>Username</th>
+                                    <th>Bài đã hoàn thành</th>
+                                    <th>Tỷ lệ hoàn thành</th>
+                                    <th>Điểm trung bình</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in stats.student_stats %}
+                                <tr>
+                                    <td>{{ student.full_name or 'Chưa cập nhật' }}</td>
+                                    <td>{{ student.username }}</td>
+                                    <td>{{ student.completed_exercises }}/{{ student.total_exercises }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ student.progress_rate }}%"
+                                                 aria-valuenow="{{ student.progress_rate }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.1f"|format(student.progress_rate) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if student.avg_score > 0 %}
+                                            <span class="badge badge-success">{{ "%.1f"|format(student.avg_score) }}/10</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Chưa có điểm</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if student.progress_rate >= 80 %}
+                                            <span class="badge badge-success">Xuất sắc</span>
+                                        {% elif student.progress_rate >= 60 %}
+                                            <span class="badge badge-info">Tốt</span>
+                                        {% elif student.progress_rate >= 40 %}
+                                            <span class="badge badge-warning">Trung bình</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Cần cải thiện</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+
+<script>
+$(document).ready(function() {
+    $('#exerciseTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json"
+        }
+    });
+    
+    $('#studentTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json"
+        }
+    });
+});
+</script>
+{% endblock %} 
