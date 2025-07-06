@@ -7,15 +7,23 @@
         <a href="/quiz/list-page" class="btn btn-outline-secondary me-3">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
-        <div>
+        <div class="flex-grow-1">
             <h1 class="mb-1">Tạo Quiz Mới</h1>
             <p class="text-muted mb-0">Sử dụng AI để sinh câu hỏi trắc nghiệm tự động</p>
         </div>
+        <a href="/quiz/list-page" class="btn btn-info">
+            <i class="fas fa-list"></i> Danh Sách Quiz
+        </a>
     </div>
 
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0"><i class="fas fa-magic"></i> Tạo Quiz Trắc Nghiệm Tự Động</h3>
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-magic"></i> Tạo Quiz Trắc Nghiệm Tự Động</h3>
+                <a href="/quiz/list-page" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Xem Danh Sách
+                </a>
+            </div>
         </div>
         <div class="card-body">
             <form id="createQuizForm">
@@ -41,8 +49,8 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="num_questions" class="form-label">Số lượng câu hỏi</label>
-                            <input type="number" class="form-control" id="num_questions" name="num_questions" min="1" max="20"
-                                value="5" required>
+                            <input type="number" class="form-control" id="num_questions" name="num_questions" min="1"
+                                max="20" value="5" required>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -57,12 +65,18 @@
                 </div>
                 <div class="mb-3">
                     <label for="content" class="form-label">Nội dung bài học (để sinh câu hỏi)</label>
-                    <textarea class="form-control" id="content" name="content" rows="5" 
-                        placeholder="Nhập nội dung bài học hoặc chủ đề để AI sinh câu hỏi trắc nghiệm..." required></textarea>
+                    <textarea class="form-control" id="content" name="content" rows="5"
+                        placeholder="Nhập nội dung bài học hoặc chủ đề để AI sinh câu hỏi trắc nghiệm..."
+                        required></textarea>
                 </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-magic"></i> Tạo Quiz
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-magic"></i> Tạo Quiz
+                    </button>
+                    <a href="/quiz/list-page" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> Xem Danh Sách
+                    </a>
+                </div>
                 <div id="loadingSpinner" class="text-center mt-3" style="display:none;">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Đang tạo quiz...</span>
@@ -71,7 +85,12 @@
                 </div>
             </form>
             <div id="quizPreview" class="mt-4" style="display:none;">
-                <h5><i class="fas fa-eye"></i> Xem trước câu hỏi được sinh tự động:</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-eye"></i> Xem trước câu hỏi được sinh tự động:</h5>
+                    <a href="/quiz/list-page" class="btn btn-info btn-sm">
+                        <i class="fas fa-list"></i> Xem Danh Sách Quiz
+                    </a>
+                </div>
                 <div id="questionsList"></div>
             </div>
         </div>
@@ -88,10 +107,10 @@
         const num_questions = document.getElementById('num_questions').value;
         const topic = document.getElementById('topic').value;
         const created_by = '{{ session.username if session.username else "lecture" }}';
-        
+
         // Thêm chủ đề vào nội dung
         const fullContent = `Chủ đề: ${topic}\n\n${content}`;
-        
+
         const res = await fetch('/quiz/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -115,9 +134,28 @@
                 });
                 document.getElementById('questionsList').innerHTML = html;
                 document.getElementById('quizPreview').style.display = 'block';
-                
-                // Hiển thị thông báo thành công
-                alert('Tạo quiz thành công! Quiz đã được lưu với trạng thái "pending". Bạn có thể triển khai quiz từ danh sách.');
+
+                // Hiển thị thông báo thành công với nút điều hướng
+                const successMessage = `
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Tạo quiz thành công!</h5>
+                        <p>Quiz đã được lưu với trạng thái "pending". Bạn có thể triển khai quiz từ danh sách.</p>
+                        <div class="mt-3">
+                            <a href="/quiz/list-page" class="btn btn-primary">
+                                <i class="fas fa-list"></i> Xem Danh Sách Quiz
+                            </a>
+                            <button onclick="document.getElementById('quizPreview').style.display='none'; this.parentElement.parentElement.remove();" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i> Đóng
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Thêm thông báo vào đầu form
+                const form = document.getElementById('createQuizForm');
+                const alertDiv = document.createElement('div');
+                alertDiv.innerHTML = successMessage;
+                form.insertBefore(alertDiv.firstElementChild, form.firstChild);
             }
         }
         document.getElementById('loadingSpinner').style.display = 'none';

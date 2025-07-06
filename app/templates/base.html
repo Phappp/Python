@@ -639,6 +639,11 @@
           <ul class="navbar-nav me-auto">
             {% if username %}
             {% if role == 'student' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
+                <i class="fas fa-question-circle me-1"></i>Làm Quiz
+              </a>
+            </li>
             <!-- XÓA NÚT TÀI LIỆU HỌC TẬP Ở ĐÂY -->
             {#
             <li class="nav-item">
@@ -671,6 +676,11 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.create_course') }}">
                 <i class="fas fa-plus me-1"></i>Tạo khóa học
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
+                <i class="fas fa-question-circle me-1"></i>Quản lý Quiz
               </a>
             </li>
             <!-- Button quyền riêng cho lecture và student -->
