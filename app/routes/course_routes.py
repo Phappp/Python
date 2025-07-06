@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, jsonify
 from app.forms import CourseForm, ChapterForm
 from app.controllers.course_controller import CourseController
 from app.utils.decorators import role_required, login_required
-from app.models.course_model import Course
+from app.models.course_model import Course, CourseReview
 
 course_bp = Blueprint('course', __name__, url_prefix='/courses')
 
@@ -181,3 +181,29 @@ def view_course(course_id):
         chapters=chapters,
         title=course['name']
     ) 
+
+@course_bp.route('/<course_id>/review', methods=['POST'])
+@login_required
+def submit_review(course_id):
+    if session.get('role') != 'student':
+        return jsonify({'success': False, 'message': 'Chỉ sinh viên mới được đánh giá.'}), 403
+    data = request.get_json()
+    rating = data.get('rating')
+    comment = data.get('comment', '')
+    username = session.get('username')
+    if not rating or int(rating) < 1 or int(rating) > 5:
+        return jsonify({'success': False, 'message': 'Số sao không hợp lệ.'}), 400
+    CourseReview.add_review(course_id, username, rating, comment)
+    return jsonify({'success': True, 'message': 'Đã lưu đánh giá.'})
+
+@course_bp.route('/<course_id>/reviews', methods=['GET'])
+def get_reviews(course_id):
+    reviews = CourseReview.get_reviews_by_course(course_id)
+    # Ẩn _id, chỉ trả về thông tin cần thiết
+    result = [{
+        'username': r.get('username'),
+        'rating': r.get('rating'),
+        'comment': r.get('comment'),
+        'created_at': r.get('created_at').strftime('%d/%m/%Y %H:%M') if r.get('created_at') else ''
+    } for r in reviews]
+    return jsonify({'reviews': result}) 
