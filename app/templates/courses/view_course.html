@@ -283,7 +283,7 @@
                 reviewsList.innerHTML = '<div class="text-danger">Lỗi khi tải đánh giá.</div>';
             }
         }
-        document.addEventListener('DOMContentLoaded', loadReviews);
+        loadReviews(); // Luôn gọi khi vào trang
     });
 </script>
 {% endblock %}
