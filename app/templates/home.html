@@ -580,6 +580,95 @@
             display: none;
         }
     }
+.custom-welcome-banner .d-flex {
+    gap: 28px;
+    justify-content: center;
+}
+.custom-welcome-banner .btn {
+    border-radius: 18px;
+    font-size: 1.18rem;
+    font-weight: 700;
+    padding: 18px 44px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    transition: all 0.18s cubic-bezier(.4,1.6,.6,1);
+    display: flex;
+    align-items: center;
+    min-width: 180px;
+    letter-spacing: 0.5px;
+}
+.custom-welcome-banner .btn i {
+    font-size: 1.3em;
+    margin-right: 10px;
+}
+/* Mặc định: gradient màu đẹp */
+.custom-welcome-banner .btn-success {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    color: #fff;
+    border: none;
+}
+.custom-welcome-banner .btn-primary {
+    background: linear-gradient(90deg, #2980b9 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+}
+.custom-welcome-banner .btn-info {
+    background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+    color: #fff;
+    border: none;
+}
+.custom-welcome-banner .btn:hover, .custom-welcome-banner .btn:focus {
+    filter: brightness(0.93);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+    outline: none;
+    color: #fff;
+}
+/* Giao diện SÁNG: nút nền đen, chữ trắng */
+body.theme-light .custom-welcome-banner .btn {
+    background: #111 !important;
+    color: #fff !important;
+    border: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.13);
+}
+body.theme-light .custom-welcome-banner .btn:hover, body.theme-light .custom-welcome-banner .btn:focus {
+    background: #222 !important;
+    color: #fff !important;
+    filter: none;
+}
+/* Giao diện TỐI: nút nền trắng, chữ đen */
+body.theme-dark .custom-welcome-banner .btn {
+    background: #fff !important;
+    color: #181a1b !important;
+    border: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.13);
+}
+body.theme-dark .custom-welcome-banner .btn:hover, body.theme-dark .custom-welcome-banner .btn:focus {
+    background: #f1f1f1 !important;
+    color: #181a1b !important;
+    filter: none;
+}
+body.theme-dark .custom-welcome-banner h1,
+body.theme-dark .custom-welcome-banner h1 b,
+body.theme-dark .custom-welcome-banner p.lead {
+    color: #fff !important;
+}
+body:not(.theme-light):not(.theme-dark) .custom-welcome-banner h1,
+body:not(.theme-light):not(.theme-dark) .custom-welcome-banner h1 b,
+body:not(.theme-light):not(.theme-dark) .custom-welcome-banner p.lead {
+    color: #fff !important;
+}
+body:not(.theme-light):not(.theme-dark) .custom-welcome-banner .btn i {
+    color: #fff !important;
+}
+@media (max-width: 767px) {
+    .custom-welcome-banner .btn {
+        font-size: 1.05rem;
+        padding: 13px 10px;
+        min-width: 120px;
+    }
+    .custom-welcome-banner .d-flex {
+        gap: 12px;
+    }
+}
 </style>
 
 <div class="container mt-4">
@@ -717,7 +806,7 @@
 {% endif %}
 {% if username and role == 'student' %}
 <div class="container mt-4">
-    <div class="welcome-banner">
+    <div class="welcome-banner custom-welcome-banner">
         <h1>Chào mừng Sinh viên, <b>{{ username }}</b>!</h1>
         <p class="lead">Bạn có thể tham gia các khóa học và làm bài tập tại đây.</p>
         <div class="d-flex justify-content-center flex-wrap">
