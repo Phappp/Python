@@ -16,41 +16,57 @@ class StatisticsController:
         Lấy thống kê tổng quan cho lecture dashboard
         """
         username = session.get('username')
+        role = session.get('role')
         if not username:
             return None
             
         try:
             # Thống kê khóa học
-            courses = list(Course.find_by_creator(username))
+            if role == 'lecture':
+                courses = list(Course.get_all())
+            else:
+                courses = list(Course.find_by_creator(username))
             total_courses = len(courses)
             active_courses = len([c for c in courses if c.get('is_active', True)])
             
             # Thống kê sinh viên
-            total_students = 0
-            for course in courses:
-                total_students += len(course.get('students', []))
+            if role == 'lecture':
+                total_students = User.count_by_role('student')
+            else:
+                total_students = 0
+                for course in courses:
+                    total_students += len(course.get('students', []))
             
             # Thống kê bài tập
-            exercises = list(Exercise.find_by_creator(username))
+            if role == 'lecture':
+                exercises = list(Exercise.get_all())
+            else:
+                exercises = list(Exercise.find_by_creator(username))
             total_exercises = len(exercises)
             active_exercises = len([e for e in exercises if e.get('is_visible', True)])
             
-            # Thống kê bài nộp
+            # Thống kê số lượt nộp bài
             total_submissions = 0
-            total_quiz_submissions = 0
             for exercise in exercises:
                 submissions = list(Submission.find_by_exercise(str(exercise['_id'])))
                 total_submissions += len(submissions)
             
             # Thống kê quiz
-            quizzes = list(Quiz.find_by_creator(username))
+            if role == 'lecture':
+                quizzes = list(Quiz.get_all())
+            else:
+                quizzes = list(Quiz.find_by_creator(username))
             total_quizzes = len(quizzes)
+            total_quiz_submissions = 0
             for quiz in quizzes:
                 quiz_submissions = list(QuizSubmission.find_by_quiz(str(quiz['_id'])))
                 total_quiz_submissions += len(quiz_submissions)
             
             # Thống kê tài liệu
-            documents = list(Document.find_by_uploader(username))
+            if role == 'lecture':
+                documents = list(Document.get_all())
+            else:
+                documents = list(Document.find_by_uploader(username))
             total_documents = len(documents)
             total_downloads = sum(d.get('download_count', 0) for d in documents)
             
