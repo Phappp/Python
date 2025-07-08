@@ -115,6 +115,30 @@
     <div id="reviews-list">
         <div class="text-muted">Đang tải đánh giá...</div>
     </div>
+    {% if username and role == 'student' %}
+    <div class="card mt-4 w-100" style="margin-bottom:16px;">
+      <div class="card-body">
+        <form id="reviewForm">
+          <div class="mb-3 text-center">
+            <label class="form-label"><b>Đánh giá khóa học của bạn</b></label><br>
+            <div id="starRating" style="font-size:2rem;">
+              <span class="star" data-value="1">☆</span>
+              <span class="star" data-value="2">☆</span>
+              <span class="star" data-value="3">☆</span>
+              <span class="star" data-value="4">☆</span>
+              <span class="star" data-value="5">☆</span>
+            </div>
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+          <div class="mb-3">
+            <label for="reviewText" class="form-label">Nhận xét của bạn (tùy chọn):</label>
+            <textarea class="form-control" id="reviewText" name="review" rows="3" maxlength="500" placeholder="Cảm nghĩ của bạn về khóa học..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Gửi đánh giá</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Modal Chúc mừng và Đánh giá -->
@@ -263,7 +287,7 @@
                 const data = await res.json();
                 if (data.reviews && data.reviews.length > 0) {
                     reviewsList.innerHTML = data.reviews.map(r => `
-                        <div class="card mb-2">
+                        <div class="card mb-2 review-card w-100" style="margin-bottom:16px;">
                             <div class="card-body p-2 d-flex align-items-center">
                                 <div style="font-size:1.3rem;color:#ffc107;min-width:90px;">
                                     ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}

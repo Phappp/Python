@@ -639,16 +639,11 @@
           <ul class="navbar-nav me-auto">
             {% if username %}
             {% if role == 'student' %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
-                <i class="fas fa-question-circle me-1"></i>Làm Quiz
-              </a>
-            </li>
             <!-- XÓA NÚT TÀI LIỆU HỌC TẬP Ở ĐÂY -->
             {#
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('document.view_documents') }}">
-                <i class="fas fa-file-alt me-1"></i>Tài liệu học tập
+              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
+                <i class="fas fa-question-circle me-1"></i>Làm Quiz
               </a>
             </li>
             #}
