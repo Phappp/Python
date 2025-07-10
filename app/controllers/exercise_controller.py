@@ -122,11 +122,35 @@ def manage_exercises(course_id):
 
 @exercise_bp.route('/deploy_exercise/<exercise_id>', methods=['POST'])
 def deploy_exercise(exercise_id):
+
+    from app.models.notification_model import Notification
+    from app.models.user_model import User
+    from bson.objectid import ObjectId
+    exercise = mongo.db.exercises.find_one({'_id': ObjectId(exercise_id)})
+    # Tìm tên khóa học chứa bài tập này
+    course_name = ''
+    for c in mongo.db.courses.find():
+        for ch in c.get('chapters', []):
+            if ch['_id'] == exercise['chapter_id']:
+                course_name = c.get('name', '')
+                break
+        if course_name:
+            break
+    # Gửi thông báo cho tất cả sinh viên
+    all_students = mongo.db.users.find({'role': 'student'})
+    for student in all_students:
+        Notification.create(
+            user_id=student['username'],
+            message=f"Bài tập mới '{exercise.get('title', 'Không rõ')}' đã được triển khai trong khóa học '{course_name}'!",
+            exercise_id=exercise_id
+        )
+
     # Kiểm tra quyền: chỉ lecture và admin mới được deploy bài tập
     if session.get('role') not in ['lecture', 'admin']:
         flash('Bạn không có quyền triển khai bài tập!', 'danger')
         return redirect(url_for('exercise.manage_exercises'))
     
+
     mongo.db.exercises.update_one({'_id': ObjectId(exercise_id)}, {'$set': {'status': 'Đang triển khai'}})
     flash('Bài tập đã được triển khai!')
     return redirect(url_for('exercise.manage_exercises'))

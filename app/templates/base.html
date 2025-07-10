@@ -696,6 +696,30 @@
 
           <ul class="navbar-nav">
             {% if username %}
+            <!-- Notification bell for students -->
+            {% if role == 'student' %}
+            <li class="nav-item dropdown d-flex align-items-center" style="margin-left: 10px;">
+              <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo">
+                <i class="fas fa-bell fa-lg"></i>
+                {% set unread_count = notifications|selectattr('is_read', 'equalto', False)|list|length %}
+                {% if unread_count > 0 %}
+                <span class="notification-badge">{{ unread_count }}</span>
+                {% endif %}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
+                style="min-width: 340px; max-height: 400px; overflow-y: auto;">
+                <li class="dropdown-header">Thông báo</li>
+                <div id="notification-list-container">
+                  <!-- Notifications will be loaded here by JS -->
+                </div>
+                <li id="notification-loading" class="px-3 py-2 text-center text-muted" style="display:none;">Đang tải...
+                </li>
+                <li id="notification-end" class="px-3 py-2 text-center text-muted" style="display:none;">Đã xem hết
+                  thông báo</li>
+              </ul>
+            </li>
+            {% endif %}
             <!-- Theme switcher button (chỉ hiện khi đã đăng nhập) -->
             <li class="nav-item dropdown d-flex align-items-center" style="margin-left: 30px;">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="themeDropdown" role="button"
@@ -800,13 +824,14 @@
   </header>
 
   <div class="flash-messages-container">
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show alert-custom" role="alert">
-      {{ message }}
+    {% if unread_notifications and unread_notifications|length > 0 %}
+    {% for n in unread_notifications %}
+    <div class="alert alert-info alert-dismissible fade show alert-custom" role="alert">
+      {{ n.message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {% endfor %} {% endif %} {% endwith %}
+    {% endfor %}
+    {% endif %}
   </div>
 
   {% block content %}{% endblock %}
@@ -872,6 +897,89 @@
           setTheme(this.getAttribute('data-theme'));
         });
       });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      let skip = 0;
+      const limit = 5;
+      let loading = false;
+      let endReached = false;
+      const notificationListContainer = document.getElementById('notification-list-container');
+      const loadingElem = document.getElementById('notification-loading');
+      const endElem = document.getElementById('notification-end');
+
+      function renderNotification(n) {
+        return `<li class="px-3 py-2 border-bottom notification-item ${n.is_read ? 'text-muted' : ''}"
+          data-id="${n._id}" style="cursor:pointer;${n.is_read ? 'opacity:0.5;' : ''}">
+          <div style="font-size: 1rem;">${n.message}</div>
+          <div class="text-muted" style="font-size:0.85em">${n.created_at || ''}</div>
+        </li>`;
+      }
+
+      async function loadNotifications() {
+        if (loading || endReached) return;
+        loading = true;
+        loadingElem.style.display = '';
+        const res = await fetch(`/notifications/paginated?skip=${skip}&limit=${limit}`);
+        const data = await res.json();
+        loadingElem.style.display = 'none';
+        if (data.success && data.notifications.length > 0) {
+          data.notifications.forEach(n => {
+            notificationListContainer.insertAdjacentHTML('beforeend', renderNotification(n));
+          });
+          skip += data.notifications.length;
+          if (data.notifications.length < limit) {
+            endReached = true;
+            endElem.style.display = '';
+          }
+        } else {
+          endReached = true;
+          endElem.style.display = '';
+        }
+        loading = false;
+      }
+
+      if (notificationDropdown) {
+        notificationDropdown.addEventListener('show.bs.dropdown', function () {
+          // Reset state
+          skip = 0;
+          endReached = false;
+          notificationListContainer.innerHTML = '';
+          endElem.style.display = 'none';
+          loadNotifications();
+        });
+        // Infinite scroll
+        const dropdownMenu = notificationDropdown.nextElementSibling;
+        dropdownMenu.addEventListener('scroll', function () {
+          if (dropdownMenu.scrollTop + dropdownMenu.clientHeight >= dropdownMenu.scrollHeight - 10) {
+            loadNotifications();
+          }
+        });
+        // Mark as read on click
+        notificationListContainer.addEventListener('click', function (e) {
+          const li = e.target.closest('.notification-item');
+          if (!li) return;
+          const id = li.getAttribute('data-id');
+          fetch('/notifications/mark_read/' + id, { method: 'POST' }).then(r => {
+            if (r.ok) {
+              li.classList.add('text-muted');
+              li.style.opacity = 0.5;
+              // Giảm badge
+              const badge = notificationDropdown.querySelector('.notification-badge');
+              if (badge) {
+                let count = parseInt(badge.textContent.trim());
+                if (count > 1) {
+                  badge.textContent = count - 1;
+                } else {
+                  badge.style.display = 'none';
+                }
+              }
+            }
+          });
+        });
+      }
     });
   </script>
   <script>
