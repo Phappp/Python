@@ -8,6 +8,7 @@
     integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
   <style>
     /* Header Styles */
     .header {
@@ -641,8 +642,8 @@
             <!-- XÓA NÚT TÀI LIỆU HỌC TẬP Ở ĐÂY -->
             {#
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('document.view_documents') }}">
-                <i class="fas fa-file-alt me-1"></i>Tài liệu học tập
+              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
+                <i class="fas fa-question-circle me-1"></i>Làm Quiz
               </a>
             </li>
             #}
@@ -672,7 +673,13 @@
                 <i class="fas fa-plus me-1"></i>Tạo khóa học
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
+                <i class="fas fa-question-circle me-1"></i>Quản lý Quiz
+              </a>
+            </li>
             <!-- Button quyền riêng cho lecture và student -->
+            {# Ẩn menu quyền riêng
             {% if (role == 'lecture' or role == 'student') and has_any_custom_permission() %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('admin.view_my_permissions') }}"
@@ -682,6 +689,7 @@
               </a>
             </li>
             {% endif %}
+            #}
             {% endif %}
             {% endif %}
           </ul>

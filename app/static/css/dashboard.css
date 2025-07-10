@@ -1,0 +1,200 @@
+/* Dashboard Statistics Styles */
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.border-left-secondary {
+    border-left: 0.25rem solid #858796 !important;
+}
+
+.border-left-dark {
+    border-left: 0.25rem solid #5a5c69 !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f8f9fc;
+}
+
+.progress {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.progress-bar {
+    background-color: #4e73df;
+    border-radius: 0.25rem;
+}
+
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Activity cards */
+.activity-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.activity-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Statistics cards */
+.stat-card {
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2) !important;
+}
+
+/* Progress bars with different colors */
+.progress-bar-success {
+    background-color: #1cc88a;
+}
+
+.progress-bar-warning {
+    background-color: #f6c23e;
+}
+
+.progress-bar-danger {
+    background-color: #e74a3b;
+}
+
+.progress-bar-info {
+    background-color: #36b9cc;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* Table styles */
+.table-responsive {
+    border-radius: 0.35rem;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+}
+
+/* Button styles */
+.btn-export {
+    border-radius: 0.35rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-export:hover {
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .card {
+    background-color: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .card-header {
+    background-color: #4a5568;
+    border-bottom-color: #718096;
+}
+
+[data-theme="dark"] .text-gray-800 {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-gray-300 {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .table th {
+    background-color: #4a5568;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .table {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th {
+    border-color: #718096;
+} 

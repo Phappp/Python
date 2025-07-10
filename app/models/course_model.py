@@ -106,3 +106,21 @@ class Course:
             {'_id': ObjectId(course_id)},
             {'$pull': {'chapters': {'_id': ObjectId(chapter_id)}}}
         ) 
+
+class CourseReview:
+    @staticmethod
+    def add_review(course_id, username, rating, comment):
+        from datetime import datetime
+        from app.extensions import mongo
+        return mongo.db.course_reviews.insert_one({
+            'course_id': str(course_id),
+            'username': username,
+            'rating': int(rating),
+            'comment': comment,
+            'created_at': datetime.utcnow()
+        })
+
+    @staticmethod
+    def get_reviews_by_course(course_id):
+        from app.extensions import mongo
+        return list(mongo.db.course_reviews.find({'course_id': str(course_id)}).sort('created_at', -1)) 

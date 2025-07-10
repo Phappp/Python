@@ -109,11 +109,78 @@
     </div>
 </div>
 
+<!-- Đánh giá khóa học -->
+<div class="container mt-4" id="course-reviews-section">
+    <h4 class="mb-3"><i class="fas fa-star text-warning"></i> Đánh giá của học viên</h4>
+    <div id="reviews-list">
+        <div class="text-muted">Đang tải đánh giá...</div>
+    </div>
+    {% if username and role == 'student' %}
+    <div class="card mt-4 w-100" style="margin-bottom:16px;">
+      <div class="card-body">
+        <form id="reviewForm">
+          <div class="mb-3 text-center">
+            <label class="form-label"><b>Đánh giá khóa học của bạn</b></label><br>
+            <div id="starRating" style="font-size:2rem;">
+              <span class="star" data-value="1">☆</span>
+              <span class="star" data-value="2">☆</span>
+              <span class="star" data-value="3">☆</span>
+              <span class="star" data-value="4">☆</span>
+              <span class="star" data-value="5">☆</span>
+            </div>
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+          <div class="mb-3">
+            <label for="reviewText" class="form-label">Nhận xét của bạn (tùy chọn):</label>
+            <textarea class="form-control" id="reviewText" name="review" rows="3" maxlength="500" placeholder="Cảm nghĩ của bạn về khóa học..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Gửi đánh giá</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal Chúc mừng và Đánh giá -->
+<div class="modal fade" id="congratsModal" tabindex="-1" aria-labelledby="congratsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="congratsModalLabel">🎉 Chúc mừng bạn đã hoàn thành khóa học!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm">
+          <div class="mb-3 text-center">
+            <label class="form-label">Đánh giá khóa học:</label><br>
+            <div id="starRating" style="font-size:2rem;">
+              <span class="star" data-value="1">☆</span>
+              <span class="star" data-value="2">☆</span>
+              <span class="star" data-value="3">☆</span>
+              <span class="star" data-value="4">☆</span>
+              <span class="star" data-value="5">☆</span>
+            </div>
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+          <div class="mb-3">
+            <label for="reviewText" class="form-label">Nhận xét của bạn (tùy chọn):</label>
+            <textarea class="form-control" id="reviewText" name="review" rows="3" maxlength="500" placeholder="Cảm nghĩ của bạn về khóa học..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Gửi đánh giá</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const chapterList = document.getElementById('chapter-list');
         const videoPlayer = document.getElementById('video-player');
         const videoTitle = document.getElementById('video-title');
+        const congratsModal = new bootstrap.Modal(document.getElementById('congratsModal'));
+        const stars = document.querySelectorAll('#starRating .star');
+        const ratingInput = document.getElementById('ratingInput');
 
         if (chapterList && videoPlayer) {
             chapterList.addEventListener('click', function (e) {
@@ -133,9 +200,114 @@
                     if (videoTitle) {
                         videoTitle.textContent = newTitle;
                     }
+
+                    // Nếu là chương cuối cùng thì hiện modal chúc mừng
+                    const allItems = chapterList.querySelectorAll('li.list-group-item');
+                    if (allItems.length > 0 && clickedItem === allItems[allItems.length - 1]) {
+                        setTimeout(() => congratsModal.show(), 500);
+                    }
                 }
             });
         }
+        // Xử lý chọn sao
+        if (stars && ratingInput) {
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', function () {
+                    const val = parseInt(this.getAttribute('data-value'));
+                    stars.forEach((s, idx) => {
+                        s.textContent = idx < val ? '★' : '☆';
+                    });
+                });
+                star.addEventListener('mouseleave', function () {
+                    const current = parseInt(ratingInput.value);
+                    stars.forEach((s, idx) => {
+                        s.textContent = idx < current ? '★' : '☆';
+                    });
+                });
+                star.addEventListener('click', function () {
+                    const val = parseInt(this.getAttribute('data-value'));
+                    ratingInput.value = val;
+                    stars.forEach((s, idx) => {
+                        s.textContent = idx < val ? '★' : '☆';
+                    });
+                });
+            });
+        }
+        // Reset sao khi mở modal lại
+        document.getElementById('congratsModal').addEventListener('show.bs.modal', function () {
+            ratingInput.value = 0;
+            stars.forEach(s => s.textContent = '☆');
+            document.getElementById('reviewText').value = '';
+        });
+        // Lấy course_id từ URL
+        function getCourseIdFromUrl() {
+            // URL dạng /courses/<course_id>/view
+            const parts = window.location.pathname.split('/');
+            const idx = parts.indexOf('courses');
+            if (idx !== -1 && parts.length > idx + 1) {
+                return parts[idx + 1];
+            }
+            return '';
+        }
+        // Gửi đánh giá về backend
+        document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const rating = parseInt(document.getElementById('ratingInput').value);
+            const comment = document.getElementById('reviewText').value;
+            if (!rating) {
+                alert('Vui lòng chọn số sao!');
+                return;
+            }
+            const courseId = getCourseIdFromUrl();
+            try {
+                const res = await fetch(`/courses/${courseId}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating, comment })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    congratsModal.hide();
+                    loadReviews();
+                    alert('Cảm ơn bạn đã đánh giá!');
+                } else {
+                    alert(data.message || 'Lỗi khi gửi đánh giá.');
+                }
+            } catch (err) {
+                alert('Lỗi kết nối server!');
+            }
+        });
+        // Hiển thị danh sách đánh giá
+        async function loadReviews() {
+            const reviewsList = document.getElementById('reviews-list');
+            reviewsList.innerHTML = '<div class="text-muted">Đang tải đánh giá...</div>';
+            const courseId = getCourseIdFromUrl();
+            try {
+                const res = await fetch(`/courses/${courseId}/reviews`);
+                const data = await res.json();
+                if (data.reviews && data.reviews.length > 0) {
+                    reviewsList.innerHTML = data.reviews.map(r => `
+                        <div class="card mb-2 review-card w-100" style="margin-bottom:16px;">
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div style="font-size:1.3rem;color:#ffc107;min-width:90px;">
+                                    ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    <b>${r.username}</b>
+                                    <span class="text-muted" style="font-size:0.95em;">${r.created_at}</span><br>
+                                    <span>${r.comment ? r.comment.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '<i class=\'text-muted\'>Không có nhận xét</i>'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    reviewsList.innerHTML = '<div class="text-muted">Chưa có đánh giá nào cho khóa học này.</div>';
+                }
+            } catch (err) {
+                reviewsList.innerHTML = '<div class="text-danger">Lỗi khi tải đánh giá.</div>';
+            }
+        }
+        loadReviews(); // Luôn gọi khi vào trang
     });
 </script>
 {% endblock %}

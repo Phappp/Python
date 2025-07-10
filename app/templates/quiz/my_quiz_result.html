@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Kết Quả Bài Làm Quiz{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/quiz/list-page" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <h1 class="mb-1">Kết Quả Bài Làm Quiz</h1>
+            <p class="text-muted mb-0">Chi tiết bài làm của bạn</p>
+        </div>
+    </div>
+
+    <div class="card shadow-lg">
+        <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0"><i class="fas fa-chart-line"></i> Kết Quả Bài Làm Quiz</h3>
+        </div>
+        <div class="card-body">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+</div>
+<script>
+    async function loadMyResult() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const quiz_id = urlParams.get('quiz_id');
+        let student_id = '{{ session.username if session.username else "student" }}';
+        const res = await fetch(`/quiz/${quiz_id}/my_submission?student_id=${student_id}`);
+        const data = await res.json();
+        if (data.submission) {
+            const scoreClass = data.submission.score >= 8 ? 'text-success' : data.submission.score >= 6 ? 'text-warning' : 'text-danger';
+            const statusClass = data.submission.score >= 8 ? 'bg-success' : data.submission.score >= 6 ? 'bg-warning' : 'bg-danger';
+            const statusText = data.submission.score >= 8 ? 'Xuất sắc' : data.submission.score >= 6 ? 'Khá' : 'Cần cải thiện';
+
+            let html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="${scoreClass}">Điểm của bạn: <b>${data.submission.score}</b></h5>
+                        <p><b>Thời gian nộp:</b> ${new Date(data.submission.submitted_at).toLocaleString()}</p>
+                        <p><b>Trạng thái:</b> <span class="badge ${statusClass}">${statusText}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Thống kê:</h6>
+                        <p><b>Tổng số câu hỏi:</b> ${Object.keys(data.submission.answers).length}</p>
+                        <p><b>Thời gian làm bài:</b> ${new Date(data.submission.submitted_at).toLocaleString()}</p>
+                    </div>
+                </div>
+                <hr>
+                <h6>Đáp án của bạn:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Câu hỏi ID</th>
+                                <th>Đáp án của bạn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            for (const [qid, ans] of Object.entries(data.submission.answers)) {
+                html += `<tr><td><strong>${qid}</strong></td><td>${ans}</td></tr>`;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('resultContent').innerHTML = html;
+        } else {
+            document.getElementById('resultContent').innerHTML = `
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Bạn chưa nộp bài quiz này</h5>
+                    <p>Hãy quay lại danh sách quiz để làm bài.</p>
+                    <a href="/quiz/list-page" class="btn btn-primary">Quay lại danh sách quiz</a>
+                </div>
+            `;
+        }
+    }
+    loadMyResult();
+</script>
+{% endblock %}

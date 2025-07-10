@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Thực Hành Code{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-dark text-white">
+            <h3 class="mb-0">Thực Hành Code</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="language" class="form-label">Ngôn ngữ lập trình</label>
+                        <select class="form-select" id="language">
+                            <option value="python">Python</option>
+                            <option value="perl">Perl</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="code" class="form-label">Code của bạn</label>
+                        <textarea class="form-control" id="code" rows="15"
+                            placeholder="Nhập code của bạn ở đây...">print("Hello, World!")</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="runCode()">Chạy Code</button>
+                    <button class="btn btn-secondary" onclick="clearCode()">Xóa Code</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Kết quả</label>
+                        <div id="output" class="form-control"
+                            style="height: 200px; overflow-y: auto; background-color: #f8f9fa; font-family: monospace;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lỗi (nếu có)</label>
+                        <div id="error" class="form-control"
+                            style="height: 100px; overflow-y: auto; background-color: #f8f9fa; font-family: monospace; color: #dc3545;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function runCode() {
+        const code = document.getElementById('code').value;
+        const language = document.getElementById('language').value;
+
+        document.getElementById('output').innerHTML = 'Đang chạy...';
+        document.getElementById('error').innerHTML = '';
+
+        try {
+            const response = await fetch('/practice-code/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code, language })
+            });
+
+            const data = await response.json();
+
+            if (data.output) {
+                document.getElementById('output').innerHTML = data.output;
+            } else {
+                document.getElementById('output').innerHTML = '(Không có output)';
+            }
+
+            if (data.error) {
+                document.getElementById('error').innerHTML = data.error;
+            }
+        } catch (error) {
+            document.getElementById('error').innerHTML = 'Lỗi kết nối: ' + error.message;
+        }
+    }
+
+    function clearCode() {
+        document.getElementById('code').value = '';
+        document.getElementById('output').innerHTML = '';
+        document.getElementById('error').innerHTML = '';
+    }
+</script>
+{% endblock %}

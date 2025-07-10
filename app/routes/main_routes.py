@@ -10,6 +10,10 @@ def home():
         role = session.get('role', 'student')
         if role == 'admin':
             return redirect(url_for('admin.admin_dashboard'))
+        elif role == 'lecture':
+            # Redirect lecture về dashboard thống kê
+            return redirect(url_for('statistics.lecture_dashboard'))
+        
         username = session['username']
         role_display = 'Sinh viên' if role == 'student' else 'Giảng viên'
         courses = None

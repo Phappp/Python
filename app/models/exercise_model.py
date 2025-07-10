@@ -55,6 +55,13 @@ class Exercise:
         return mongo.db.exercises.find({'created_by': username}).sort('created_at', -1)
 
     @staticmethod
+    def find_by_course(course_id):
+        """
+        Tìm bài tập theo khóa học
+        """
+        return mongo.db.exercises.find({'course_id': ObjectId(course_id)}).sort('created_at', -1)
+
+    @staticmethod
     def update(exercise_id, data):
         """
         Cập nhật bài tập
@@ -126,6 +133,16 @@ class Submission:
         Tìm tất cả submission của một user
         """
         return mongo.db.submissions.find({'user_id': user_id}).sort('submitted_at', -1)
+
+    @staticmethod
+    def find_by_user_and_exercise(user_id, exercise_id):
+        """
+        Tìm submission của user cho một bài tập cụ thể
+        """
+        return mongo.db.submissions.find_one({
+            'user_id': user_id,
+            'exercise_id': ObjectId(exercise_id)
+        })
 
     @staticmethod
     def update_score(submission_id, score, llm_feedback=None, test_results=None):

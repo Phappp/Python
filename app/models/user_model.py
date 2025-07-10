@@ -183,3 +183,8 @@ class User:
             'manage_backups',
             'system_monitoring'
         ]
+
+    @staticmethod
+    def count_by_role(role):
+        """Đếm số lượng user theo role"""
+        return mongo.db.users.count_documents({'role': role})
