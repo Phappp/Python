@@ -593,6 +593,67 @@
 </head>
 
 <body>
+  <!-- Widget tìm kiếm nâng cao -->
+  <div id="search-widget" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">
+    <button id="search-btn" title="Tìm kiếm"
+      style="background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+      <i class="fa fa-search"></i>
+    </button>
+    <div id="search-form"
+      style="display:none; background: #fff; border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; min-width: 250px;">
+      <input type="text" id="search-keyword" placeholder="Nhập từ khóa..." class="form-control mb-2">
+      <select id="search-type" class="form-select mb-2">
+        <option value="">Tất cả</option>
+        <option value="lecture">Bài giảng</option>
+        <option value="exercise">Bài tập</option>
+        <option value="user">Người dùng</option>
+      </select>
+      <input type="text" id="search-creator" placeholder="Người tạo (tùy chọn)" class="form-control mb-2">
+      <input type="text" id="search-difficulty" placeholder="Độ khó/Cấp độ (tùy chọn)" class="form-control mb-2">
+      <button id="do-search" class="btn btn-primary w-100">Tìm kiếm</button>
+    </div>
+  </div>
+  <div id="search-results"
+    style="position: fixed; top: 80px; right: 20px; z-index: 2000; background: #fff; max-height: 400px; overflow-y: auto; min-width: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none;">
+  </div>
+  <script>
+    document.getElementById('search-btn').onclick = function () {
+      const form = document.getElementById('search-form');
+      form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none';
+    };
+    document.getElementById('do-search').onclick = function () {
+      const q = document.getElementById('search-keyword').value;
+      const type = document.getElementById('search-type').value;
+      const created_by = document.getElementById('search-creator').value;
+      const difficulty = document.getElementById('search-difficulty').value;
+      let url = `/search?q=${encodeURIComponent(q)}&type=${type}`;
+      if (created_by) url += `&created_by=${encodeURIComponent(created_by)}`;
+      if (difficulty) url += `&difficulty=${encodeURIComponent(difficulty)}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          let html = '';
+          if (data.length === 0) html = '<div class="p-2">Không tìm thấy kết quả.</div>';
+          else data.forEach(item => {
+            if (item.type === 'lecture') html += `<a href='/courses/${item.id}/view' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài giảng:</b> ${item.name} <br><small>${item.description || ''}</small></div></a>`;
+            else if (item.type === 'exercise') html += `<a href='/programming-exercises/${item.id}/preview' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài tập:</b> ${item.title} <br><small>${item.description || ''}</small></div></a>`;
+            else if (item.type === 'user') html += `<a href='/auth/profile?username=${encodeURIComponent(item.username)}' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Người dùng:</b> ${item.username} (${item.full_name || ''}) <br><small>Vai trò: ${item.role || ''}</small></div></a>`;
+          });
+          const resultDiv = document.getElementById('search-results');
+          resultDiv.innerHTML = html;
+          resultDiv.style.display = 'block';
+        });
+    };
+    // Ẩn kết quả khi click ra ngoài
+    document.addEventListener('click', function (e) {
+      const widget = document.getElementById('search-widget');
+      const results = document.getElementById('search-results');
+      if (!widget.contains(e.target)) {
+        document.getElementById('search-form').style.display = 'none';
+        results.style.display = 'none';
+      }
+    });
+  </script>
   {% if not username %}
   <!-- Theme switcher cho trang landing page (chưa đăng nhập) -->
   <!-- <div style="position: fixed; top: 24px; right: 120px; z-index: 2000;">
