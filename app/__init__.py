@@ -73,6 +73,7 @@ def create_app(config_class=Config):
     from app.controllers.quiz_controller import quiz_bp
     from app.routes.quiz_routes import quiz_page_bp
     from app.routes.statistics_routes import statistics_bp
+    from app.controllers.search_controller import search_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(course_bp)
@@ -84,6 +85,7 @@ def create_app(config_class=Config):
     app.register_blueprint(quiz_bp)
     app.register_blueprint(quiz_page_bp)
     app.register_blueprint(statistics_bp)
+    app.register_blueprint(search_bp)
 
     register_exercise_routes(app)
     mail.init_app(app)

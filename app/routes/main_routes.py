@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for, jsonify, request
 from app.models.course_model import Course
 from app.models.notification_model import Notification
+from app.controllers.search_controller import search_bp
 
 main_bp = Blueprint('main', __name__)
 
