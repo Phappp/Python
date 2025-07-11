@@ -112,6 +112,15 @@
 <!-- Đánh giá khóa học -->
 <div class="container mt-4" id="course-reviews-section">
     <h4 class="mb-3"><i class="fas fa-star text-warning"></i> Đánh giá của học viên</h4>
+    <!-- Thống kê đánh giá -->
+    <div id="review-stats" class="mb-3" style="display:none;">
+      <div class="row g-2 align-items-center">
+        <div class="col-auto"><b>Thống kê đánh giá:</b></div>
+        <div class="col">
+          <div class="d-flex flex-wrap gap-2" id="review-stats-bar"></div>
+        </div>
+      </div>
+    </div>
     <div id="reviews-list">
         <div class="text-muted">Đang tải đánh giá...</div>
     </div>
@@ -150,21 +159,21 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
-        <form id="reviewForm">
+        <form id="reviewFormModal">
           <div class="mb-3 text-center">
             <label class="form-label">Đánh giá khóa học:</label><br>
-            <div id="starRating" style="font-size:2rem;">
+            <div id="starRatingModal" style="font-size:2rem;">
               <span class="star" data-value="1">☆</span>
               <span class="star" data-value="2">☆</span>
               <span class="star" data-value="3">☆</span>
               <span class="star" data-value="4">☆</span>
               <span class="star" data-value="5">☆</span>
             </div>
-            <input type="hidden" name="rating" id="ratingInput" value="0">
+            <input type="hidden" name="rating" id="ratingInputModal" value="0">
           </div>
           <div class="mb-3">
-            <label for="reviewText" class="form-label">Nhận xét của bạn (tùy chọn):</label>
-            <textarea class="form-control" id="reviewText" name="review" rows="3" maxlength="500" placeholder="Cảm nghĩ của bạn về khóa học..."></textarea>
+            <label for="reviewTextModal" class="form-label">Nhận xét của bạn (tùy chọn):</label>
+            <textarea class="form-control" id="reviewTextModal" name="review" rows="3" maxlength="500" placeholder="Cảm nghĩ của bạn về khóa học..."></textarea>
           </div>
           <button type="submit" class="btn btn-success w-100">Gửi đánh giá</button>
         </form>
@@ -233,11 +242,42 @@
                 });
             });
         }
+        // Thêm xử lý chọn sao cho modal
+        function setupStarRatingModal() {
+            const stars = document.querySelectorAll('#starRatingModal .star');
+            const ratingInput = document.getElementById('ratingInputModal');
+            if (stars && ratingInput) {
+                stars.forEach(star => {
+                    star.addEventListener('mouseenter', function () {
+                        const val = parseInt(this.getAttribute('data-value'));
+                        stars.forEach((s, idx) => {
+                            s.textContent = idx < val ? '★' : '☆';
+                        });
+                    });
+                    star.addEventListener('mouseleave', function () {
+                        const current = parseInt(ratingInput.value);
+                        stars.forEach((s, idx) => {
+                            s.textContent = idx < current ? '★' : '☆';
+                        });
+                    });
+                    star.addEventListener('click', function () {
+                        const val = parseInt(this.getAttribute('data-value'));
+                        ratingInput.value = val;
+                        stars.forEach((s, idx) => {
+                            s.textContent = idx < val ? '★' : '☆';
+                        });
+                    });
+                });
+            }
+        }
+        setupStarRatingModal();
         // Reset sao khi mở modal lại
         document.getElementById('congratsModal').addEventListener('show.bs.modal', function () {
-            ratingInput.value = 0;
-            stars.forEach(s => s.textContent = '☆');
-            document.getElementById('reviewText').value = '';
+            const ratingInput = document.getElementById('ratingInputModal');
+            const stars = document.querySelectorAll('#starRatingModal .star');
+            if (ratingInput) ratingInput.value = 0;
+            if (stars) stars.forEach(s => s.textContent = '☆');
+            document.getElementById('reviewTextModal').value = '';
         });
         // Lấy course_id từ URL
         function getCourseIdFromUrl() {
@@ -249,7 +289,7 @@
             }
             return '';
         }
-        // Gửi đánh giá về backend
+        // Gửi đánh giá về backend (form ngoài)
         document.getElementById('reviewForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const rating = parseInt(document.getElementById('ratingInput').value);
@@ -267,9 +307,35 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    congratsModal.hide();
-                    loadReviews();
-                    alert('Cảm ơn bạn đã đánh giá!');
+                    // Sau khi đánh giá thành công, reload lại trang để làm mới mọi thứ
+                    location.reload();
+                } else {
+                    alert(data.message || 'Lỗi khi gửi đánh giá.');
+                }
+            } catch (err) {
+                alert('Lỗi kết nối server!');
+            }
+        });
+        // Gửi đánh giá từ modal
+        document.getElementById('reviewFormModal').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const rating = parseInt(document.getElementById('ratingInputModal').value);
+            const comment = document.getElementById('reviewTextModal').value;
+            if (!rating) {
+                alert('Vui lòng chọn số sao!');
+                return;
+            }
+            const courseId = getCourseIdFromUrl();
+            try {
+                const res = await fetch(`/courses/${courseId}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating, comment })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    // Sau khi đánh giá thành công, reload lại trang để làm mới mọi thứ
+                    location.reload();
                 } else {
                     alert(data.message || 'Lỗi khi gửi đánh giá.');
                 }
@@ -285,6 +351,21 @@
             try {
                 const res = await fetch(`/courses/${courseId}/reviews`);
                 const data = await res.json();
+                // Thống kê số lượng đánh giá từng loại sao
+                if (data.reviews) {
+                  const stats = [0,0,0,0,0,0]; // 0 không dùng, 1-5
+                  data.reviews.forEach(r => {
+                    if (r.rating >= 1 && r.rating <= 5) stats[r.rating]++;
+                  });
+                  const total = data.reviews.length;
+                  const statsBar = document.getElementById('review-stats-bar');
+                  let html = '';
+                  for (let i = 5; i >= 1; i--) {
+                    html += `<span class='badge bg-warning text-dark' style='font-size:1rem;'>${i}★: <b>${stats[i]}</b></span>`;
+                  }
+                  statsBar.innerHTML = html;
+                  document.getElementById('review-stats').style.display = total > 0 ? '' : 'none';
+                }
                 if (data.reviews && data.reviews.length > 0) {
                     reviewsList.innerHTML = data.reviews.map(r => `
                         <div class="card mb-2 review-card w-100" style="margin-bottom:16px;">
@@ -302,9 +383,11 @@
                     `).join('');
                 } else {
                     reviewsList.innerHTML = '<div class="text-muted">Chưa có đánh giá nào cho khóa học này.</div>';
+                    document.getElementById('review-stats').style.display = 'none';
                 }
             } catch (err) {
                 reviewsList.innerHTML = '<div class="text-danger">Lỗi khi tải đánh giá.</div>';
+                document.getElementById('review-stats').style.display = 'none';
             }
         }
         loadReviews(); // Luôn gọi khi vào trang
