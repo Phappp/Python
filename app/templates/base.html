@@ -595,10 +595,12 @@
 <body>
   <!-- Widget tìm kiếm nâng cao -->
   <div id="search-widget" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">
+    {% if username %}
     <button id="search-btn" title="Tìm kiếm"
       style="background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
       <i class="fa fa-search"></i>
     </button>
+    {% endif %}
     <div id="search-form"
       style="display:none; background: #fff; border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; min-width: 250px;">
       <input type="text" id="search-keyword" placeholder="Nhập từ khóa..." class="form-control mb-2">
