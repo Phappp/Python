@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <h6>{{ exercise.title }}</h6>
                     <div class="mb-3">
-                        <p class="text-muted">{{ exercise.description|nl2br }}</p>
+                        <p class="text-muted">{{ exercise.description|replace('<br>', '\n')|nl2br|safe }}</p>
                     </div>
 
                     <div class="mb-3">
@@ -119,6 +119,10 @@
                                     <div id="testOutput" class="form-control bg-light"
                                         style="height: 80px; overflow-y: auto;">
                                         <small class="text-muted">Kết quả sẽ hiển thị ở đây...</small>
+                                    </div>
+                                    <div class="mt-2">
+                                        <input id="expectedOutput" class="form-control form-control-sm"
+                                            placeholder="Expected Output (tuỳ chọn để so sánh)">
                                     </div>
                                 </div>
                             </div>
@@ -261,26 +265,36 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    let output = '';
+                    let actualOutput = (data.output || '').trim();
+                    if (data.output !== undefined) {
+                        output += `<strong>Output:</strong>\n${actualOutput || '(output rỗng)'}`;
+                    }
                     if (data.error) {
-                        testOutput.innerHTML = `<span class="test-error">Lỗi: ${data.error}</span>`;
-                        testStatus.innerHTML = '<span class="test-error">❌ Test thất bại</span>';
+                        output += `\n\n<strong>Error:</strong>\n${data.error}`;
+                    }
+                    if (data.execution_time) {
+                        output += `\n\n<strong>Thời gian chạy:</strong> ${data.execution_time}s`;
+                    }
+                    if (data.memory_used) {
+                        output += `\n<strong>Bộ nhớ sử dụng:</strong> ${data.memory_used}MB`;
+                    }
+                    testOutput.innerHTML = output.replace(/\n/g, '<br>');
+                    // So sánh với expected output nếu có
+                    const expected = document.getElementById('expectedOutput').value.trim();
+                    if (expected) {
+                        if (expected === actualOutput) {
+                            testStatus.innerHTML = '<span class="test-success">✅ Output khớp với Expected Output</span>';
+                        } else {
+                            testStatus.innerHTML = '<span class="test-error">❌ Output không khớp!<br>Expected: <code>' + expected + '</code></span>';
+                        }
                     } else {
-                        let output = '';
-                        if (data.output) {
-                            output += `<strong>Output:</strong>\n${data.output}`;
+                        // Nếu không nhập expected, chỉ báo thành công nếu không có lỗi
+                        if (!data.error) {
+                            testStatus.innerHTML = '<span class="test-success">✅ Test code chạy xong</span>';
+                        } else {
+                            testStatus.innerHTML = '<span class="test-error">❌ Test thất bại</span>';
                         }
-                        if (data.error) {
-                            output += `\n\n<strong>Error:</strong>\n${data.error}`;
-                        }
-                        if (data.execution_time) {
-                            output += `\n\n<strong>Thời gian chạy:</strong> ${data.execution_time}s`;
-                        }
-                        if (data.memory_used) {
-                            output += `\n<strong>Bộ nhớ sử dụng:</strong> ${data.memory_used}MB`;
-                        }
-
-                        testOutput.innerHTML = output.replace(/\n/g, '<br>');
-                        testStatus.innerHTML = '<span class="test-success">✅ Test thành công</span>';
                     }
                 })
                 .catch(error => {
@@ -306,8 +320,8 @@ def main():
     n = int(input())
     arr = list(map(int, input().split()))
     
-    # Xử lý logic
-    result = sum(arr)
+    # Xử lý logic: chỉ tính tổng các số dương
+    result = sum(x for x in arr if x > 0)
     
     # In kết quả
     print(result)
