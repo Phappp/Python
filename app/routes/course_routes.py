@@ -41,8 +41,12 @@ def create_course():
 @login_required
 @role_required('lecture')
 def manage_courses():
-    # Hiển thị tất cả các khóa học cho lecture (bao gồm cả admin tạo và mình tạo)
-    courses = list(Course.get_all())
+    username = session.get('username')
+    if not username:
+        flash('Phiên làm việc không hợp lệ!', 'danger')
+        return redirect(url_for('auth.login'))
+    # Chỉ hiển thị các khóa học do giảng viên này tạo
+    courses = list(Course.find_by_creator(username))
     return render_template('courses/manage_courses.html', courses=courses, title="Quản lý khóa học")
 
 @course_bp.route('/<course_id>/edit', methods=['GET', 'POST'])
