@@ -79,8 +79,8 @@ class SecuritySettingsForm(FlaskForm):
     submit = SubmitField('Cập nhật cài đặt bảo mật')
 
 class CourseForm(FlaskForm):
-    name = StringField('Tên khóa học', validators=[DataRequired(), Length(min=5, max=100)])
-    description = StringField('Mô tả', validators=[DataRequired(), Length(min=10, max=200)])
+    name = StringField('Tên khóa học', validators=[DataRequired()])
+    description = StringField('Mô tả', validators=[DataRequired()])
     original_price = StringField('Giá gốc (ví dụ: 2.500.000)', validators=[DataRequired()])
     discounted_price = StringField('Giá khuyến mãi (ví dụ: 1.299.000)', validators=[DataRequired()])
     color = SelectField('Màu nền', 
