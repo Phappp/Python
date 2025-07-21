@@ -49,6 +49,10 @@
                                 </div>
                                 {% endif %}
                                 <small class="form-text text-muted">Mô tả chi tiết yêu cầu, ràng buộc và ví dụ</small>
+                                {% if form.description.data %}
+                                <div class="mt-2 p-2 bg-light border rounded"><strong>Xem trước mô tả:</strong><br>{{
+                                    form.description.data|safe|nl2br }}</div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -210,6 +214,8 @@
 <style>
     .sticky-top {
         z-index: 1020;
+        top: 80px !important;
+        /* Đảm bảo panel không bị chạm header cố định */
     }
 
     pre code {
