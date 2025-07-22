@@ -594,63 +594,100 @@
 
 <body>
   <!-- Widget tìm kiếm nâng cao -->
-  <div id="search-widget" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">
-    <button id="search-btn" title="Tìm kiếm"
-      style="background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+  {% if username %}
+  <div id="search-widget"
+    style="position: fixed; border-radius: 50% !important; bottom: 110px; right: 30px; z-index: 2001;">
+    <button id="search-btn" title="Tìm kiếm" class="btn btn-main"
+      style="border-radius: 50%; width: 48px; height: 48px; box-shadow: 0 4px 16px rgba(102,126,234,0.13); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
       <i class="fa fa-search"></i>
     </button>
-    <div id="search-form"
-      style="display:none; background: #fff; border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; min-width: 250px;">
-      <input type="text" id="search-keyword" placeholder="Nhập từ khóa..." class="form-control mb-2">
-      <select id="search-type" class="form-select mb-2">
+  </div>
+  <!-- Modal tìm kiếm hiện đại -->
+  <div id="search-modal"
+    style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3000; background: rgba(30,30,40,0.25); backdrop-filter: blur(2px); align-items: center; justify-content: center;">
+    <div
+      style="background: rgba(255,255,255,0.97); border-radius: 22px; box-shadow: 0 12px 48px rgba(102,126,234,0.18); border: 2px solid rgba(255,192,203,0.2); min-width: 340px; max-width: 95vw; width: 400px; padding: 32px 28px 18px 28px; position: relative;">
+      <button id="close-search-modal"
+        style="position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer;"><i
+          class="fas fa-times"></i></button>
+      <h5 style="font-weight: 700; color: #4facfe; text-align: center; margin-bottom: 18px;">Tìm kiếm nâng cao</h5>
+      <input type="text" id="search-keyword" placeholder="Nhập từ khóa..." class="form-control login-style mb-2"
+        style="border-radius: 12px;">
+      <select id="search-type" class="form-select mb-2 login-style" style="border-radius: 12px;">
         <option value="">Tất cả</option>
         <option value="lecture">Bài giảng</option>
         <option value="exercise">Bài tập</option>
         <option value="user">Người dùng</option>
       </select>
-      <input type="text" id="search-creator" placeholder="Người tạo (tùy chọn)" class="form-control mb-2">
-      <input type="text" id="search-difficulty" placeholder="Độ khó/Cấp độ (tùy chọn)" class="form-control mb-2">
-      <button id="do-search" class="btn btn-primary w-100">Tìm kiếm</button>
+      <input type="text" id="search-creator" placeholder="Người tạo (tùy chọn)" class="form-control login-style mb-2"
+        style="border-radius: 12px;">
+      <input type="text" id="search-difficulty" placeholder="Độ khó/Cấp độ (tùy chọn)"
+        class="form-control login-style mb-2" style="border-radius: 12px;">
+      <button id="do-search" class="btn btn-main w-100" style="border-radius: 12px;">Tìm kiếm</button>
+      <div id="search-results"
+        style="margin-top: 18px; max-height: 260px; overflow-y: auto; border-radius: 12px; background: rgba(255,255,255,0.93); box-shadow: 0 2px 8px rgba(102,126,234,0.08); display: none; border: 1px solid #eee;">
+      </div>
     </div>
   </div>
   <div id="search-results"
-    style="position: fixed; top: 80px; right: 20px; z-index: 2000; background: #fff; max-height: 400px; overflow-y: auto; min-width: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none;">
+    style="position: fixed; bottom: 170px; right: 30px; z-index: 2000; background: rgba(255,255,255,0.95); max-height: 400px; overflow-y: auto; min-width: 320px; border-radius: 18px; box-shadow: 0 8px 32px rgba(102,126,234,0.13); display: none; border: 2px solid rgba(255,192,203,0.2); backdrop-filter: blur(12px);">
   </div>
+  {% endif %}
   <script>
-    document.getElementById('search-btn').onclick = function () {
-      const form = document.getElementById('search-form');
-      form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none';
-    };
-    document.getElementById('do-search').onclick = function () {
-      const q = document.getElementById('search-keyword').value;
-      const type = document.getElementById('search-type').value;
-      const created_by = document.getElementById('search-creator').value;
-      const difficulty = document.getElementById('search-difficulty').value;
-      let url = `/search?q=${encodeURIComponent(q)}&type=${type}`;
-      if (created_by) url += `&created_by=${encodeURIComponent(created_by)}`;
-      if (difficulty) url += `&difficulty=${encodeURIComponent(difficulty)}`;
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          let html = '';
-          if (data.length === 0) html = '<div class="p-2">Không tìm thấy kết quả.</div>';
-          else data.forEach(item => {
-            if (item.type === 'lecture') html += `<a href='/courses/${item.id}/view' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài giảng:</b> ${item.name} <br><small>${item.description || ''}</small></div></a>`;
-            else if (item.type === 'exercise') html += `<a href='/programming-exercises/${item.id}/preview' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài tập:</b> ${item.title} <br><small>${item.description || ''}</small></div></a>`;
-            else if (item.type === 'user') html += `<a href='/auth/profile?username=${encodeURIComponent(item.username)}' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Người dùng:</b> ${item.username} (${item.full_name || ''}) <br><small>Vai trò: ${item.role || ''}</small></div></a>`;
-          });
-          const resultDiv = document.getElementById('search-results');
-          resultDiv.innerHTML = html;
-          resultDiv.style.display = 'block';
+    document.addEventListener('DOMContentLoaded', function () {
+      // Modal tìm kiếm hiện đại
+      const searchBtn = document.getElementById('search-btn');
+      const searchModal = document.getElementById('search-modal');
+      const closeSearchModal = document.getElementById('close-search-modal');
+      const searchKeyword = document.getElementById('search-keyword');
+      const searchResults = document.getElementById('search-results');
+      if (searchBtn && searchModal && closeSearchModal && searchKeyword && searchResults) {
+        searchBtn.onclick = function (e) {
+          e.stopPropagation();
+          searchModal.style.display = 'flex';
+          setTimeout(() => { searchKeyword.focus(); }, 100);
+        };
+        closeSearchModal.onclick = function () {
+          searchModal.style.display = 'none';
+          searchResults.style.display = 'none';
+        };
+        // Đóng modal khi click ra ngoài vùng form
+        searchModal.onclick = function (e) {
+          if (e.target === searchModal) {
+            searchModal.style.display = 'none';
+            searchResults.style.display = 'none';
+          }
+        };
+        // Xử lý tìm kiếm
+        document.getElementById('do-search').onclick = function () {
+          const q = document.getElementById('search-keyword').value;
+          const type = document.getElementById('search-type').value;
+          const created_by = document.getElementById('search-creator').value;
+          const difficulty = document.getElementById('search-difficulty').value;
+          let url = `/search?q=${encodeURIComponent(q)}&type=${type}`;
+          if (created_by) url += `&created_by=${encodeURIComponent(created_by)}`;
+          if (difficulty) url += `&difficulty=${encodeURIComponent(difficulty)}`;
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              let html = '';
+              if (data.length === 0) html = '<div class="p-2">Không tìm thấy kết quả.</div>';
+              else data.forEach(item => {
+                if (item.type === 'lecture') html += `<a href='/courses/${item.id}/view' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài giảng:</b> ${item.name} <br><small>${item.description || ''}</small></div></a>`;
+                else if (item.type === 'exercise') html += `<a href='/programming-exercises/${item.id}/preview' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Bài tập:</b> ${item.title} <br><small>${item.description || ''}</small></div></a>`;
+                else if (item.type === 'user') html += `<a href='/auth/profile?username=${encodeURIComponent(item.username)}' class='text-decoration-none text-dark'><div class='p-2 border-bottom search-result-item' style='cursor:pointer'><b>Người dùng:</b> ${item.username} (${item.full_name || ''}) <br><small>Vai trò: ${item.role || ''}</small></div></a>`;
+              });
+              searchResults.innerHTML = html;
+              searchResults.style.display = 'block';
+            });
+        };
+        // Đóng modal bằng phím ESC
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && searchModal.style.display === 'flex') {
+            searchModal.style.display = 'none';
+            searchResults.style.display = 'none';
+          }
         });
-    };
-    // Ẩn kết quả khi click ra ngoài
-    document.addEventListener('click', function (e) {
-      const widget = document.getElementById('search-widget');
-      const results = document.getElementById('search-results');
-      if (!widget.contains(e.target)) {
-        document.getElementById('search-form').style.display = 'none';
-        results.style.display = 'none';
       }
     });
   </script>
@@ -719,24 +756,25 @@
                 <i class="fas fa-list me-1"></i>Quản lý bài tập
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('programming_exercise.manage_exercises') }}">
-                <i class="fas fa-code me-1"></i>Bài tập lập trình
-              </a>
-            </li>
+
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('document.manage_documents') }}">
                 <i class="fas fa-file-alt me-1"></i>Quản lý tài liệu
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="{{ url_for('course.create_course') }}">
                 <i class="fas fa-plus me-1"></i>Tạo khóa học
               </a>
-            </li>
+            </li> -->
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('quiz_page.list_quiz_page') }}">
                 <i class="fas fa-question-circle me-1"></i>Quản lý Quiz
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('programming_exercise.manage_exercises') }}">
+                <i class="fas fa-code me-1"></i>Bài tập lập trình
               </a>
             </li>
             <!-- Button quyền riêng cho lecture và student -->
@@ -984,10 +1022,10 @@
 
       function renderNotification(n) {
         return `<li class="px-3 py-2 border-bottom notification-item ${n.is_read ? 'text-muted' : ''}"
-          data-id="${n._id}" style="cursor:pointer;${n.is_read ? 'opacity:0.5;' : ''}">
-          <div style="font-size: 1rem;">${n.message}</div>
-          <div class="text-muted" style="font-size:0.85em">${n.created_at || ''}</div>
-        </li>`;
+        data-id="${n._id}" style="cursor:pointer;${n.is_read ? 'opacity:0.5;' : ''}">
+        <div style="font-size: 1rem;">${n.message}</div>
+        <div class="text-muted" style="font-size:0.85em">${n.created_at || ''}</div>
+      </li>`;
       }
 
       async function loadNotifications() {

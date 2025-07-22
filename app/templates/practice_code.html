@@ -1,9 +1,114 @@
 {% extends 'base.html' %}
 {% block title %}Thực Hành Code{% endblock %}
 {% block content %}
+<style>
+    .practice-code-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
+        /* border: 2.5px solid; */
+        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
+        margin-top: 32px;
+        padding: 0;
+        transition: box-shadow 0.2s;
+    }
+
+    .practice-code-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: #fff;
+        border-radius: 22px 22px 0 0;
+        padding: 24px 32px 16px 32px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .practice-code-header i {
+        font-size: 2rem;
+        color: #fff;
+    }
+
+    .practice-code-header h3 {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4facfe;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.97);
+        border: 2px solid #e3f2fd;
+        font-size: 1.1rem;
+        padding: 12px 16px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 2px #b3e5fc;
+        background: #fff;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: #fff !important;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        padding: 12px 28px;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
+        transition: all 0.2s;
+        margin-right: 8px;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: #fff !important;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 14px !important;
+        font-weight: 500;
+    }
+
+    #output,
+    #error {
+        border-radius: 14px;
+        background: #f8fafd;
+        font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+        font-size: 1rem;
+        padding: 12px 16px;
+        min-height: 60px;
+        box-shadow: 0 2px 8px rgba(80, 120, 220, 0.07);
+    }
+
+    #output {
+        color: #222;
+        min-height: 200px;
+    }
+
+    #error {
+        color: #dc3545;
+        min-height: 100px;
+    }
+</style>
 <div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-dark text-white">
+    <div class="practice-code-card shadow-lg">
+        <div class="practice-code-header">
+            <i class="fas fa-terminal"></i>
             <h3 class="mb-0">Thực Hành Code</h3>
         </div>
         <div class="card-body">
@@ -21,21 +126,19 @@
                         <textarea class="form-control" id="code" rows="15"
                             placeholder="Nhập code của bạn ở đây...">print("Hello, World!")</textarea>
                     </div>
-                    <button class="btn btn-primary" onclick="runCode()">Chạy Code</button>
-                    <button class="btn btn-secondary" onclick="clearCode()">Xóa Code</button>
+                    <button class="btn btn-gradient" onclick="runCode()"><i class="fas fa-play me-1"></i>Chạy
+                        Code</button>
+                    <button class="btn btn-outline-secondary" onclick="clearCode()"><i
+                            class="fas fa-eraser me-1"></i>Xóa Code</button>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Kết quả</label>
-                        <div id="output" class="form-control"
-                            style="height: 200px; overflow-y: auto; background-color: #f8f9fa; font-family: monospace;">
-                        </div>
+                        <div id="output" class="form-control" style="height: 200px; overflow-y: auto;"></div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Lỗi (nếu có)</label>
-                        <div id="error" class="form-control"
-                            style="height: 100px; overflow-y: auto; background-color: #f8f9fa; font-family: monospace; color: #dc3545;">
-                        </div>
+                        <div id="error" class="form-control" style="height: 100px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>

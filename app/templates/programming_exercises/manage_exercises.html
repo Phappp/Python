@@ -1,21 +1,122 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .manage-ex-title {
+        font-weight: 700;
+        font-size: 2.2rem;
+        color: #4facfe;
+        text-align: left;
+        margin-bottom: 0;
+        margin-top: 12px;
+    }
+
+    .manage-ex-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
+        /* border: 2.5px solid; */
+        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
+        padding: 32px 24px 24px 24px;
+        margin-bottom: 32px;
+    }
+
+    .table-ex {
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(80, 120, 220, 0.07);
+    }
+
+    .table-ex th {
+        background: linear-gradient(90deg, #e3f2fd 60%, #f8fafc 100%);
+        color: #1976d2;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: none;
+        text-align: center;
+    }
+
+    .table-ex td {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .table-ex tr {
+        transition: background 0.15s;
+    }
+
+    .table-ex tbody tr:hover {
+        background: #f0f7ff;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: #fff !important;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        padding: 8px 20px;
+        font-size: 1rem;
+        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
+        transition: all 0.2s;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: #fff !important;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
+    }
+
+    .btn-link,
+    .btn-warning,
+    .btn-info,
+    .btn-danger,
+    .btn-outline-info,
+    .btn-outline-warning,
+    .btn-outline-secondary,
+    .btn-outline-danger {
+        border-radius: 14px !important;
+        font-weight: 500;
+    }
+
+    .btn-add-ex {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: #fff !important;
+        border: none;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 12px 32px;
+        box-shadow: 0 4px 16px rgba(80, 120, 220, 0.13);
+        transition: all 0.2s;
+    }
+
+    .btn-add-ex:hover {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: #fff !important;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(39, 174, 96, 0.13);
+    }
+</style>
 <div class="container mt-4">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="mb-1">{{ title }}</h1>
+            <h1 class="manage-ex-title">{{ title }}</h1>
             <p class="text-muted mb-0">Quản lý và tạo bài tập lập trình cho sinh viên</p>
         </div>
-        <a href="{{ url_for('programming_exercise.create_exercise') }}" class="btn btn-primary">
+        <a href="{{ url_for('programming_exercise.create_exercise') }}" class="btn btn-add-ex">
             <i class="fas fa-plus-circle"></i> Tạo bài tập mới
         </a>
     </div>
-
     <!-- Filter Form -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    <div class="manage-ex-card mb-4">
+        <div class="card-body p-0">
             <form method="GET" class="row g-3">
                 <div class="col-md-3">
                     {{ form.language.label(class="form-label") }}
@@ -30,14 +131,13 @@
                     {{ form.search(class="form-control", placeholder="Tìm kiếm theo tên...") }}
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-outline-primary w-100">
+                    <button type="submit" class="btn btn-gradient w-100">
                         <i class="fas fa-search"></i> Lọc
                     </button>
                 </div>
             </form>
         </div>
     </div>
-
     <!-- Statistics -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -93,16 +193,15 @@
             </div>
         </div>
     </div>
-
     <!-- Exercises List -->
-    <div class="card shadow-sm">
+    <div class="manage-ex-card">
         <div class="card-header">
             <h5 class="mb-0">Danh sách bài tập</h5>
         </div>
         <div class="card-body">
             {% if exercises %}
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover table-ex">
                     <thead class="table-light">
                         <tr>
                             <th>Tiêu đề</th>
@@ -142,17 +241,17 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <a href="{{ url_for('programming_exercise.view_submissions', exercise_id=exercise._id) }}"
-                                        class="btn btn-sm btn-outline-info" title="Xem bài nộp">
+                                        class="btn btn-sm btn-outline-info btn-gradient" title="Xem bài nộp">
                                         <i class="fas fa-list"></i>
                                     </a>
                                     <a href="{{ url_for('programming_exercise.edit_exercise', exercise_id=exercise._id) }}"
-                                        class="btn btn-sm btn-outline-warning" title="Sửa">
+                                        class="btn btn-sm btn-outline-warning btn-gradient" title="Sửa">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form method="POST"
                                         action="{{ url_for('programming_exercise.toggle_visibility', exercise_id=exercise._id) }}"
                                         class="d-inline">
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary btn-gradient"
                                             title="Bật/tắt hiển thị">
                                             {% if exercise.is_visible %}
                                             <i class="fas fa-eye-slash"></i>
@@ -165,7 +264,8 @@
                                         action="{{ url_for('programming_exercise.delete_exercise', exercise_id=exercise._id) }}"
                                         class="d-inline"
                                         onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài tập này?');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-gradient"
+                                            title="Xóa">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -181,7 +281,7 @@
                 <i class="fas fa-code fa-3x text-muted mb-3"></i>
                 <h4 class="text-muted">Chưa có bài tập nào</h4>
                 <p class="text-muted">Bắt đầu tạo bài tập lập trình đầu tiên của bạn!</p>
-                <a href="{{ url_for('programming_exercise.create_exercise') }}" class="btn btn-primary">
+                <a href="{{ url_for('programming_exercise.create_exercise') }}" class="btn btn-add-ex">
                     <i class="fas fa-plus-circle"></i> Tạo bài tập đầu tiên
                 </a>
             </div>
@@ -189,28 +289,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .btn-group .btn {
-        margin-right: 2px;
-    }
-
-    .table th {
-        border-top: none;
-        font-weight: 600;
-    }
-
-    .badge {
-        font-size: 0.75rem;
-    }
-</style>
 {% endblock %}
