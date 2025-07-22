@@ -1,91 +1,164 @@
 {% extends "base.html" %} {% block content %}
+<style>
+  .manage-chapters-title {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #4facfe;
+    text-align: center;
+    margin-bottom: 18px;
+    margin-top: 12px;
+  }
+
+  .manage-chapters-card,
+  .add-chapter-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* border: 2.5px solid; */
+    border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
+    margin-bottom: 32px;
+    transition: box-shadow 0.2s;
+  }
+
+  .add-chapter-header,
+  .manage-chapters-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: #fff;
+    border-radius: 22px 22px 0 0;
+    padding: 18px 32px 12px 32px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #4facfe;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control {
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.97);
+    border: 2px solid #e3f2fd;
+    font-size: 1.1rem;
+    padding: 12px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-control:focus {
+    border-color: #4facfe;
+    box-shadow: 0 0 0 2px #b3e5fc;
+    background: #fff;
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: #fff !important;
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
+    transition: all 0.2s;
+  }
+
+  .btn-gradient:hover {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff !important;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
+  }
+
+  .list-group-item {
+    border-radius: 16px !important;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(80, 120, 220, 0.07);
+    border: 1.5px solid #e3f2fd;
+    transition: background 0.15s, box-shadow 0.2s;
+  }
+
+  .list-group-item:hover {
+    background: #f0f7ff;
+    box-shadow: 0 4px 16px rgba(80, 120, 220, 0.13);
+  }
+
+  .btn-outline-warning,
+  .btn-outline-danger {
+    border-radius: 12px !important;
+    font-weight: 500;
+    padding: 6px 16px;
+  }
+</style>
 <div class="container mt-4">
-  <a
-    href="{{ url_for('course.manage_courses') }}"
-    class="btn btn-sm btn-outline-secondary mb-3"
-  >
+  <a href="{{ url_for('course.manage_courses') }}" class="btn btn-sm btn-outline-secondary mb-3"
+    style="border-radius: 14px;">
     <i class="fas fa-arrow-left"></i> Quay lại danh sách khóa học
   </a>
-
-  <h1 class="mb-2">Quản lý chương cho khóa học: "{{ course.name }}"</h1>
+  <h1 class="manage-chapters-title">Quản lý chương cho khóa học: "{{ course.name }}"</h1>
   <p class="text-muted mb-4">
     Tại đây bạn có thể thêm, sửa, hoặc xóa các chương.
   </p>
-
   <div class="row">
     <!-- Form thêm chương mới -->
     <div class="col-lg-4">
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Thêm chương mới</h5>
+      <div class="add-chapter-card shadow-sm mb-4">
+        <div class="add-chapter-header">
+          <i class="fas fa-plus-circle me-2"></i>Thêm chương mới
         </div>
         <div class="card-body">
-          <form
-            method="POST"
-            action="{{ url_for('course.manage_chapters', course_id=course._id) }}"
-            novalidate
-          >
+          <form method="POST" action="{{ url_for('course.manage_chapters', course_id=course._id) }}" novalidate>
             {{ form.hidden_tag() }}
-
             <div class="mb-3">
-              {{ form.title.label(class="form-label fw-bold") }} {{
-              form.title(class="form-control" + (" is-invalid" if
-              form.title.errors else "")) }} {% if form.title.errors %}
+              {{ form.title.label(class="form-label fw-bold") }}
+              {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+              {% if form.title.errors %}
               <div class="invalid-feedback">
                 {% for e in form.title.errors %}<span>{{ e }}</span>{% endfor %}
               </div>
               {% endif %}
             </div>
-
             <div class="mb-3">
-              {{ form.video_url.label(class="form-label fw-bold") }} {{
-              form.video_url(class="form-control" + (" is-invalid" if
-              form.video_url.errors else "")) }} {% if form.video_url.errors %}
+              {{ form.video_url.label(class="form-label fw-bold") }}
+              {{ form.video_url(class="form-control" + (" is-invalid" if form.video_url.errors else "")) }}
+              {% if form.video_url.errors %}
               <div class="invalid-feedback">
-                {% for e in form.video_url.errors %}<span>{{ e }}</span>{%
-                endfor %}
+                {% for e in form.video_url.errors %}<span>{{ e }}</span>{% endfor %}
               </div>
               {% endif %}
             </div>
-
-            <div class="d-grid">{{ form.submit(class="btn btn-primary") }}</div>
+            <div class="d-grid">{{ form.submit(class="btn btn-gradient btn-lg") }}</div>
           </form>
         </div>
       </div>
     </div>
-
     <!-- Danh sách các chương đã có -->
     <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-header">
-          <h5 class="mb-0">Danh sách chương ({{ chapters|length }})</h5>
+      <div class="manage-chapters-card shadow-sm">
+        <div class="manage-chapters-header">
+          <i class="fas fa-list-ul me-2"></i>Danh sách chương ({{ chapters|length }})
         </div>
         <div class="card-body">
           {% if chapters %}
           <ul class="list-group list-group-flush">
             {% for chapter in chapters %}
-            <li
-              class="list-group-item d-flex justify-content-between align-items-center"
-            >
+            <li class="list-group-item d-flex justify-content-between align-items-center">
               <div>
                 <h6 class="mb-0">{{ loop.index }}. {{ chapter.title }}</h6>
                 <small class="text-muted">{{ chapter.video_url }}</small>
               </div>
               <div>
                 <!-- Nút sửa chương -->
-                <a
-                  href="{{ url_for('course.edit_chapter', course_id=course._id, chapter_id=chapter._id) }}"
-                  class="btn btn-sm btn-outline-warning me-1"
-                >
+                <a href="{{ url_for('course.edit_chapter', course_id=course._id, chapter_id=chapter._id) }}"
+                  class="btn btn-sm btn-outline-warning me-1">
                   <i class="fas fa-edit"></i> Sửa
                 </a>
                 <!-- Nút xóa chương -->
-                <form
-                  action="{{ url_for('course.delete_chapter', course_id=course._id, chapter_id=chapter._id) }}"
-                  method="POST"
-                  class="d-inline"
-                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa chương này không?');"
-                >
+                <form action="{{ url_for('course.delete_chapter', course_id=course._id, chapter_id=chapter._id) }}"
+                  method="POST" class="d-inline"
+                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa chương này không?');">
                   <button type="submit" class="btn btn-sm btn-outline-danger">
                     <i class="fas fa-trash-alt"></i> Xóa
                   </button>
