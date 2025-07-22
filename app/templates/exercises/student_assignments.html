@@ -1,137 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
-<style>
-    .student-assignments-title {
-        font-weight: 700;
-        font-size: 2rem;
-        color: #4facfe;
-        text-align: center;
-        margin-bottom: 32px;
-        margin-top: 12px;
-    }
-
-    .student-assignments-card {
-        background: rgba(255, 255, 255, 0.88);
-        backdrop-filter: blur(10px);
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
-        /* border: 2.5px solid; */
-        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
-        padding: 32px 24px 24px 24px;
-        margin-bottom: 32px;
-    }
-
-    .table-assignments {
-        background: rgba(255, 255, 255, 0.97);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(80, 120, 220, 0.07);
-    }
-
-    .table-assignments th {
-        background: linear-gradient(90deg, #e3f2fd 60%, #f8fafc 100%);
-        color: #1976d2;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: none;
-        text-align: center;
-    }
-
-    .table-assignments td {
-        vertical-align: middle;
-        text-align: center;
-        border: none;
-        font-size: 1rem;
-    }
-
-    .table-assignments tr {
-        transition: background 0.15s;
-    }
-
-    .table-assignments tbody tr:hover {
-        background: #f0f7ff;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: #fff !important;
-        border: none;
-        border-radius: 14px;
-        font-weight: 600;
-        padding: 8px 20px;
-        font-size: 1rem;
-        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
-        transition: all 0.2s;
-    }
-
-    .btn-gradient:hover {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #fff !important;
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
-    }
-
-    .btn-link {
-        border-radius: 14px !important;
-        font-weight: 500;
-    }
-</style>
 <div class="container mt-4">
-    <div class="student-assignments-card">
-        <a href="{{ url_for('exercise.student_assignments') }}" class="btn btn-link mb-2"><i
-                class="fas fa-arrow-left"></i> Quay lại</a>
-        <h2 class="student-assignments-title">Bài tập đã được giao{% if course %} - {{ course.name }}{% endif %}</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered table-assignments">
-                <thead>
-                    <tr>
-                        <th>Tiêu đề</th>
-                        <th>Đề bài</th>
-                        <th>Hạn nộp</th>
-                        <th>Bài làm của bạn</th>
-                        <th>Điểm</th>
-                        <th>Nộp bài</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ex in exercises %}
-                    {% set expired = ex.due_date and ex.due_date < now %} <tr>
-                        <td>{{ ex.title }}</td>
-                        <td>
-                            <a href="/{{ ex.filepath }}" target="_blank">{{ ex.filename }}</a>
-                        </td>
-                        <td>{{ ex.due_date | datetimeformat }}</td>
-                        <td>
-                            {% if submissions[ex._id|string] %}
-                            <a href="/{{ submissions[ex._id|string].filepath }}" target="_blank">{{
-                                submissions[ex._id|string].filename }}</a>
-                            {% else %}-{% endif %}
-                        </td>
-                        <td>
-                            {% if submissions[ex._id|string] and submissions[ex._id|string].score is not none %}
-                            {{ submissions[ex._id|string].score }}
-                            {% else %}-{% endif %}
-                        </td>
-                        <td>
-                            {% if not submissions[ex._id|string] %}
-                            {% if expired %}
-                            <span class="text-danger">Đã hết hạn nộp</span>
-                            {% else %}
-                            <form method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="exercise_id" value="{{ ex._id }}">
-                                <input type="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx" required
-                                    style="border-radius: 10px; border: 1.5px solid #e3f2fd; padding: 4px 8px;">
-                                <button type="submit" class="btn btn-gradient btn-sm mt-2"><i
-                                        class="fas fa-upload me-1"></i>Nộp bài</button>
-                            </form>
-                            {% endif %}
-                            {% else %}Đã nộp{% endif %}
-                        </td>
-                        </tr>
-                        {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <a href="{{ url_for('exercise.student_assignments') }}" class="btn btn-link mb-2"><i class="fas fa-arrow-left"></i>
+        Quay lại</a>
+    <h2>Bài tập đã được giao{% if course %} - {{ course.name }}{% endif %}</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Đề bài</th>
+                <th>Hạn nộp</th>
+                <th>Bài làm của bạn</th>
+                <th>Điểm</th>
+                <th>Nộp bài</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ex in exercises %}
+            {% set expired = ex.due_date and ex.due_date < now %} <tr>
+                <td>{{ ex.title }}</td>
+                <td>
+                    <a href="/{{ ex.filepath }}" target="_blank">{{ ex.filename }}</a>
+                </td>
+                <td>{{ ex.due_date | datetimeformat }}</td>
+                <td>
+                    {% if submissions[ex._id|string] %}
+                    <a href="/{{ submissions[ex._id|string].filepath }}" target="_blank">{{
+                        submissions[ex._id|string].filename }}</a>
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if submissions[ex._id|string] and submissions[ex._id|string].score is not none %}
+                    {{ submissions[ex._id|string].score }}
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if not submissions[ex._id|string] %}
+                    {% if expired %}
+                    <span class="text-danger">Đã hết hạn nộp</span>
+                    {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="exercise_id" value="{{ ex._id }}">
+                        <input type="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Nộp bài</button>
+                    </form>
+                    {% endif %}
+                    {% else %}Đã nộp{% endif %}
+                </td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

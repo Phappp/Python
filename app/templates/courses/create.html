@@ -1,95 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .create-course-card {
-        background: rgba(255, 255, 255, 0.88);
-        backdrop-filter: blur(10px);
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
-        /* border: 2.5px solid; */
-        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
-        margin-top: 32px;
-        padding: 0;
-        transition: box-shadow 0.2s;
-    }
-
-    .create-course-header {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: #fff;
-        border-radius: 22px 22px 0 0;
-        padding: 24px 32px 16px 32px;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        justify-content: center;
-    }
-
-    .create-course-header i {
-        font-size: 2rem;
-        color: #fff;
-    }
-
-    .create-course-header h3 {
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 0;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: #4facfe;
-        letter-spacing: 0.5px;
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 14px !important;
-        background: rgba(255, 255, 255, 0.97);
-        border: 2px solid #e3f2fd;
-        font-size: 1.1rem;
-        padding: 12px 16px;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #4facfe;
-        box-shadow: 0 0 0 2px #b3e5fc;
-        background: #fff;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: #fff !important;
-        border: none;
-        border-radius: 14px;
-        font-weight: 600;
-        padding: 14px 0;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
-        transition: all 0.2s;
-    }
-
-    .btn-gradient:hover {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #fff !important;
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
-    }
-</style>
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="create-course-card shadow-sm">
-                <div class="create-course-header">
-                    <i class="fas fa-plus-circle"></i>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">{{ title }}</h3>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body">
                     <form method="POST" action="" novalidate>
                         {{ form.hidden_tag() }}
+
                         <div class="mb-3">
                             {{ form.name.label(class="form-label fw-bold") }}
                             {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
@@ -99,6 +21,7 @@
                             </div>
                             {% endif %}
                         </div>
+
                         <div class="mb-3">
                             {{ form.description.label(class="form-label fw-bold") }}
                             {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else
@@ -109,9 +32,30 @@
                             </div>
                             {% endif %}
                         </div>
-                        {# Ẩn trường giá gốc và giá khuyến mãi, gán mặc định 0 #}
-                        <input type="hidden" name="original_price" value="0">
-                        <input type="hidden" name="discounted_price" value="0">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.original_price.label(class="form-label fw-bold") }}
+                                {{ form.original_price(class="form-control" + (" is-invalid" if
+                                form.original_price.errors else "")) }}
+                                {% if form.original_price.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.original_price.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.discounted_price.label(class="form-label fw-bold") }}
+                                {{ form.discounted_price(class="form-control" + (" is-invalid" if
+                                form.discounted_price.errors else "")) }}
+                                {% if form.discounted_price.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.discounted_price.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             {{ form.color.label(class="form-label fw-bold") }}
                             {{ form.color(class="form-select" + (" is-invalid" if form.color.errors else "")) }}
@@ -121,16 +65,17 @@
                             </div>
                             {% endif %}
                         </div>
+
                         <div class="mb-3">
                             {{ form.course_type.label(class="form-label fw-bold") }}
-                            {{ form.course_type(class="form-select" + (" is-invalid" if form.course_type.errors else
-                            "")) }}
+                            {{ form.course_type(class="form-select" + (" is-invalid" if form.course_type.errors else "")) }}
                             {% if form.course_type.errors %}
                             <div class="invalid-feedback">
                                 {% for error in form.course_type.errors %}<span>{{ error }}</span>{% endfor %}
                             </div>
                             {% endif %}
                         </div>
+
                         <div class="mb-3">
                             {{ form.icon_class.label(class="form-label fw-bold") }}
                             {{ form.icon_class(class="form-control" + (" is-invalid" if form.icon_class.errors else ""))
@@ -141,8 +86,9 @@
                             </div>
                             {% endif %}
                         </div>
+
                         <div class="d-grid gap-2">
-                            {{ form.submit(class="btn btn-gradient btn-lg") }}
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
                         </div>
                     </form>
                 </div>

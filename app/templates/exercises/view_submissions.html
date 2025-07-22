@@ -1,111 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<style>
-    .view-sub-card {
-        background: rgba(255, 255, 255, 0.88);
-        backdrop-filter: blur(10px);
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
-        /* border: 2.5px solid; */
-        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
-        margin-top: 32px;
-        padding: 32px 24px 24px 24px;
-        transition: box-shadow 0.2s;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .table-view-sub th {
-        background: linear-gradient(90deg, #e3f2fd 60%, #f8fafc 100%);
-        color: #1976d2;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: none;
-        text-align: center;
-    }
-
-    .table-view-sub td {
-        vertical-align: middle;
-        text-align: center;
-        border: none;
-        font-size: 1rem;
-    }
-
-    .table-view-sub tr {
-        transition: background 0.15s;
-    }
-
-    .table-view-sub tbody tr:hover {
-        background: #f0f7ff;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: #fff !important;
-        border: none;
-        border-radius: 14px;
-        font-weight: 600;
-        padding: 8px 20px;
-        font-size: 1rem;
-        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
-        transition: all 0.2s;
-    }
-
-    .btn-gradient:hover {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #fff !important;
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
-    }
-
-    .btn-link,
-    .btn-primary {
-        border-radius: 14px !important;
-        font-weight: 500;
-    }
-</style>
 <div class="container mt-4">
-    <a href="{{ url_for('exercise.manage_exercises', course_id=course_id) }}" class="btn btn-link mb-2"
-        style="border-radius: 14px;">
-        <i class="fas fa-arrow-left"></i> Quay lại</a>
-    <div class="view-sub-card">
-        <h2 class="mb-3" style="color:#4facfe;font-weight:700;">Danh sách sinh viên đã nộp bài: {{ exercise.title }}
-        </h2>
-        <p><strong>Hạn nộp:</strong> {{ exercise.due_date | datetimeformat }}</p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-view-sub">
-                <thead>
-                    <tr>
-                        <th>Sinh viên</th>
-                        <th>File nộp</th>
-                        <th>Điểm</th>
-                        <th>Chấm điểm</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sub in submissions %}
-                    <tr>
-                        <td>{{ sub.student_username }}</td>
-                        <td>
-                            <a href="/{{ sub.filepath }}" target="_blank">{{ sub.filename }}</a>
-                        </td>
-                        <td>{% if sub.score is not none %}{{ sub.score }}{% else %}-{% endif %}</td>
-                        <td>
-                            <form method="POST"
-                                action="{{ url_for('exercise.grade_submission', submission_id=sub._id) }}"
-                                class="d-flex align-items-center">
-                                <input type="number" name="score" min="0" max="10" step="0.1"
-                                    class="form-control form-control-sm me-2"
-                                    value="{% if sub.score is not none %}{{ sub.score }}{% endif %}" required>
-                                <button type="submit" class="btn btn-gradient btn-sm">Chấm</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <a href="{{ url_for('exercise.manage_exercises', course_id=course_id) }}" class="btn btn-link mb-2"><i
+            class="fas fa-arrow-left"></i> Quay lại</a>
+    <h2>Danh sách sinh viên đã nộp bài: {{ exercise.title }}</h2>
+    <p><strong>Hạn nộp:</strong> {{ exercise.due_date | datetimeformat }}</p>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sinh viên</th>
+                <th>File nộp</th>
+                <th>Điểm</th>
+                <th>Chấm điểm</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub in submissions %}
+            <tr>
+                <td>{{ sub.student_username }}</td>
+                <td>
+                    <a href="/{{ sub.filepath }}" target="_blank">{{ sub.filename }}</a>
+                </td>
+                <td>{% if sub.score is not none %}{{ sub.score }}{% else %}-{% endif %}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('exercise.grade_submission', submission_id=sub._id) }}"
+                        class="d-flex align-items-center">
+                        <input type="number" name="score" min="0" max="10" step="0.1"
+                            class="form-control form-control-sm me-2"
+                            value="{% if sub.score is not none %}{{ sub.score }}{% endif %}" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Chấm</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

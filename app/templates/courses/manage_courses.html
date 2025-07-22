@@ -1,156 +1,63 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .manage-courses-title {
-        font-weight: 700;
-        font-size: 2.2rem;
-        color: #4facfe;
-        text-align: center;
-        margin-bottom: 32px;
-        margin-top: 12px;
-    }
-
-    .manage-courses-card {
-        background: rgba(255, 255, 255, 0.88);
-        backdrop-filter: blur(10px);
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
-        /* border: 2.5px solid; */
-        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
-        padding: 32px 24px 24px 24px;
-        margin-bottom: 32px;
-    }
-
-    .table-courses {
-        background: rgba(255, 255, 255, 0.97);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(80, 120, 220, 0.07);
-    }
-
-    .table-courses th {
-        background: linear-gradient(90deg, #e3f2fd 60%, #f8fafc 100%);
-        color: #1976d2;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: none;
-        text-align: center;
-    }
-
-    .table-courses td {
-        vertical-align: middle;
-        text-align: center;
-        border: none;
-        font-size: 1rem;
-    }
-
-    .table-courses tr {
-        transition: background 0.15s;
-    }
-
-    .table-courses tbody tr:hover {
-        background: #f0f7ff;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: #fff !important;
-        border: none;
-        border-radius: 14px;
-        font-weight: 600;
-        padding: 8px 20px;
-        font-size: 1rem;
-        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
-        transition: all 0.2s;
-    }
-
-    .btn-gradient:hover {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #fff !important;
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
-    }
-
-    .btn-link,
-    .btn-warning,
-    .btn-info,
-    .btn-danger {
-        border-radius: 14px !important;
-        font-weight: 500;
-    }
-
-    .btn-add-course {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #fff !important;
-        border: none;
-        border-radius: 16px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        padding: 12px 32px;
-        box-shadow: 0 4px 16px rgba(80, 120, 220, 0.13);
-        transition: all 0.2s;
-    }
-
-    .btn-add-course:hover {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: #fff !important;
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 24px rgba(39, 174, 96, 0.13);
-    }
-</style>
 <div class="container mt-4">
-    <h1 class="manage-courses-title">{{ title }}</h1>
-    <div class="manage-courses-card">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle table-courses">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Tên khóa học</th>
-                        <th scope="col">Mô tả</th>
-                        <th scope="col" class="text-center">Số chương</th>
-                        <th scope="col" class="text-end">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if courses %}
-                    {% for course in courses %}
-                    <tr>
-                        <td><strong>{{ course.name }}</strong></td>
-                        <td>{{ course.description|truncate(100) }}</td>
-                        <td class="text-center">{{ course.chapters|length }}</td>
-                        <td class="text-end">
-                            <a href="{{ url_for('course.manage_chapters', course_id=course._id) }}"
-                                class="btn btn-sm btn-info btn-gradient me-1">
-                                <i class="fas fa-list-ul"></i> Quản lý chương
-                            </a>
-                            <a href="{{ url_for('course.edit_course', course_id=course._id) }}"
-                                class="btn btn-sm btn-warning btn-gradient me-1">
-                                <i class="fas fa-edit"></i> Sửa
-                            </a>
-                            {% if course.created_by == session.username %}
-                            <form action="{{ url_for('course.delete_course', course_id=course._id) }}" method="POST"
-                                class="d-inline"
-                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
-                                <button type="submit" class="btn btn-sm btn-danger btn-gradient">
-                                    <i class="fas fa-trash-alt"></i> Xóa
-                                </button>
-                            </form>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="text-center">Bạn chưa tạo khóa học nào.</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+    <h1 class="mb-4">{{ title }}</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Tên khóa học</th>
+                            <th scope="col">Mô tả</th>
+                            <th scope="col" class="text-center">Số chương</th>
+                            <th scope="col" class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if courses %}
+                        {% for course in courses %}
+                        <tr>
+                            <td><strong>{{ course.name }}</strong></td>
+                            <td>{{ course.description|truncate(100) }}</td>
+                            <td class="text-center">{{ course.chapters|length }}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('course.manage_chapters', course_id=course._id) }}"
+                                    class="btn btn-sm btn-info me-1">
+                                    <i class="fas fa-list-ul"></i> Quản lý chương
+                                </a>
+                                <a href="{{ url_for('course.edit_course', course_id=course._id) }}"
+                                    class="btn btn-sm btn-warning me-1">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <!-- Nút xóa khóa học - chỉ hiển thị nếu khóa học do lecture tạo -->
+                                {% if course.created_by == session.username %}
+                                <form action="{{ url_for('course.delete_course', course_id=course._id) }}" method="POST"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Bạn chưa tạo khóa học nào.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="mt-4 text-center">
-        <a href="{{ url_for('course.create_course') }}" class="btn btn-add-course">
+
+    <div class="mt-4">
+        <a href="{{ url_for('course.create_course') }}" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Thêm khóa học mới
         </a>
     </div>

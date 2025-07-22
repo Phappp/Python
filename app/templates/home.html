@@ -755,26 +755,26 @@ body:not(.theme-light):not(.theme-dark) .custom-welcome-banner .btn i {
 
 {% if username and role == 'student' %}
 <div class="vertical-toolbar">
-    <!-- <a class="toolbar-item" tabindex="0" href="{{ url_for('exercise.student_assignments') }}">
+    <a class="toolbar-item" tabindex="0" href="{{ url_for('exercise.student_assignments') }}">
         <i class="fas fa-clipboard-list"></i>
         <span class="toolbar-label">Bài tập</span>
-    </a> -->
-    <!-- <a class="toolbar-item" tabindex="0" href="{{ url_for('programming_exercise.student_exercises') }}">
+    </a>
+    <a class="toolbar-item" tabindex="0" href="{{ url_for('programming_exercise.student_exercises') }}">
         <i class="fas fa-code"></i>
         <span class="toolbar-label">Lập trình</span>
-    </a> -->
-    <!-- <a class="toolbar-item" tabindex="0" href="{{ url_for('document.view_documents') }}">
+    </a>
+    <a class="toolbar-item" tabindex="0" href="{{ url_for('document.view_documents') }}">
         <i class="fas fa-file-alt"></i>
         <span class="toolbar-label">Tài liệu</span>
-    </a> -->
-    <!-- <a class="toolbar-item" tabindex="0" href="{{ url_for('code_practice.practice_code_page') }}">
+    </a>
+    <a class="toolbar-item" tabindex="0" href="{{ url_for('code_practice.practice_code_page') }}">
         <i class="fas fa-terminal"></i>
         <span class="toolbar-label">Coding</span>
-    </a> -->
-    <!-- <a class="toolbar-item" tabindex="0" href="/quiz/list-page">
+    </a>
+    <a class="toolbar-item" tabindex="0" href="/quiz/list-page">
         <i class="fas fa-question-circle"></i>
         <span class="toolbar-label">Quiz</span>
-    </a> -->
+    </a>
     <!-- <div class="toolbar-item" tabindex="0">
         <i class="fas fa-certificate"></i>
         <span class="toolbar-label">Chứng chỉ</span>
@@ -785,8 +785,8 @@ body:not(.theme-light):not(.theme-dark) .custom-welcome-banner .btn i {
 {% if username and role == 'lecture' %}
 <div class="container mt-4">
     <div class="welcome-banner">
-        <!-- <h1>Chào mừng Giảng viên, <b>{{ username }}</b>!</h1>
-        <p class="lead">Bạn có thể quản lý và thêm các khóa học mới tại đây.</p> -->
+        <h1>Chào mừng Giảng viên, <b>{{ username }}</b>!</h1>
+        <p class="lead">Bạn có thể quản lý và thêm các khóa học mới tại đây.</p>
         <div class="d-flex justify-content-center flex-wrap">
             <a href="{{ url_for('course.create_course') }}" class="btn btn-primary btn-lg mt-3">
                 <i class="fas fa-plus-circle"></i> Thêm khóa học mới
@@ -807,8 +807,8 @@ body:not(.theme-light):not(.theme-dark) .custom-welcome-banner .btn i {
 {% if username and role == 'student' %}
 <div class="container mt-4">
     <div class="welcome-banner custom-welcome-banner">
-        <!-- <h1>Chào mừng Sinh viên, <b>{{ username }}</b>!</h1>
-        <p class="lead">Bạn có thể tham gia các khóa học và làm bài tập tại đây.</p> -->
+        <h1>Chào mừng Sinh viên, <b>{{ username }}</b>!</h1>
+        <p class="lead">Bạn có thể tham gia các khóa học và làm bài tập tại đây.</p>
         <div class="d-flex justify-content-center flex-wrap">
             <a href="/quiz/list-page" class="btn btn-success btn-lg mt-3">
                 <i class="fas fa-question-circle"></i> Làm Quiz
@@ -818,12 +818,6 @@ body:not(.theme-light):not(.theme-dark) .custom-welcome-banner .btn i {
             </a>
             <a href="{{ url_for('programming_exercise.student_exercises') }}" class="btn btn-info btn-lg mt-3">
                 <i class="fas fa-code"></i> Bài tập lập trình
-            </a>
-            <a href="{{ url_for('code_practice.practice_code_page') }}" class="btn btn-info btn-lg mt-3">
-                <i class="fas fa-code"></i> Coding
-            </a>
-            <a href="{{ url_for('document.view_documents') }}" class="btn btn-info btn-lg mt-3">
-                <i class="fas fa-code"></i> Tài liệu
             </a>
         </div>
     </div>
