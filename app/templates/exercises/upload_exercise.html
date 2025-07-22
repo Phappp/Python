@@ -1,39 +1,100 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    .upload-ex-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(80, 120, 220, 0.13), 0 2px 8px rgba(0, 0, 0, 0.08);
+        /* border: 2.5px solid; */
+        border-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) 1;
+        margin-top: 32px;
+        padding: 32px 24px 24px 24px;
+        transition: box-shadow 0.2s;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4facfe;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.97);
+        border: 2px solid #e3f2fd;
+        font-size: 1.1rem;
+        padding: 12px 16px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 2px #b3e5fc;
+        background: #fff;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: #fff !important;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        padding: 14px 0;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.13);
+        transition: all 0.2s;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: #fff !important;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(80, 120, 220, 0.13);
+    }
+</style>
 <div class="container mt-4">
     <a href="{{ url_for('exercise.manage_exercises', course_id=request.view_args.course_id) }}"
-        class="btn btn-link mb-2"><i class="fas fa-arrow-left"></i> Quay lại</a>
-    <h2>Thêm bài tập</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">Tiêu đề bài tập:</label>
-            <input class="form-control" type="text" id="title" name="title" required>
-        </div>
-        <div class="mb-3">
-            <label for="chapter_id" class="form-label">Chọn chương:</label>
-            <select class="form-control" id="chapter_id" name="chapter_id" required>
-                <option value="">-- Chọn chương --</option>
-                {% for chapter in chapters %}
-                <option value="{{ chapter.chapter_id }}">{{ chapter.chapter_title }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="mb-3 row">
-            <div class="col-md-6">
-                <label for="due_date" class="form-label">Hạn nộp (ngày):</label>
-                <input class="form-control" type="date" id="due_date" name="due_date" required placeholder="dd/MM/yyyy">
+        class="btn btn-link mb-2" style="border-radius: 14px;"><i class="fas fa-arrow-left"></i> Quay lại</a>
+    <div class="upload-ex-card">
+        <h2 class="mb-4" style="color:#4facfe;font-weight:700;">Thêm bài tập</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Tiêu đề bài tập:</label>
+                <input class="form-control" type="text" id="title" name="title" required>
             </div>
-            <div class="col-md-6">
-                <label for="due_time" class="form-label">Hạn nộp (giờ):</label>
-                <input class="form-control" type="time" id="due_time" name="due_time" required>
+            <div class="mb-3">
+                <label for="chapter_id" class="form-label">Chọn chương:</label>
+                <select class="form-control" id="chapter_id" name="chapter_id" required>
+                    <option value="">-- Chọn chương --</option>
+                    {% for chapter in chapters %}
+                    <option value="{{ chapter.chapter_id }}">{{ chapter.chapter_title }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
-        <div class="mb-3">
-            <label for="file" class="form-label">Chọn file bài tập (PDF, TXT, hình ảnh, Word):</label>
-            <input class="form-control" type="file" id="file" name="file" accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx"
-                required>
-        </div>
-        <button type="submit" class="btn btn-primary">Tải lên</button>
-    </form>
+            <div class="mb-3 row">
+                <div class="col-md-6">
+                    <label for="due_date" class="form-label">Hạn nộp (ngày):</label>
+                    <input class="form-control" type="date" id="due_date" name="due_date" required
+                        placeholder="dd/MM/yyyy">
+                </div>
+                <div class="col-md-6">
+                    <label for="due_time" class="form-label">Hạn nộp (giờ):</label>
+                    <input class="form-control" type="time" id="due_time" name="due_time" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="file" class="form-label">Chọn file bài tập (PDF, TXT, hình ảnh, Word):</label>
+                <input class="form-control" type="file" id="file" name="file"
+                    accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx" required>
+            </div>
+            <button type="submit" class="btn btn-gradient">Tải lên</button>
+        </form>
+    </div>
 </div>
 {% endblock %}
